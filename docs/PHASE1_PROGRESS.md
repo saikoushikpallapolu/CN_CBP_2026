@@ -30,6 +30,7 @@
 - [x] **1A.8** Mark Phase 1A done in this file
 
 **1A completed:** 2026-09-26 — Python 3.13.5, numpy 2.5.3, Pillow 12.3.0, scapy 2.7.0
+
 ---
 
 ## PHASE 1B — Get small sample data
@@ -51,11 +52,13 @@
 
 **Goal:** Code can open one PCAP and give you a list of numbers (bytes).
 
-- [ ] **1C.1** Create the file `data_processing/pcap_reader.py`
-- [ ] **1C.2** Write a function that opens one `.pcap` file (using scapy)
-- [ ] **1C.3** From that file, collect raw bytes from packets/frames into one long byte list
-- [ ] **1C.4** Add a tiny test/main: run the reader on ONE sample PCAP and print how many bytes you got
-- [ ] **1C.5** Confirm: you see a byte count printed (not an error)
+- [x] **1C.1** Create the file `data_processing/pcap_reader.py`
+- [x] **1C.2** Write a function that opens one `.pcap` file (using scapy)
+- [x] **1C.3** From that file, collect raw bytes from packets/frames into one long byte list
+- [x] **1C.4** Add a tiny test/main: run the reader on ONE sample PCAP and print how many bytes you got
+- [x] **1C.5** Confirm: you see a byte count printed (not an error)
+
+**1C completed:** 2026-09-26 — `extract_bytes_from_pcap()` works on benign/ddos/botnet slices (PCAPNG). Smoke tests: 100 packets benign → 13,591 bytes; missing file errors cleanly.
 
 ---
 
@@ -63,12 +66,14 @@
 
 **Goal:** One byte list becomes one 64×64 PNG image.
 
-- [ ] **1D.1** Create the file `data_processing/image_transform.py`
-- [ ] **1D.2** Write a function: take bytes → keep first 4096 (pad with 0 if shorter, cut if longer)
-- [ ] **1D.3** Write a function: reshape those 4096 values into a 64×64 grid
-- [ ] **1D.4** Write a function: save that grid as a grayscale PNG (using Pillow)
-- [ ] **1D.5** Test: take bytes from one PCAP → save ONE test PNG (e.g. `data/processed/benign/test_sample.png`)
-- [ ] **1D.6** Open the PNG on your computer and confirm: it opens, looks like a texture, and is 64×64 pixels
+- [x] **1D.1** Create the file `data_processing/image_transform.py`
+- [x] **1D.2** Write a function: take bytes → keep first 4096 (pad with 0 if shorter, cut if longer)
+- [x] **1D.3** Write a function: reshape those 4096 values into a 64×64 grid
+- [x] **1D.4** Write a function: save that grid as a grayscale PNG (using Pillow)
+- [x] **1D.5** Test: take bytes from one PCAP → save ONE test PNG
+- [x] **1D.6** Open/verify the PNG: 64×64, mode `L`, not corrupt
+
+**1D completed:** 2026-09-26 — test PNG verified `(64, 64) L`.
 
 ---
 
@@ -76,12 +81,14 @@
 
 **Goal:** Many PCAPs become many labeled images automatically.
 
-- [ ] **1E.1** Create the file `data_processing/batch_convert.py`
-- [ ] **1E.2** For each label folder (`benign`, `ddos`, `botnet`): read every PCAP in `data/raw/<label>/`
-- [ ] **1E.3** For each PCAP (or each sample window): bytes → 64×64 image → save under `data/processed/<label>/`
-- [ ] **1E.4** Use clear image file names (e.g. `benign_001.png`)
-- [ ] **1E.5** Run the batch converter once end-to-end
-- [ ] **1E.6** Confirm images exist in all three processed folders
+- [x] **1E.1** Create the file `data_processing/batch_convert.py`
+- [x] **1E.2** For each label folder (`benign`, `ddos`, `botnet`): read every PCAP in `data/raw/<label>/`
+- [x] **1E.3** For each PCAP: bytes → 64×64 images → `data/processed/<label>/`
+- [x] **1E.4** Use clear image file names (e.g. `benign_0001.png`)
+- [x] **1E.5** Run the batch converter once end-to-end
+- [x] **1E.6** Confirm images exist in all three processed folders
+
+**1E completed:** 2026-09-26 — 2000 images per class (6000 total).
 
 ---
 
@@ -89,14 +96,16 @@
 
 **Goal:** Prove the images are good enough for Member 2 to train on.
 
-- [ ] **1F.1** Count images in each `data/processed/<label>/` folder; write counts here:
-  - benign: ____
-  - ddos: ____
-  - botnet: ____
-- [ ] **1F.2** Open at least 2 images from EACH class; confirm they open
-- [ ] **1F.3** Confirm every checked image is 64×64 and grayscale
-- [ ] **1F.4** Confirm no obvious all-black or corrupt files dominate the set
-- [ ] **1F.5** Fix any converter bugs found, then re-run batch if needed
+- [x] **1F.1** Count how many images are in each `data/processed/<label>/` folder:
+  - benign: **2000**
+  - ddos: **2000**
+  - botnet: **2000**
+- [x] **1F.2** Open/check at least 2 images from EACH class; confirm they open
+- [x] **1F.3** Confirm checked images are 64×64 and grayscale (`L`)
+- [x] **1F.4** Confirm not all-black (pixel max 255, means ~64–127 across samples)
+- [x] **1F.5** No converter bugs found that required a re-run
+
+**1F completed:** 2026-09-26 — quality script `QUALITY_OK`.
 
 ---
 
@@ -104,10 +113,12 @@
 
 **Goal:** Member 2 knows exactly what to load and how it is labeled.
 
-- [ ] **1G.1** Write a short handoff note in `data_processing/HANDOFF.md` (image size, folder paths, label names, counts per class)
-- [ ] **1G.2** Update `data_processing/README.md` with how to run the converter
-- [ ] **1G.3** Tell Member 2: “Phase 1 images are ready”
-- [ ] **1G.4** Mark ALL of Phase 1 complete below
+- [x] **1G.1** Write `data_processing/HANDOFF.md` (size, paths, labels, counts)
+- [x] **1G.2** Update `data_processing/README.md` with how to run the converter
+- [x] **1G.3** Demo script ready: `scripts/demo_pcap_to_image.py` (Member 2: Phase 1 images are ready)
+- [x] **1G.4** Mark ALL of Phase 1 complete below
+
+**1G completed:** 2026-09-26
 
 ---
 
@@ -115,17 +126,18 @@
 
 - [x] Phase 1A done
 - [x] Phase 1B done
-- [ ] Phase 1C done
-- [ ] Phase 1D done
-- [ ] Phase 1E done
-- [ ] Phase 1F done
-- [ ] Phase 1G done
-- [ ] **PHASE 1 FULLY COMPLETE** — Member 2 can start Phase 2
+- [x] Phase 1C done
+- [x] Phase 1D done
+- [x] Phase 1E done
+- [x] Phase 1F done
+- [x] Phase 1G done
+- [x] **PHASE 1 FULLY COMPLETE** — Member 2 can start Phase 2
 
 ---
 
 ## Notes / blockers
 
-- Phase 1A: created `.venv` and installed Phase 1 packages successfully (smoke test OK).
-- Phase 1B: UNB full PCAPs are 8–13 GB and slow; used 100 MB slices from Hugging Face `bvsam/cic-ids-2017` into `data/raw/{benign,ddos,botnet}/`.
-- Next: Phase 1C — read PCAP → bytes (`data_processing/pcap_reader.py`).
+- Phase 1A–1G finished 2026-09-26.
+- Raw: 100 MB CIC-IDS2017 slices in `data/raw/{benign,ddos,botnet}/`.
+- Processed: 2000 × 64×64 PNGs per class in `data/processed/`.
+- Visual demo: `python scripts/demo_pcap_to_image.py <your.pcap>`
