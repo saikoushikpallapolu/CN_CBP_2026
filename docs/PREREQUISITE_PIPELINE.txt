@@ -1,0 +1,250 @@
+================================================================================
+  PREREQUISITE — UNDERSTAND THIS BEFORE CODING (MEMBER 1 FOCUS)
+  PCAP → Byte Stream → Image → CNN
+================================================================================
+
+Read this before writing data_processing code. It explains the backend /
+behind-the-scenes of the whole idea in simple words.
+
+
+--------------------------------------------------------------------------------
+1. WHAT IS A NETWORK PACKET, REALLY?
+--------------------------------------------------------------------------------
+
+When a computer talks on a network, it does not send “one big file.”
+It sends many small chunks.
+
+Each chunk is a PACKET (at the data-link layer often called a FRAME).
+
+A packet is just structured BYTES, like a labeled envelope:
+
+  [ Header bytes ][ Payload bytes ]
+       ↑                  ↑
+    who/where/how      the actual data
+
+Examples of what headers store (as numbers):
+  - source / destination addresses
+  - type of traffic
+  - length, flags, etc.
+
+IMPORTANT:
+  To the computer there is no “text” and no “picture” yet — only a list of
+  numbers from 0 to 255. Those numbers are BYTES.
+
+
+--------------------------------------------------------------------------------
+2. HOW A PACKET BECOMES A BYTE STREAM
+--------------------------------------------------------------------------------
+
+STEP A — Capture
+  Tools like Wireshark or libraries like Scapy record traffic into a PCAP file.
+  A PCAP is basically: “here are thousands of packets, in order, as raw bytes.”
+
+STEP B — Read one sample
+  For our project we don’t always use one tiny packet alone. We usually take a
+  SAMPLE, for example:
+    - one FLOW (same conversation: same IPs/ports for a while), or
+    - a WINDOW of consecutive bytes/packets
+
+  Then we flatten that sample into one long list:
+
+    bytes = [45, 0, 0, 60, 28, 46, 64, 0, 128, 6, ...]
+
+  That list is the BYTE STREAM.
+
+STEP C — Make every sample the same length
+  CNNs need fixed-size inputs. We chose 64 × 64 = 4096 pixels, so we need
+  exactly 4096 bytes:
+
+    Situation                    What we do
+    ---------------------------  --------------------------------------------
+    Stream longer than 4096      Keep the FIRST 4096, drop the rest (TRUNCATE)
+    Stream shorter than 4096     Add zeros at the end (PAD)
+
+  So every sample becomes a vector of length 4096.
+  That is Member 1’s first real job.
+
+
+--------------------------------------------------------------------------------
+3. HOW THE BYTE STREAM BECOMES AN IMAGE
+--------------------------------------------------------------------------------
+
+A grayscale image is also just a grid of numbers 0–255:
+  - 0   = black
+  - 255 = white
+  - middle values = gray
+
+So we REUSE EACH BYTE AS A PIXEL BRIGHTNESS.
+
+RESHAPE (the key trick)
+  Take the length-4096 list and fold it into a grid ROW BY ROW (row-major):
+
+    byte[0]    → pixel at row 0, col 0
+    byte[1]    → pixel at row 0, col 1
+    ...
+    byte[63]   → pixel at row 0, col 63
+    byte[64]   → pixel at row 1, col 0
+    ...
+    byte[4095] → pixel at row 63, col 63
+
+  Result: one 64×64 grayscale image.
+
+TINY TOY EXAMPLE (only 4×4, same idea):
+
+  Bytes:  0, 0, 255, 255,  10, 10, 200, 200,  ...
+
+  Image:
+     0     0   255   255
+    10    10   200   200
+    ...
+
+  When you open that as a PNG, you see stripes / blocks / noise textures.
+  Different traffic types often create DIFFERENT VISUAL TEXTURES.
+
+WHY THIS CONNECTS TO UNIT II (DATA LINK FRAMING)
+  Framing = “data arranged in a structure on the wire.”
+  We take that byte structure and LAY IT OUT IN 2D SPACE so a vision model
+  can look at it. We are not drawing a random picture — we are VISUALIZING
+  the frame/byte layout.
+
+
+--------------------------------------------------------------------------------
+4. WHY BENIGN vs DDoS vs BOTNET CAN LOOK DIFFERENT
+--------------------------------------------------------------------------------
+
+This is intuition, not magic:
+
+  Traffic     Typical byte-pattern “vibe”
+  ----------  --------------------------------------------------------------
+  Benign      Mixed sizes, varied content → more irregular textures
+  DDoS        Many similar flood packets → repeating / dense patterns
+  Botnet      Command-and-control / scan-like patterns → another repetition
+
+The CNN does NOT understand “DDoS” as a word. It learns:
+  “Images with THIS texture usually got label X.”
+
+
+--------------------------------------------------------------------------------
+5. HOW THE CNN ANALYSES THE IMAGE (BEHIND THE SCENES)
+--------------------------------------------------------------------------------
+
+Think of the CNN as a stack of pattern detectors.
+
+INPUT
+  One image: shape (1, 64, 64)
+  (1 channel = grayscale; color would be 3 channels)
+
+CONVOLUTION LAYERS (the “looking” part)
+  A FILTER (small window, e.g. 3×3) slides across the image and computes:
+    “How much does this local patch match my pattern?”
+
+  Early filters learn simple things: edges, stripes, dots, repeats.
+  Deeper filters combine those into richer textures.
+
+  So the network turns the image into FEATURE MAPS =
+  “where interesting patterns appeared.”
+
+POOLING
+  Shrinks the feature maps (keeps strong signals, reduces size).
+  Makes the model a bit robust to exact position
+  (pattern a little left/right still counts).
+
+FULLY CONNECTED LAYERS + OUTPUT
+  After enough conv/pool, the 2D features are flattened into a vector and
+  passed to a small neural net that outputs 3 scores, for example:
+
+    benign:  0.05
+    ddos:    0.90
+    botnet:  0.05
+
+  Usually we take the highest → prediction “ddos”.
+
+TRAINING (how it “learns”)
+  1. Show image + true label
+  2. Model guesses
+  3. Measure error (LOSS)
+  4. Adjust filter weights slightly to reduce error next time
+
+  After many examples, filters become tuned to textures that separate
+  the three classes.
+
+
+--------------------------------------------------------------------------------
+6. FULL PIPELINE IN ONE GLANCE
+--------------------------------------------------------------------------------
+
+  PCAP file
+     ↓  (read packets / frames)
+  Raw bytes of a sample
+     ↓  (pad / truncate to 4096)
+  Fixed byte stream
+     ↓  (each byte = pixel, reshape 64×64)
+  Grayscale traffic image
+     ↓  (CNN: conv → pool → … → scores)
+  Label: benign | ddos | botnet
+
+
+MEMBER RESPONSIBILITY REMINDER
+
+  Member 1 (data_processing/)
+    Everything ABOVE the CNN:
+    PCAP → bytes → fixed-length stream → image files in
+    data/processed/<label>/
+
+  Member 2 (ml/)
+    Train the CNN on those images.
+
+  Member 3 (classification/)
+    Load the trained model and show predictions.
+
+
+--------------------------------------------------------------------------------
+7. TERMS QUICK RECAP
+--------------------------------------------------------------------------------
+
+  PCAP           Recording of captured network packets as bytes
+  Packet/Frame   One chunk of network data (headers + payload)
+  Byte           A number 0–255
+  Byte stream    A long list of bytes from one sample
+  Pad            Add zeros to reach fixed length
+  Truncate       Cut extra bytes to reach fixed length
+  Grayscale      Black-and-white image; one brightness per pixel
+  Reshape        Fold a 1D list into a 2D grid (e.g. 4096 → 64×64)
+  CNN            Neural net good at finding patterns in images
+  Convolution    Sliding filter that detects local patterns
+  Pooling        Shrinks feature maps, keeps strong signals
+  Training       Learning from labeled examples by reducing error
+  Inference      Using a trained model to predict a new image’s class
+  Benign         Normal / safe traffic
+  DDoS           Flood attack that overwhelms a target
+  Botnet         Group of infected devices controlled by an attacker
+
+
+--------------------------------------------------------------------------------
+8. WHAT YOU SHOULD BE ABLE TO SAY OUT LOUD BEFORE CODING
+--------------------------------------------------------------------------------
+
+  1. A packet is a sequence of bytes (0–255).
+  2. A PCAP is a recording of many packets.
+  3. We build one sample byte stream, force length 4096.
+  4. We reshape to 64×64 so each byte is one pixel.
+  5. The CNN finds local visual patterns and maps them to a class.
+  6. We need labeled folders so training knows the truth.
+
+
+--------------------------------------------------------------------------------
+9. NEXT STEP AFTER THIS FILE
+--------------------------------------------------------------------------------
+
+  - If anything above is unclear, ask in chat before coding.
+  - Then start Member 1 plan: PCAP reader → byte extract → pad/truncate →
+    reshape → save PNG under data/processed/<label>/.
+
+  Related docs:
+    docs/TEAM_GUIDE.txt   — full project guide, roles, build order
+    docs/design.md        — locked numbers (64×64, PyTorch, 90% target, etc.)
+
+
+================================================================================
+  End of prerequisite file
+================================================================================

@@ -36,6 +36,10 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Start here (team)
+
+Read **[docs/TEAM_GUIDE.txt](docs/TEAM_GUIDE.txt)** before coding — problem, architecture, roles, build order, and terms explained simply.
+
 ## Status
 
 Scaffold only — implementation next.

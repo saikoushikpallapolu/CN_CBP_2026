@@ -1,0 +1,423 @@
+================================================================================
+  PCAP-TO-IMAGE MALWARE FINGERPRINTING
+  Team Guide — Read This Before You Start Building
+================================================================================
+
+This file explains:
+  - what problem we are solving
+  - how the system is designed (architecture)
+  - what each member owns
+  - the order we should build in
+  - important terms (explained simply)
+  - decisions we must make before coding heavily
+
+
+--------------------------------------------------------------------------------
+1. WHAT PROBLEM ARE WE SOLVING?
+--------------------------------------------------------------------------------
+
+Today, many firewalls and security tools look for "signatures".
+
+  Signature (simple meaning):
+    A fixed pattern, like a fingerprint of known malware.
+    Example: "if this exact byte pattern appears, block it."
+
+The problem:
+  Attackers keep changing malware slightly so the old signature
+  no longer matches. Rule-based tools then miss the attack.
+
+Our idea:
+  Instead of matching exact rules, we turn network traffic into
+  PICTURES, then teach a computer (a neural network) to LOOK at
+  those pictures and say:
+
+    - Benign  = normal, safe traffic
+    - DDoS    = flood attack (too much traffic on purpose)
+    - Botnet  = machines controlled by an attacker
+
+So we treat network security like a computer-vision problem:
+"Does this traffic IMAGE look like an attack?"
+
+
+--------------------------------------------------------------------------------
+2. WHAT ARE WE BUILDING? (ONE SENTENCE)
+--------------------------------------------------------------------------------
+
+Capture network packets → turn their bytes into grayscale images →
+train a CNN to classify: Benign / DDoS / Botnet.
+
+
+--------------------------------------------------------------------------------
+3. IMPORTANT TERMS (SIMPLE EXPLANATIONS)
+--------------------------------------------------------------------------------
+
+PCAP
+  A file that stores captured network traffic (packets/frames).
+  Think of it as a recording of what went over the network.
+
+Packet / Frame
+  A small chunk of data sent on the network.
+  "Frame" is often used at the Data Link layer (Unit II).
+
+Binary / Bytes
+  Computers store data as numbers 0–255 (bytes).
+  Raw traffic is just a long sequence of these numbers.
+
+Grayscale image
+  A black-and-white picture. Each pixel is one brightness value
+  (0 = black, 255 = white, values in between = gray).
+
+2D array
+  A grid of numbers (rows × columns), like a spreadsheet.
+  We reshape a long list of bytes into a grid, then treat that
+  grid as an image.
+
+CNN (Convolutional Neural Network)
+  A type of AI model that is good at finding patterns in images
+  (edges, textures, shapes). We use it on traffic-images.
+
+TensorFlow / PyTorch
+  Two popular libraries for building and training neural networks.
+  The team should pick ONE and stick to it.
+
+Training
+  Showing the model many labeled examples so it learns.
+  Example: "this image is DDoS", "this one is benign".
+
+Inference / Classification
+  After training: give a new image → model outputs a label
+  (benign / DDoS / botnet).
+
+DDoS
+  Distributed Denial of Service — many sources flood a target so
+  the service becomes slow or unavailable.
+
+Botnet
+  A group of infected devices controlled by an attacker, often
+  used for spam, DDoS, or stealing data.
+
+Benign traffic
+  Normal, legitimate network activity.
+
+Unit II (Data Link framing)
+  Course topic about how data is packaged into frames on the link.
+  In our project: how raw frame bytes become structured 2D images.
+
+Unit V (Network Security)
+  Course topic about protecting networks.
+  In our project: detecting attacks (DDoS / botnet) from traffic.
+
+
+--------------------------------------------------------------------------------
+4. ARCHITECTURE (HOW THE PIECES FIT)
+--------------------------------------------------------------------------------
+
+Think of a pipeline — each stage feeds the next:
+
+  [1] DATA INPUT
+        Raw PCAP files
+        (folder: data/raw/)
+              |
+              v
+  [2] DATA PROCESSING  (Unit II)
+        Read bytes from packets/frames
+        Convert byte sequence → fixed-size 2D grayscale image
+        Save labeled images
+        (code: data_processing/   output: data/processed/)
+              |
+              v
+  [3] MACHINE LEARNING  (Unit V — detection)
+        Load images + labels
+        Train a CNN
+        Save the trained model (weights)
+        (code: ml/   output: ml/checkpoints/)
+              |
+              v
+  [4] CLASSIFICATION / OUTPUT
+        Load trained model
+        Predict on new images
+        Report: Benign | DDoS | Botnet
+        (code: classification/)
+
+Optional helpers:
+  notebooks/  — try ideas, plots, experiments (not final product code)
+  scripts/    — short commands that run the full pipeline
+  docs/       — write-ups, syllabus mapping, design decisions
+
+
+Visual flow (same as the project poster):
+
+  PCAP binary stream
+        → blue data blocks
+        → 2D grayscale "traffic image"
+        → CNN (convolution + pooling + fully connected layers)
+        → screen output: Benign (OK) or Malicious (DDoS / Botnet)
+
+
+--------------------------------------------------------------------------------
+5. REPO FOLDERS AND WHAT EACH IS FOR
+--------------------------------------------------------------------------------
+
+  data/
+    Shared files. Large PCAPs and images are NOT uploaded to git.
+    Put captures in data/raw/, generated images in data/processed/.
+
+  data_processing/
+    Code that turns PCAP/bytes into images.
+
+  ml/
+    CNN model, training, evaluation.
+
+  classification/
+    Use the trained model to label new traffic and show results.
+
+  docs/
+    Project explanation, syllabus mapping, design checklist.
+
+  notebooks/
+    Experiments only.
+
+  scripts/
+    Glue scripts to run steps end-to-end later.
+
+  requirements.txt
+    Python packages the project needs.
+
+  README.md
+    Short overview for anyone opening the repo.
+
+
+--------------------------------------------------------------------------------
+6. MEMBER ROLES (WHO DOES WHAT)
+--------------------------------------------------------------------------------
+
+We organize by MODULE, not by "my personal folder".
+Each person is the MAIN OWNER of one area, but everyone can help
+with integration. Fill names in the blanks.
+
+----------------------------------------------------------------------------
+ROLE A — Data Processing Lead
+Folder: data_processing/  (+ help organize data/)
+----------------------------------------------------------------------------
+  Name: Sai Koushik Reddy Pallapolu
+
+  You own:
+    - Finding / preparing PCAP samples (benign, DDoS, botnet)
+    - Reading PCAP files in Python
+    - Converting bytes → grayscale images of a FIXED size
+    - Saving images into data/processed/ with clear labels
+      (example folders: benign/, ddos/, botnet/)
+
+  You must deliver:
+    - A working convert script (PCAP folder → image folder)
+    - A short note: image size, how bytes map to pixels, labels used
+
+  You hand off TO: Role B (ML Lead)
+
+
+----------------------------------------------------------------------------
+ROLE B — ML / CNN Lead
+Folder: ml/
+----------------------------------------------------------------------------
+  Name: Ritheesh Chandra 
+
+  You own:
+    - Choosing PyTorch OR TensorFlow (team agrees once)
+    - Building the CNN
+    - Training and evaluating on data/processed/
+    - Saving the best model into ml/checkpoints/
+
+  You must deliver:
+    - train.py / evaluate.py (or equivalent)
+    - Metrics: accuracy (and ideally F1 / confusion matrix)
+    - A saved model file the next person can load
+
+  You depend ON: Role A’s images
+  You hand off TO: Role C (Classification Lead)
+
+
+----------------------------------------------------------------------------
+ROLE C — Classification / Demo Lead
+Folder: classification/  (+ scripts/ for demo)
+----------------------------------------------------------------------------
+  Name: Snehansh Reddy
+
+  You own:
+    - Loading the saved model
+    - Running predictions on new images (or a small demo set)
+    - Clear output: "Benign" vs "DDoS" vs "Botnet"
+    - A simple demo path for presentation (CLI is enough at first)
+
+  You must deliver:
+    - infer / report script that a judge or teacher can run
+    - Example outputs for each class
+
+  You depend ON: Role B’s trained model
+
+
+----------------------------------------------------------------------------
+ROLE D — Docs / Integration (can be shared or a 4th member)
+Folder: docs/  (+ README, scripts wiring)
+----------------------------------------------------------------------------
+  Name: Nidhish Nutakki
+
+  You own:
+    - Keeping docs accurate (abstract, syllabus mapping, design)
+    - Helping merge pieces so the pipeline runs start-to-finish
+    - Presentation materials / report sections if needed
+
+  If the team is only 3 people:
+    Split Role D among everyone (each updates docs for their module).
+
+
+HOW TO WORK TOGETHER (IMPORTANT)
+  - Use feature branches, then merge to main with a PR/review.
+  - Do NOT create folders named after people.
+  - Talk when interfaces change (image size, label names, model path).
+  - Small weekly goal > big silent coding.
+
+
+--------------------------------------------------------------------------------
+7. BUILD FLOW (ORDER OF WORK — FOLLOW THIS)
+--------------------------------------------------------------------------------
+
+Do NOT all start the CNN on day one. The pipeline has dependencies.
+
+PHASE 0 — Align (1 short meeting)
+  [ ] Assign Role A / B / C (/ D) names above
+  [ ] Pick framework: PyTorch OR TensorFlow (one only)
+  [ ] Agree image size (example: 64x64) — write it in docs/design.md
+  [ ] Agree labels: 3 classes (benign, ddos, botnet) unless you
+      decide binary later
+  [ ] Decide where sample PCAPs will live (local drive / shared link)
+  [ ] Everyone clones the repo and creates a Python virtual environment
+
+PHASE 1 — Data Processing (Role A starts; others can help)
+  [ ] Collect small sample PCAPs for each class (start SMALL)
+  [ ] Write: read PCAP → extract bytes
+  [ ] Write: bytes → one grayscale image (fixed width/height)
+  [ ] Batch-convert and save under data/processed/<label>/
+  [ ] Spot-check: open a few images; confirm they are not empty/corrupt
+  [ ] Tell Role B: path, image size, label folder names
+
+PHASE 2 — Machine Learning (Role B; needs Phase 1 outputs)
+  [ ] Dataset loader reads images + labels
+  [ ] Split train / validation / test
+  [ ] Define a simple CNN first (do not overcomplicate)
+  [ ] Train, plot or print loss/accuracy
+  [ ] Evaluate; save best checkpoint
+  [ ] Tell Role C: model path + how to load + class order
+
+PHASE 3 — Classification & Demo (Role C)
+  [ ] Load checkpoint
+  [ ] Predict on hold-out or new images
+  [ ] Print a clear report
+  [ ] Wire a simple end-to-end script in scripts/ if possible
+        (PCAP → image → predict) for the final demo
+
+PHASE 4 — Polish (everyone)
+  [ ] Fix bugs at module boundaries
+  [ ] Update docs/design.md with final decisions
+  [ ] Prepare short demo + explanation linked to Unit II & Unit V
+  [ ] Clean README with run steps
+
+
+--------------------------------------------------------------------------------
+8. DECISIONS YOU MUST LOCK BEFORE HEAVY CODING
+--------------------------------------------------------------------------------
+
+Locked starter choices (also copied into docs/design.md).
+  These are good defaults for learning + a solid demo — change only as a team.
+
+  1. Image size: 64 x 64
+       Why: 4096 bytes fits one clear “traffic picture”; big enough for CNN
+       patterns, small enough to train on a normal laptop.
+
+  2. Byte → pixel method:
+       Take the first 4096 bytes of each sample (flow/window), pad with 0
+       if shorter, truncate if longer; each byte (0–255) = one pixel;
+       reshape row-major into a 64×64 grayscale image; save as PNG.
+       Why: Simple, matches Unit II “bytes laid out in structure,” and is
+       the classic malware/traffic visualization approach.
+
+  3. Classes: benign / ddos / botnet  (3-class, not binary)
+       Why: Matches the project poster/abstract exactly and teaches multi-
+       class CNN output (not just “bad vs good”).
+
+  4. Framework: PyTorch
+       Why: Clear tensors and training loop — easier to learn “what is
+       happening” step by step than hiding everything in high-level APIs.
+
+  5. Dataset source: CIC-IDS2017 (start with a SMALL labeled subset:
+       Benign + one DDoS scenario + Botnet; full PCAPs from CIC if available,
+       or flow/byte exports if PCAPs are too huge at first)
+       Why: Public, well-known, has the three labels we need; start small
+       so the pipeline works before you download everything.
+
+  6. Success target: test accuracy ≥ 90%, plus per-class F1 score
+       Why: Submission/approval bar — 90%+ shows a demo-ready model, not a
+       toy; F1 stops one class from looking “fine” while another is ignored.
+
+
+--------------------------------------------------------------------------------
+9. WHAT "DONE" LOOKS LIKE FOR THE PROJECT
+--------------------------------------------------------------------------------
+
+Minimum viable project (good for submission/demo):
+
+  1. PCAPs (or sample byte dumps) for at least 2–3 classes
+  2. Converter that produces grayscale traffic images
+  3. Trained CNN that clearly beats random guessing
+  4. A demo that shows a few images classified correctly
+  5. Docs that map the work to Unit II and Unit V
+
+Nice to have (later):
+
+  - Confusion matrix and F1 scores
+  - One-command pipeline script
+  - Comparison: signature/rules vs our image+CNN idea (discussion)
+
+
+--------------------------------------------------------------------------------
+10. PRACTICAL RULES (AVOID PAIN)
+--------------------------------------------------------------------------------
+
+  - Do not commit huge PCAP files or model weights to git.
+    Keep them local; document the download/source link in data/README.md
+
+  - Keep image size and label names IDENTICAL across all modules.
+    If Role A uses 64x64 and folders named "ddos", Role B must match.
+
+  - Start with a SMALL dataset to prove the pipeline works,
+    then add more data to improve accuracy.
+
+  - Prefer simple CNN first. Fancy architectures can wait.
+
+  - Notebooks are for exploration. Final code belongs in the module
+    folders so anyone can run it without opening Jupyter.
+
+
+--------------------------------------------------------------------------------
+11. QUICK MAP: SYLLABUS ↔ CODE
+--------------------------------------------------------------------------------
+
+  Unit II — Data Link framing
+    → data_processing/: frames/bytes arranged into a structured 2D image
+
+  Unit V — Network Security
+    → ml/ + classification/: detect DDoS / Botnet vs benign
+
+
+--------------------------------------------------------------------------------
+12. NEXT STEP AFTER READING THIS
+--------------------------------------------------------------------------------
+
+  1. Fill member names under Section 6.
+  2. Hold Phase 0 meeting (Section 7) and fill docs/design.md.
+  3. Role A starts Phase 1 with a tiny sample.
+  4. Sync as a team when the first images exist — then ML begins.
+
+
+================================================================================
+  End of guide — keep this file updated if architecture or roles change.
+================================================================================
