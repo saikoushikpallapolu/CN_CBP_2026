@@ -16,19 +16,14 @@ env/
 .DS_Store
 Thumbs.db
 
-# Large / local artifacts (keep label folders via .gitkeep)
+# Large raw captures only (each CIC slice is ~100 MB; GitHub rejects >100 MB files).
+# Regenerated images under data/processed/ ARE tracked so the ML team can clone & train.
 data/raw/**
 !data/raw/
 !data/raw/**/
 !data/raw/**/.gitkeep
 !data/raw/README.md
 !data/raw/**/README.md
-data/processed/**
-!data/processed/
-!data/processed/**/
-!data/processed/**/.gitkeep
-!data/processed/README.md
-!data/processed/**/README.md
 
 # Models & training outputs
 ml/checkpoints/**
