@@ -16,13 +16,19 @@ env/
 .DS_Store
 Thumbs.db
 
-# Large / local artifacts (keep folder structure via .gitkeep)
+# Large / local artifacts (keep label folders via .gitkeep)
 data/raw/**
-data/processed/**
-!data/raw/.gitkeep
-!data/processed/.gitkeep
+!data/raw/
+!data/raw/**/
+!data/raw/**/.gitkeep
 !data/raw/README.md
+!data/raw/**/README.md
+data/processed/**
+!data/processed/
+!data/processed/**/
+!data/processed/**/.gitkeep
 !data/processed/README.md
+!data/processed/**/README.md
 
 # Models & training outputs
 ml/checkpoints/**

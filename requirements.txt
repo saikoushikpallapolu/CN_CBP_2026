@@ -1,13 +1,12 @@
-# Core (pin versions when the team agrees on stack)
+# Phase 1 — Data Processing (Member 1)
 numpy
 Pillow
 scapy
 
-# Choose one primary DL framework for the project
+# Phase 2 — Machine Learning (Member 2) — install later
 # torch
-# tensorflow
 
-# Notebooks / viz (optional)
+# Optional (notebooks / viz)
 # jupyter
 # matplotlib
 # scikit-learn

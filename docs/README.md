@@ -6,6 +6,7 @@ Project documentation aligned with the abstract and syllabus.
 |-----|---------|
 | `PREREQUISITE_PIPELINE.txt` | **Read first** — how PCAP → bytes → image → CNN works (plain language) |
 | `TEAM_GUIDE.txt` | Problem, architecture, roles, build order |
+| `PHASE1_PROGRESS.md` | **Member 1 checklist** — Phase 1 steps (1A–1G), mark done as you go |
 | `abstract.md` | Problem statement + approach summary |
 | `syllabus_mapping.md` | Unit II / Unit V mapping |
 | `design.md` | Locked design decisions (image size, framework, targets) |
