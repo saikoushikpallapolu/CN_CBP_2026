@@ -1,0 +1,13 @@
+# Core (pin versions when the team agrees on stack)
+numpy
+Pillow
+scapy
+
+# Choose one primary DL framework for the project
+# torch
+# tensorflow
+
+# Notebooks / viz (optional)
+# jupyter
+# matplotlib
+# scikit-learn
