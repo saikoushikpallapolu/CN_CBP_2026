@@ -1,6 +1,6 @@
 # data/
 
-Shared datasets for the pipeline. Large binaries are **not** committed (see root `.gitignore`).
+Shared datasets for the pipeline. Processed images are in git. Raw PCAPs are in git via **Git LFS** (each slice is 100 MB, which GitHub will not store as a normal file).
 
 | Subfolder | Contents |
 |-----------|----------|
@@ -20,7 +20,9 @@ Shared datasets for the pipeline. Large binaries are **not** committed (see root
 
 UNB full day PCAPs are ~8–13 GB each. For Phase 1 we use **100 MB slices** (first bytes of each day file) so the pipeline can start without multi-hour downloads.
 
-## Files currently in `data/raw/` (local only — not in git)
+## Files in `data/raw/` (Git LFS)
+
+After clone, run `git lfs pull` if the `.pcap` files look tiny.
 
 | Label | File | Approx size | CIC day |
 |-------|------|-------------|---------|
