@@ -16,14 +16,14 @@ env/
 .DS_Store
 Thumbs.db
 
-# Large raw captures only (each CIC slice is ~100 MB; GitHub rejects >100 MB files).
-# Regenerated images under data/processed/ ARE tracked so the ML team can clone & train.
+# Raw PCAPs are tracked via Git LFS (see .gitattributes). Folder layout stays categorized.
 data/raw/**
 !data/raw/
 !data/raw/**/
 !data/raw/**/.gitkeep
 !data/raw/README.md
 !data/raw/**/README.md
+!data/raw/**/*.pcap
 
 # Models & training outputs
 ml/checkpoints/**
