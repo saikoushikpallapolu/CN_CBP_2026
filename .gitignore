@@ -38,3 +38,5 @@ ml/runs/**
 .env
 *.pem
 credentials.json
+
+data/processed_*/
