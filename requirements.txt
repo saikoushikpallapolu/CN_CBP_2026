@@ -1,12 +1,15 @@
-# Phase 1 — Data Processing (Member 1)
+# Phase 1 — Data Processing
 numpy
 Pillow
 scapy
 
-# Phase 2 — Machine Learning (Member 2) — install later
-# torch
+# Phase 2 — Machine Learning
+torch
+torchvision
+scikit-learn
 
-# Optional (notebooks / viz)
-# jupyter
-# matplotlib
-# scikit-learn
+# Phase 3 — Backend API & Web Dashboard
+fastapi
+uvicorn
+python-multipart
+
