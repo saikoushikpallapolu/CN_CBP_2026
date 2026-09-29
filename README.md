@@ -36,10 +36,18 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Running the Web Dashboard
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Launch FastAPI web dashboard
+python -m uvicorn api.server:app --reload
+```
+Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser to inspect PCAP traffic captures and view 2D grayscale fingerprint classifications in real time.
+
 ## Start here (team)
 
-Read **[docs/TEAM_GUIDE.txt](docs/TEAM_GUIDE.txt)** before coding — problem, architecture, roles, build order, and terms explained simply.
+Read **[docs/TEAM_GUIDE.txt](docs/TEAM_GUIDE.txt)** and **[notes/PHASE_NOTES.md](notes/PHASE_NOTES.md)** for architecture details and implementation records.
 
-## Status
-
-Scaffold only — implementation next.
