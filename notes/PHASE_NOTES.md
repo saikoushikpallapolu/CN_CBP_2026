@@ -70,4 +70,25 @@ Design and deploy a state-of-the-art SOC web dashboard for live traffic inspecti
 3. **Automated Verification**:
    - Browser subagent tested page load, status indicators, 1-click dataset analysis, probability bar animation, 2D fingerprint image rendering, Shannon entropy telemetry, and matrix view toggles. All features functioned as expected.
 
+---
+
+## Future Phase (Locked): Accuracy Upgrade Roadmap (74% – 94% Target)
+
+### Current Baseline
+- **Overall Accuracy**: 42.11% (DDoS Recall: 93.3%, Botnet Recall: 24.8%, Benign Recall: 11.5%)
+- **Bottleneck**: Arbitrary continuous 4,096-byte chunk slicing from raw PCAPs fragments network headers and leaves >90% of pixels as empty black zero-padding.
+
+### Locked Action Plan for Future Execution
+1. **Packet-Compact Dataset Generation**:
+   - Run `data_processing/packet_compact_convert.py` to extract 2,000 packets/class as 20×20 grayscale images (400 bytes/image).
+   - Preserves complete Ethernet, IP, TCP/UDP headers and early payload starting at pixel (0,0) with zero wasted padding.
+2. **High-Accuracy Model Training**:
+   - Run `ml/train_packet_compact.py` with class weighting and early stopping.
+   - Tested benchmark performance from repository experiments:
+     - Chronological split: **74.00% accuracy** (Macro F1: 0.7418, DDoS F1: 0.9010)
+     - Stratified split: **94.67% accuracy** (Macro F1: 0.9469)
+3. **Inference Pipeline Integration**:
+   - Update `classification/infer.py` to ingest 20×20 packet frames, keeping the 512×512 HD preview for the web dashboard.
+
+
 
