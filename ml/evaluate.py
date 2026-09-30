@@ -1,10 +1,3 @@
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
 import torch
 import torch.nn as nn
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
@@ -53,9 +46,10 @@ class TrafficCNN(nn.Module):
 # Load Cycle 3 model
 model = TrafficCNN().to(device)
 
-import os
-checkpoint_path = "ml/checkpoints/best_model.pth" if os.path.exists("ml/checkpoints/best_model.pth") else "ml/checkpoints/cycle4_model.pth"
-checkpoint = torch.load(checkpoint_path, map_location=device)
+checkpoint = torch.load(
+    "ml/checkpoints/cycle4_model.pth",
+    map_location=device
+)
 
 model.load_state_dict(checkpoint["model_state_dict"])
 model.eval()

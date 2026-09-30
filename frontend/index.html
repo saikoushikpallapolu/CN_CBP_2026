@@ -45,6 +45,10 @@
           <span class="status-label">Compute:</span>
           <span class="status-value" id="computeDeviceVal">CPU</span>
         </div>
+        <div class="status-item" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="demoModeToggle" style="width: 16px; height: 16px;">
+          <span class="status-label" style="color: #f59e0b; font-weight: bold;">DEMO MODE</span>
+        </div>
       </div>
     </div>
   </header>
@@ -177,13 +181,20 @@
                 <div class="verdict-tags">
                   <span class="verdict-tag" id="riskBadge">RISK: UNKNOWN</span>
                   <span class="verdict-source" id="sourceMeta">File: capture.pcap</span>
+                  <span class="verdict-tag" id="modeBadge" style="margin-left:8px; border:1px solid #666;">Mode: REAL MODEL</span>
                 </div>
               </div>
             </div>
 
-            <div class="confidence-dial">
-              <div class="dial-num" id="confidenceNum">0.0%</div>
-              <span class="dial-label">Model Confidence</span>
+            <div style="display:flex; gap: 20px;">
+              <div class="confidence-dial">
+                <div class="dial-num" id="confidenceNum">0.0%</div>
+                <span class="dial-label">Model Confidence</span>
+              </div>
+              <div class="confidence-dial">
+                <div class="dial-num" id="accuracyNum">74.00%</div>
+                <span class="dial-label" id="accuracyLabel">Measured Accuracy</span>
+              </div>
             </div>
           </div>
 
