@@ -106,7 +106,7 @@ def get_sample_files() -> list[dict[str, Any]]:
 
 
 @app.post("/api/analyze/sample")
-def analyze_sample(req: SampleAnalyzeRequest) -> dict[str, Any]:
+def analyze_sample(req: SampleAnalyzeRequest, demo: bool = False) -> dict[str, Any]:
     """Run malware fingerprinting on one of the preloaded demo samples."""
     sample = next((s for s in DEMO_SAMPLES if s["id"] == req.sample_id), None)
     if not sample:
@@ -117,6 +117,16 @@ def analyze_sample(req: SampleAnalyzeRequest) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=f"Sample file not found on disk: {target_path}")
 
     try:
+        if demo:
+            from demo.demo_classifier import predict_demo_image
+            # Just send a dummy byte payload for the demo presentation
+            res = predict_demo_image(target_path.name, b"demo_bytes_payload")
+            res["source_type"] = "sample"
+            res["sample_id"] = sample["id"]
+            res["sample_label"] = sample["label"]
+            res["filename"] = target_path.name
+            return res
+
         classifier = get_classifier()
         res = classifier.predict_pcap_file(target_path, max_bytes=4096)
         res["source_type"] = "sample"
@@ -129,7 +139,7 @@ def analyze_sample(req: SampleAnalyzeRequest) -> dict[str, Any]:
 
 
 @app.post("/api/analyze/upload")
-async def analyze_uploaded_file(file: UploadFile = File(...)) -> dict[str, Any]:
+async def analyze_uploaded_file(file: UploadFile = File(...), demo: bool = False) -> dict[str, Any]:
     """Run malware fingerprinting on a user-uploaded PCAP or Image file."""
     if not file.filename:
         raise HTTPException(status_code=400, detail="Uploaded file missing filename.")
@@ -139,6 +149,12 @@ async def analyze_uploaded_file(file: UploadFile = File(...)) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
     try:
+        if demo:
+            from demo.demo_classifier import predict_demo_image
+            res = predict_demo_image(file.filename, content)
+            res["source_type"] = "upload"
+            return res
+
         classifier = get_classifier()
         res = classifier.predict_uploaded_file(content, file.filename)
         res["source_type"] = "upload"

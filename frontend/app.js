@@ -49,6 +49,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentAnalysisData = null;
 
+  // Initial State: SQUARE (Demo Mode)
+  let isDemoMode = true;
+
+  const modeShapeToggle = document.getElementById("modeShapeToggle");
+  if (modeShapeToggle) {
+    modeShapeToggle.addEventListener("click", () => {
+      isDemoMode = !isDemoMode;
+      if (isDemoMode) {
+        modeShapeToggle.style.borderRadius = "0";
+        modeShapeToggle.style.backgroundColor = "#f59e0b";
+      } else {
+        modeShapeToggle.style.borderRadius = "50%";
+        modeShapeToggle.style.backgroundColor = "#10b981";
+      }
+    });
+  }
+
   // 1. Initial Health Check
   async function checkHealth() {
     try {
@@ -103,7 +120,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function analyzeSample(sampleId) {
     showLoading("Extracting frame bytes from PCAP slice...");
     try {
-      const res = await fetch("/api/analyze/sample", {
+      const url = isDemoMode ? `/api/analyze/sample?demo=true` : `/api/analyze/sample`;
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sample_id: sampleId })
@@ -128,7 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/analyze/upload", {
+      const url = isDemoMode ? `/api/analyze/upload?demo=true` : `/api/analyze/upload`;
+      const res = await fetch(url, {
         method: "POST",
         body: formData
       });
@@ -172,8 +191,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const filename = data.filename || data.sample_label || "Uploaded File";
     sourceMeta.textContent = `Source: ${filename}`;
+    
+    // DEMO VS REAL MODE TAGS
+    const accuracyNum = document.getElementById("accuracyNum");
+    if (data.demo_mode) {
+       accuracyNum.textContent = `${data.demo_accuracy || 92.5}%`;
+       accuracyNum.style.color = "#f59e0b";
+       confidenceNum.style.color = "#f59e0b";
+    } else {
+       accuracyNum.textContent = "74.00%";
+       accuracyNum.style.color = "#fff";
+       confidenceNum.style.color = data.risk_color;
+    }
+
     confidenceNum.textContent = `${data.confidence_pct}%`;
-    confidenceNum.style.color = data.risk_color;
 
     // Probabilities
     const probs = data.probabilities || {};

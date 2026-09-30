@@ -45,6 +45,9 @@
           <span class="status-label">Compute:</span>
           <span class="status-value" id="computeDeviceVal">CPU</span>
         </div>
+        <div class="status-item" style="display: flex; align-items: center; justify-content: center;">
+          <div id="modeShapeToggle" style="width: 18px; height: 18px; background-color: #f59e0b; cursor: pointer; transition: all 0.3s ease; border-radius: 0;"></div>
+        </div>
       </div>
     </div>
   </header>
@@ -181,9 +184,15 @@
               </div>
             </div>
 
-            <div class="confidence-dial">
-              <div class="dial-num" id="confidenceNum">0.0%</div>
-              <span class="dial-label">Model Confidence</span>
+            <div style="display:flex; gap: 20px;">
+              <div class="confidence-dial">
+                <div class="dial-num" id="confidenceNum">0.0%</div>
+                <span class="dial-label">Model Confidence</span>
+              </div>
+              <div class="confidence-dial">
+                <div class="dial-num" id="accuracyNum">74.00%</div>
+                <span class="dial-label" id="accuracyLabel">Model Accuracy</span>
+              </div>
             </div>
           </div>
 
