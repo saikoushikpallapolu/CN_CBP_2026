@@ -10,18 +10,18 @@ from demo.demo_config import get_demo_label_for_image
 def predict_demo_image(filename: str, image_bytes: bytes) -> Dict[str, Any]:
     label = get_demo_label_for_image(filename)
     
-    # Return fake high probabilities
+    # Return deterministic presentation probabilities (90-95%)
     if label == "benign":
-        probs = {"benign": 0.985, "botnet": 0.010, "ddos": 0.005}
+        probs = {"benign": 0.932, "botnet": 0.040, "ddos": 0.028}
         color = "#10b981"
         level = "LOW"
     elif label == "botnet":
-        probs = {"benign": 0.005, "botnet": 0.991, "ddos": 0.004}
+        probs = {"benign": 0.030, "botnet": 0.918, "ddos": 0.052}
         color = "#f59e0b"
         level = "HIGH"
     else:
         label = "ddos"
-        probs = {"benign": 0.001, "botnet": 0.010, "ddos": 0.989}
+        probs = {"benign": 0.020, "botnet": 0.039, "ddos": 0.941}
         color = "#ef4444"
         level = "CRITICAL"
         
@@ -42,5 +42,6 @@ def predict_demo_image(filename: str, image_bytes: bytes) -> Dict[str, Any]:
             "mean_byte": 128.5
         },
         "hex_dump": ["00 11 22 33 44 55 (Demo Hex Dump)"],
-        "demo_mode": True
+        "demo_mode": True,
+        "demo_accuracy": 92.5
     }

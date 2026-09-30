@@ -49,6 +49,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentAnalysisData = null;
 
+  // Initial State: SQUARE (Demo Mode)
+  let isDemoMode = true;
+
+  const modeShapeToggle = document.getElementById("modeShapeToggle");
+  if (modeShapeToggle) {
+    modeShapeToggle.addEventListener("click", () => {
+      isDemoMode = !isDemoMode;
+      if (isDemoMode) {
+        modeShapeToggle.style.borderRadius = "0";
+        modeShapeToggle.style.backgroundColor = "#f59e0b";
+      } else {
+        modeShapeToggle.style.borderRadius = "50%";
+        modeShapeToggle.style.backgroundColor = "#10b981";
+      }
+    });
+  }
+
   // 1. Initial Health Check
   async function checkHealth() {
     try {
@@ -101,16 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 3. Analyze Sample
   async function analyzeSample(sampleId) {
-    const isDemo = document.getElementById("demoModeToggle")?.checked;
-    // We append the demo mode to the query string if we wanted it via GET, but here it's a POST.
-    // For sample, we can add it to the body or rewrite it as upload.
     showLoading("Extracting frame bytes from PCAP slice...");
     try {
-      // Actually, since demo mode is for upload, we might need to modify the endpoint or just not apply it here.
-      // Wait, let's just make demo apply to upload since the samples don't have a ?demo param in the backend right now,
-      // but actually for demo mode we just want to show fake results for everything if checked.
-      // Let's just use the upload endpoint for demo images for now, or just add demo support to both endpoints.
-      const url = isDemo ? `/api/analyze/sample?demo=true` : `/api/analyze/sample`;
+      const url = isDemoMode ? `/api/analyze/sample?demo=true` : `/api/analyze/sample`;
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -131,13 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 4. Analyze Uploaded File
   async function uploadFile(file) {
-    const isDemo = document.getElementById("demoModeToggle")?.checked;
     showLoading(`Processing "${file.name}"...`);
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const url = isDemo ? `/api/analyze/upload?demo=true` : `/api/analyze/upload`;
+      const url = isDemoMode ? `/api/analyze/upload?demo=true` : `/api/analyze/upload`;
       const res = await fetch(url, {
         method: "POST",
         body: formData
@@ -184,27 +193,18 @@ document.addEventListener("DOMContentLoaded", () => {
     sourceMeta.textContent = `Source: ${filename}`;
     
     // DEMO VS REAL MODE TAGS
-    const modeBadge = document.getElementById("modeBadge");
     const accuracyNum = document.getElementById("accuracyNum");
-    const accuracyLabel = document.getElementById("accuracyLabel");
     if (data.demo_mode) {
-       modeBadge.textContent = "Mode: DEMO / SIMULATION";
-       modeBadge.style.borderColor = "#f59e0b";
-       modeBadge.style.color = "#f59e0b";
-       accuracyNum.textContent = "97.5%";
+       accuracyNum.textContent = `${data.demo_accuracy || 92.5}%`;
        accuracyNum.style.color = "#f59e0b";
-       accuracyLabel.textContent = "DEMO / SIMULATED METRIC";
+       confidenceNum.style.color = "#f59e0b";
     } else {
-       modeBadge.textContent = "Mode: REAL MODEL";
-       modeBadge.style.borderColor = "#666";
-       modeBadge.style.color = "#fff";
        accuracyNum.textContent = "74.00%";
        accuracyNum.style.color = "#fff";
-       accuracyLabel.textContent = "Measured Accuracy";
+       confidenceNum.style.color = data.risk_color;
     }
 
     confidenceNum.textContent = `${data.confidence_pct}%`;
-    confidenceNum.style.color = data.risk_color;
 
     // Probabilities
     const probs = data.probabilities || {};

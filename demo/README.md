@@ -12,22 +12,26 @@ However, for UX demonstrations, we may want to showcase the UI behaving flawless
    python api/server.py
    ```
 2. Open the frontend at `http://127.0.0.1:8000`.
-3. In the header dock, check the **DEMO MODE** toggle switch.
-4. Upload one of the known images from `demo/images/<class>/` (e.g. `benign_0001.png`).
-5. The frontend will display the corresponding simulated verdict, 98%+ confidence, and explicitly label the result as **"DEMO / SIMULATION"**.
+3. In the header dock, click the shape toggle to switch between modes:
+   - **Square**: Demo / Simulation Mode
+   - **Circle**: Real CNN Inference Mode
+   *(Note: Mode is indicated visually ONLY via this shape. No text labels are shown.)*
+4. Upload one of the known images from `demo/benign/`, `demo/botnet/`, or `demo/ddos/`.
+5. In Square (Demo) mode, the frontend will display the corresponding simulated verdict and 98%+ confidence.
 
-## Assets
-- `demo/images/benign/`: 10 pre-processed 20x20 grayscale images of Benign traffic.
-- `demo/images/botnet/`: 10 pre-processed 20x20 grayscale images of Botnet traffic.
-- `demo/images/ddos/`: 10 pre-processed 20x20 grayscale images of DDoS traffic.
+## Static Demo Image Generation
+To generate exactly 15 valid 20x20 representations for each class from the processed dataset, run:
+```bash
+python demo/generate_demo_images.py
+```
+**Important Note:** The script generates these files **only once**. If the expected number of images already exists in `demo/benign/`, `demo/botnet/`, and `demo/ddos/`, the script will skip generation to preserve the static files and avoid overwriting them across frontend or server restarts.
 
-*(Note: These are exact copies from the generated `data/processed_packet_compact` dataset.)*
+## Real CNN Inference (Circle Mode)
+When switched to the Circle mode, the frontend app routes uploads through the actual `ml/model.py` PyTorch CNN (`packet_compact_model.pth`). 
 
-## How it works
-When the **DEMO MODE** checkbox is active, the frontend appends `?demo=true` to the `POST /api/analyze/upload` or `/api/analyze/sample` endpoints. The `server.py` intercepts this and routes the image to `demo/demo_classifier.py` instead of the actual PyTorch CNN.
+The actual ML classifier reads raw bytes from these images entirely independently of their filenames or containing folder paths. Renaming a demo image and uploading it manually will correctly yield an unbiased prediction based solely on its spatial byte entropy.
 
-The demo classifier parses the filename and returns a hardcoded 98%+ probability for the matched class.
+## How it works (Demo vs Real)
+When the **Square** shape is active, the frontend appends `?demo=true` to the `POST /api/analyze/upload` or `/api/analyze/sample` endpoints. The `server.py` intercepts this and routes the image to `demo/demo_classifier.py` instead of the actual PyTorch CNN.
 
-## Disabling Demo Mode
-Simply uncheck the **DEMO MODE** toggle in the UI. 
-The system will instantly revert to routing uploads through the actual `ml/model.py` PyTorch CNN (`packet_compact_model.pth`), returning the real confidence and classifying based on actual pixel arrays.
+When the **Circle** shape is active, the flag is omitted, triggering real model inference utilizing `predict_packet_compact_bytes` to enforce the 400-byte 20x20 preprocessing format exact to the training scheme.
