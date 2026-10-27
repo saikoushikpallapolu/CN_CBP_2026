@@ -93,8 +93,8 @@ async function refresh() {
           : "Experimental model"
         : "Evidence mode";
     $("engine-dot").classList.toggle("online", health.production_ready);
-    $("engine-device").textContent =
-      `${health.device?.toUpperCase() || "CPU"} · ${health.representation || "flow engine"}`;
+    const runtimeName = { pytorch: "PyTorch", tensorrt: "TensorRT", onnxruntime: "ONNX Runtime" }[health.backend] || "Flow engine";
+    $("engine-device").textContent = `${health.device?.includes("cuda") ? "GPU" : "CPU"} · ${runtimeName}`;
     $("upload-limit").textContent =
       `PCAP, PCAPNG · up to ${health.max_upload_mb} MB · multiple files supported`;
     if (!health.production_ready)
@@ -458,25 +458,29 @@ function renderModel() {
   if (h.error) card.append(node("p", h.error));
   host.append(card);
   const metrics = node("article", undefined, "info-card");
-  metrics.append(node("h2", "Independent-source evaluation"));
+  metrics.append(node("h2", h.runtime_report ? "TensorRT evaluation" : "Independent-source evaluation"));
   const r = h.report || {};
+  const measured = h.runtime_report
+    ? { ...h.runtime_report, batch64_p95_ms: h.runtime_report.timings?.tensorrt?.batch64_p95_ms,
+        temperature: h.runtime_report.engine_metadata?.temperature }
+    : r;
   for (const [label, key] of [
     ["Flow accuracy", "accuracy"],
     ["Represented packet accuracy", "packet_weighted_accuracy"],
     ["Macro F1", "macro_f1"],
     ["Benign packets escalated", "benign_packet_escalation_rate"],
     ["Calibration error", "expected_calibration_error"],
-    ["PyTorch p95 / 64 flows (ms)", "batch64_p95_ms"],
+    [`${h.runtime_report ? "GPU" : "PyTorch"} p95 / 64 flows (ms)`, "batch64_p95_ms"],
     ["Temperature", "temperature"],
   ])
     metrics.append(
       kv(
         label,
-        r[key] == null
+        measured[key] == null
           ? "Not measured"
           : key.includes("accuracy") || key.includes("rate")
-            ? `${(Number(r[key]) * 100).toFixed(2)}%`
-            : Number(r[key]).toFixed(4),
+            ? `${(Number(measured[key]) * 100).toFixed(2)}%`
+            : Number(measured[key]).toFixed(4),
       ),
     );
   host.append(metrics);

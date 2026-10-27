@@ -3,22 +3,35 @@ import json
 import secrets
 import subprocess
 import time
+import argparse
+import re
 from pathlib import Path
 import requests
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gpu", action="store_true")
+    parser.add_argument("--model", default="flow_resnet")
+    args = parser.parse_args()
+    if not re.fullmatch(r"[A-Za-z0-9_]+", args.model):
+        parser.error("model must be a checkpoint basename")
     root = Path(__file__).resolve().parents[1]
     name = "trafficscan-smoke-" + secrets.token_hex(4)
     key = secrets.token_urlsafe(24)
     command = ["docker", "run", "-d", "--rm", "--name", name,
                "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
-               "--memory=2g", "--cpus=4", "--tmpfs", "/tmp:rw,size=134217728,mode=1777",
+               "--memory=" + ("4g" if args.gpu else "2g"), "--cpus=4", "--tmpfs", "/tmp:rw,size=134217728,mode=1777",
                "-p", "127.0.0.1::8000", "-e", "TRAFFICSCAN_API_KEY=" + key,
                "-e", "TRAFFICSCAN_REQUIRE_READY=1", "-e", "TRAFFICSCAN_DB=/tmp/investigations.sqlite3",
                "--mount", f"type=bind,source={root / 'ml/checkpoints'},target=/app/ml/checkpoints,readonly",
-               "--mount", f"type=bind,source={root / 'data/production/samples'},target=/app/data/production/samples,readonly",
-               "trafficscan:production"]
+               "--mount", f"type=bind,source={root / 'data/production/samples'},target=/app/data/production/samples,readonly"]
+    image = "trafficscan:gpu" if args.gpu else "trafficscan:production"
+    if args.gpu:
+        prefix = "/app/ml/checkpoints/" + args.model
+        command.extend(["--gpus", "all", "-e", "TRAFFICSCAN_CHECKPOINT=" + prefix + ".pth",
+                        "-e", "TRAFFICSCAN_TENSORRT=" + prefix + ".engine"])
+    command.append(image)
     checks = {}
     try:
         subprocess.run(command, check=True, capture_output=True, text=True)
@@ -33,6 +46,8 @@ def main():
             time.sleep(1)
         health = requests.get(base + "/api/health", timeout=10)
         checks["health"] = health.status_code == 200 and health.json()["status"] == "online"
+        if args.gpu:
+            checks["gpu_runtime_verified"] = health.json().get("backend") == "tensorrt" and bool(health.json().get("runtime_report"))
         checks["readiness_enforced"] = requests.get(base + "/api/ready", timeout=10).status_code == 503
         checks["unauthorized_blocked"] = requests.get(base + "/api/samples", timeout=10).status_code == 401
         headers = {"x-api-key": key}
@@ -44,8 +59,8 @@ def main():
         checks["history_saved"] = requests.get(base + "/api/investigations", headers=headers, timeout=10).status_code == 200
         page = requests.get(base, timeout=10)
         checks["frontend_and_security_headers"] = page.status_code == 200 and "Content-Security-Policy" in page.headers
-        destination = root / "artifacts/deployment-smoke.json"
-        destination.write_text(json.dumps(dict(image="trafficscan:production", checks=checks, passed=all(checks.values())), indent=2))
+        destination = root / ("artifacts/deployment-smoke-gpu.json" if args.gpu else "artifacts/deployment-smoke.json")
+        destination.write_text(json.dumps(dict(image=image, checks=checks, passed=all(checks.values())), indent=2))
         print(destination.read_text())
         if not all(checks.values()):
             raise SystemExit("Deployment smoke checks failed")
