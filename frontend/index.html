@@ -64,12 +64,12 @@
       <span class="pipeline-arrow">→</span>
       <div class="pipeline-step">
         <span class="step-num">02</span>
-        <span class="step-text">4,096-Byte Extraction</span>
+        <span class="step-text">400-Byte Extraction</span>
       </div>
       <span class="pipeline-arrow">→</span>
       <div class="pipeline-step">
         <span class="step-num">03</span>
-        <span class="step-text">64×64 Grayscale Matrix</span>
+        <span class="step-text">20×20 Grayscale Matrix</span>
       </div>
       <span class="pipeline-arrow">→</span>
       <div class="pipeline-step">
@@ -142,7 +142,7 @@
             <h3>How It Works</h3>
           </div>
           <p class="text-sm">
-            Each network frame contains headers and payload bytes (0–255). We map every byte to a pixel brightness value. When tiled sequentially into a 64×64 grid, benign traffic forms predictable structural lines, whereas flood attacks (DDoS) and C2 beacons (Botnet) create distinct visual entropy patterns.
+            Each network frame contains headers and payload bytes (0–255). We map every byte to a pixel brightness value. When tiled sequentially into a 20×20 grid, benign traffic forms predictable structural lines, whereas flood attacks (DDoS) and C2 beacons (Botnet) create distinct visual entropy patterns.
           </p>
         </div>
 
@@ -248,8 +248,8 @@
               <div class="card-header">
                 <h3>2D Spatial Traffic Fingerprint</h3>
                 <div class="image-controls">
-                  <button class="toggle-btn active" id="btnZoomedView">512×512 HD</button>
-                  <button class="toggle-btn" id="btnNativeView">64×64 Model</button>
+                  <button class="toggle-btn active" id="btnZoomedView">400×400 Display</button>
+                  <button class="toggle-btn" id="btnNativeView">20×20 Native</button>
                   <button class="toggle-btn icon-btn" id="btnToggleGrid" title="Toggle Coordinate Grid">#</button>
                 </div>
               </div>
@@ -260,7 +260,7 @@
                   <span id="inspectX">X: 0</span> <span id="inspectY">Y: 0</span> | Val: <span id="inspectVal">0</span>
                 </div>
               </div>
-              <p class="image-caption">4,096 bytes serialized to a 64×64 matrix where 1 byte (0–255) = 1 pixel luminance.</p>
+              <p class="image-caption">400 bytes serialized to a 20×20 matrix where 1 byte (0–255) = 1 pixel luminance.</p>
             </div>
 
             <!-- Telemetry Metrics Card -->
@@ -289,8 +289,8 @@
 
                 <div class="metric-box">
                   <span class="metric-label">Fingerprint Matrix</span>
-                  <div class="metric-val">4,096 B</div>
-                  <span class="metric-hint">64 × 64 uint8 bytes</span>
+                  <div class="metric-val" id="metricFingerprintVal">400 B</div>
+                  <span class="metric-hint" id="metricFingerprintHint">20 × 20 uint8 bytes</span>
                 </div>
 
                 <div class="metric-box">

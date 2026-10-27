@@ -179,12 +179,6 @@ class TrafficClassifier:
         pil_img.save(buf_20, format="PNG")
         b64_20 = "data:image/png;base64," + base64.b64encode(buf_20.getvalue()).decode("utf-8")
 
-        # Base64 string of zoomed 512x512 preview (nearest-neighbor)
-        zoomed_img = pil_img.resize((512, 512), resample=Image.Resampling.NEAREST)
-        buf_512 = io.BytesIO()
-        zoomed_img.save(buf_512, format="PNG")
-        b64_512 = "data:image/png;base64," + base64.b64encode(buf_512.getvalue()).decode("utf-8")
-
         # 3. Model Inference
         tensor = self.transform(pil_img).unsqueeze(0).to(self.device)
         with torch.no_grad():
@@ -223,7 +217,7 @@ class TrafficClassifier:
             "risk_color": risk_color,
             "probabilities": probability_dict,
             "image_64": b64_20,
-            "image_zoomed": b64_512,
+            "image_zoomed": b64_20,
             "telemetry": {
                 "total_bytes_received": total_len,
                 "bytes_fingerprinted": COMPACT_BYTES,

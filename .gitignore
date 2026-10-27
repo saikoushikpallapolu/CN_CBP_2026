@@ -24,6 +24,8 @@ data/raw/**
 !data/raw/README.md
 !data/raw/**/README.md
 !data/raw/**/*.pcap
+data/raw/**/source_*/**
+
 
 # Models & training outputs
 ml/checkpoints/**

@@ -35,7 +35,7 @@ def predict_demo_image(filename: str, image_bytes: bytes) -> Dict[str, Any]:
         "risk_level": level,
         "risk_color": color,
         "image_64": data_uri,
-        "image_zoomed": data_uri, # Real API might zoom it, but for demo we just pass it back
+        "image_zoomed": data_uri,
         "telemetry": {
             "entropy": 7.1 if label != "benign" else 3.2,
             "total_bytes_received": len(image_bytes),

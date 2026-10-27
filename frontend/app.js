@@ -222,8 +222,10 @@ document.addEventListener("DOMContentLoaded", () => {
     probBotnetBar.style.width = `${botnetPct}%`;
 
     // Fingerprint Image
-    fingerprintImg.src = data.image_zoomed;
-    downloadImgBtn.href = data.image_zoomed;
+    fingerprintImg.src = data.image_zoomed || data.image_64;
+    fingerprintImg.style.width = "400px";
+    fingerprintImg.style.height = "400px";
+    downloadImgBtn.href = data.image_zoomed || data.image_64;
     downloadImgBtn.download = `${data.prediction}_traffic_fingerprint.png`;
     btnZoomedView.classList.add("active");
     btnNativeView.classList.remove("active");
@@ -253,6 +255,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     metricMeanByte.textContent = (telemetry.mean_byte || 0).toFixed(1);
 
+    const fingerprintVal = document.getElementById("metricFingerprintVal");
+    const fingerprintHint = document.getElementById("metricFingerprintHint");
+    if (fingerprintVal && telemetry.bytes_fingerprinted) {
+        fingerprintVal.textContent = `${telemetry.bytes_fingerprinted} B`;
+        const dim = Math.sqrt(telemetry.bytes_fingerprinted);
+        if (fingerprintHint && dim === Math.floor(dim)) {
+            fingerprintHint.textContent = `${dim} × ${dim} uint8 bytes`;
+        }
+    }
+
     // Hex dump
     if (data.hex_dump && data.hex_dump.length > 0) {
       hexDumpTerminal.textContent = data.hex_dump.join("\n");
@@ -266,17 +278,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 6. View Controls (Zoomed vs Native 64x64, Grid lines)
+  // 6. View Controls (Zoomed vs Native, Grid lines)
   btnZoomedView.addEventListener("click", () => {
     if (!currentAnalysisData) return;
-    fingerprintImg.src = currentAnalysisData.image_zoomed;
+    fingerprintImg.style.width = "400px";
+    fingerprintImg.style.height = "400px";
     btnZoomedView.classList.add("active");
     btnNativeView.classList.remove("active");
   });
 
   btnNativeView.addEventListener("click", () => {
     if (!currentAnalysisData) return;
-    fingerprintImg.src = currentAnalysisData.image_64;
+    fingerprintImg.style.width = "20px";
+    fingerprintImg.style.height = "20px";
     btnNativeView.classList.add("active");
     btnZoomedView.classList.remove("active");
   });
