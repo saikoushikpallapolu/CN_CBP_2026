@@ -23,6 +23,8 @@ python -m scripts.gpu_container stability
 
 The audit fits the engine's temperature on validation logits before evaluating test data. It reports agreement, accuracy, F1, represented-packet escalation, calibration error and synchronized timings. The CUDA Python timing includes pinned-host copies and host/device transfers. It excludes capture parsing, HTTP handling and waiting for the first 16 packets of a flow. The capture benchmark measures the separate offline pipeline.
 
+Engine metadata uses `.engine.json`, and its matched runtime audit uses `.engine.audit.json`; the training report remains the separate `.json` file. Start the localhost review product with `python -m scripts.review_app start`. See [the current review report](FINAL_REVIEW_REPORT.md).
+
 To select the candidate artifacts, add `--model candidate_flow_resnet --data data/production/candidate_dataset.npz` to compile/audit/benchmark commands. Engine metadata must match the checkpoint hash. GPU engines are not portable across arbitrary TensorRT versions, platforms or GPU architectures. A T4 requires `--sm 75` libraries and an engine rebuilt on that T4; use a CUDA/TensorRT release compatible with its installed driver.
 
 The default web service remains experimental while calibration, benign escalation, macro F1 and operational gates fail. Deployment compose uses `TRAFFICSCAN_REQUIRE_READY=1`, forcing UNKNOWN on failed release gates. GPU acceleration does not waive these gates. A 24-hour public replay requires the PC and Docker engine to remain running; it cannot establish campus false-positive rates.

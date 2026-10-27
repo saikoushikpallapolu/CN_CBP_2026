@@ -1,0 +1,6 @@
+{
+  "train_unchanged": true,
+  "test_unchanged": true,
+  "source_groups_disjoint": true,
+  "same_capture_group_for_cse21_segments": true
+}

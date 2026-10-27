@@ -1,5 +1,7 @@
 # TrafficScan
 
+**GPU review build:** [localhost:8000](http://127.0.0.1:8000) · [Review guide](docs/REVIEW_GUIDE.md) · [Final measured report](docs/FINAL_REVIEW_REPORT.md). Start/stop with `python -m scripts.review_app start` / `stop`.
+
 Local network-capture investigations with sanitized flow fingerprints and a compact 1D residual classifier.
 
 The active v2 pipeline reads PCAP/PCAPNG, groups bidirectional traffic into bursts of up to 16 packets, extracts 32 protocol-aware bytes per packet, and runs batched inference. MAC/IP identities, ephemeral ports, checksums, TCP sequence identifiers and timestamps are masked before model input. Grayscale fingerprints are rendered by the browser after inference.

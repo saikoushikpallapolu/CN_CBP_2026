@@ -1,0 +1,7 @@
+{
+  "same_prepared_subset": true,
+  "capture_sha256": "784aa56f4f7994f2fdc3be47d7110d532bd6916814a1cdbe701a46727536e1be",
+  "full_member_crc_verified": true,
+  "original_calibration_subset_now_verified": true,
+  "scope": "Original calibration tensors remain unchanged; complete source member CRC verified"
+}

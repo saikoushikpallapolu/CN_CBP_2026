@@ -1,5 +1,7 @@
 # Recorded validation evidence
 
+Current review evidence is described in [FINAL_REVIEW_REPORT.md](../FINAL_REVIEW_REPORT.md). The `final-*` JSON files and `hoic-gpu-audit.json` supersede the older baseline/partial validation records below. `review-dashboard.png` and `review-model.png` show the current GPU review app. A live 24-hour audit remains incomplete until its duration actually elapses.
+
 These are bounded local research measurements, not enterprise certification.
 
 - `model-comparison.json`: preserved baseline versus expanded GPU candidate.
@@ -11,4 +13,4 @@ These are bounded local research measurements, not enterprise certification.
 - `replay-recovery-smoke.summary.json`: short smoke test of the repaired audit logger; not a 24-hour result.
 - `dashboard.png`: reviewed UI screenshot from the earlier baseline session; current local weights use the expanded candidate.
 
-The final archive CRC/HOIC acquisition, accelerated capture benchmark, full-duration replay and enterprise release gates remain unfinished. The handoff at the top of `../PRODUCTION_IMPLEMENTATION_STATUS.md` is authoritative for stopped/running status.
+Full archive CRC/HOIC acquisition, the accelerated capture benchmark and GPU HTTP checks are complete. The full-duration replay and enterprise release gates remain pending. [FINAL_REVIEW_REPORT.md](../FINAL_REVIEW_REPORT.md) is authoritative for current status.

@@ -1,0 +1,33 @@
+{
+  "snapshot_only": true,
+  "recorded_at": "2026-10-27T19:06:03.191597+00:00",
+  "audit": {
+    "scope": "public/offline dataset replay; no live sensor audit",
+    "requested_hours": 24.0,
+    "completed": false,
+    "iterations": 3301,
+    "failures": 0,
+    "max_rss_bytes": 679739392,
+    "started_at": "2026-10-27T18:39:05.089368+00:00",
+    "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+    "device": "cpu",
+    "backend": "tensorrt",
+    "captures": [
+      "/app/data/production/samples/monday.pcap",
+      "/app/data/production/samples/ctu1.pcap",
+      "/app/data/production/samples/friday.pcap",
+      "/app/data/production/samples/cse.pcap",
+      "/app/data/production/samples/mawi.pcap"
+    ],
+    "capture_sha256": {
+      "/app/data/production/samples/monday.pcap": "6d206267b0e29a4d0c4a3ced304d4089bfabaf12500eae30fdb02aae38ab7fdc",
+      "/app/data/production/samples/ctu1.pcap": "bd81daedcc01bcdb18b70957fbada8b6aa98944a3e319c9d8fc2d5b4b731434b",
+      "/app/data/production/samples/friday.pcap": "69a12a7deee48e5e6cad65269b87a7f599226625f607480ca4f79d2b2db88b24",
+      "/app/data/production/samples/cse.pcap": "1031bccbf74a63fac8e7de4fa4d14945675c74fcc067efb14f8ea10c2292af2b",
+      "/app/data/production/samples/mawi.pcap": "19374d0abb3e75172b4fce06d7c197d5742841795109a9b17c2d21b0f8450d45"
+    },
+    "telemetry_write_retries": 0,
+    "elapsed_seconds": 1579.903398758,
+    "passed": false
+  }
+}

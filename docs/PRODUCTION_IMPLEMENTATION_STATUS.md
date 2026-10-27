@@ -1,5 +1,7 @@
 # Production implementation status
 
+> Historical implementation/handoff record. Work resumed and the review product is now running. See [FINAL_REVIEW_REPORT.md](FINAL_REVIEW_REPORT.md) for current measurements, completed capture verification and the active long-run audit; it supersedes stopped/pending statements below.
+
 ## Handoff: stopped at user request
 
 Implementation work, the local server and active acquisition were stopped before committing. No background audit is currently running. The expanded candidate is saved locally and remains experimental. Downloaded captures, weights, environments and NVIDIA libraries are intentionally excluded from Git.

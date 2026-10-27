@@ -1,0 +1,16 @@
+{
+  "origin": "cse21-hoic",
+  "samples": 17151,
+  "source_groups": [
+    "cse21"
+  ],
+  "scope": "Frozen TensorRT engine on additional published endpoint/time attack windows; no refitting",
+  "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+  "engine_sha256": "91e0d9096de2d1272ff03cd4df4553bc2bb16480b470723ea38d1568a3c80597",
+  "temperature": 1.7969890832901,
+  "known_class_accuracy": 5.830563815520961e-05,
+  "unknown_rate": 1.0,
+  "attack_escalation_rate": 1.0,
+  "accepted_benign_rate": 0.0,
+  "limitation": "Attack-only subset: no benign false-positive rate can be inferred"
+}

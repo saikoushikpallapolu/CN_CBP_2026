@@ -1,0 +1,47 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "cuda": null,
+  "torch": "2.14.1+cpu",
+  "provider": "cuda-python pinned staging",
+  "engine_metadata": {
+    "onnx.infer": "onnxruntime.quant",
+    "onnx.quant.pre_process": "onnxruntime.quant",
+    "representation": "sanitized-flow-v1",
+    "temperature": "1.7969890832901",
+    "calibration_valid": "true",
+    "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+    "precision": "int8_qdq",
+    "bias_precision": "float32",
+    "engine_sha256": "91e0d9096de2d1272ff03cd4df4553bc2bb16480b470723ea38d1568a3c80597",
+    "target_runtime": "11.4.0.106",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "compute_capability": [
+      8,
+      9
+    ],
+    "calibration_backend": "tensorrt",
+    "calibration_samples": 635,
+    "calibration_dataset_sha256": "96b7cdd058d3f53f4cbd97f4b53b8e8512a4118b91c9ae23169438aad9381d13"
+  },
+  "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+  "scope": "Synchronized 64-flow inference; CUDA Python includes host/device transfers; excludes ingestion and flow context waiting",
+  "timings": {
+    "pytorch_cpu": {
+      "batch64_p50_ms": 12.955018500065307,
+      "batch64_p95_ms": 13.8161121498797
+    },
+    "tensorrt": {
+      "batch64_p50_ms": 0.5807359998470929,
+      "batch64_p95_ms": 0.7792424999593095
+    }
+  },
+  "test_samples": 7209,
+  "agreement_with_float32": 0.9988902760438341,
+  "max_logit_error": 3.5593442916870117,
+  "expected_calibration_error": 0.13124554141382355,
+  "accuracy": 0.9865445970314884,
+  "macro_f1": 0.8837669961569373,
+  "packet_weighted_accuracy": 0.9897943919019996,
+  "benign_packet_escalation_rate": 0.02982848620432513,
+  "rejection_rate": 0.2231932282447815
+}
