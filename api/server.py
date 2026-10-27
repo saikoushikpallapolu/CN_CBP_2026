@@ -1,182 +1,159 @@
-"""
-api/server.py - FastAPI Backend Service for PCAP-to-Image Malware Fingerprinting.
-"""
-
+"""TrafficScan investigation API. Use an authenticated TLS proxy publicly."""
 from __future__ import annotations
-
+import hmac
+import json
 import os
-import sys
+import sqlite3
+import threading
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
-
-from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from classification.production import ROOT, get_flow_classifier
+from api.body_limit import UploadBodyLimit
 
-# Ensure project root is in sys.path
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+app = FastAPI(title="TrafficScan API", version="2.0.0")
+MAX_UPLOAD = int(os.getenv("TRAFFICSCAN_MAX_UPLOAD_MB", "64")) * 1024 ** 2
+app.add_middleware(UploadBodyLimit, limit=MAX_UPLOAD + 1024 * 1024)
+DB_PATH = Path(os.getenv("TRAFFICSCAN_DB", str(ROOT / "data/production/investigations.sqlite3")))
+ANALYSIS_SLOT = threading.BoundedSemaphore(1)
+SAMPLES = {
+    "monday": ("Monday · normal baseline", "data/production/samples/monday.pcap"),
+    "ctu1": ("CTU-13 · scenario 1", "data/production/samples/ctu1.pcap"),
+    "friday": ("Friday · attack window", "data/production/samples/friday.pcap"),
+    "cse": ("CSE 2018 · LOIC attack window", "data/production/samples/cse.pcap"),
+    "mawi": ("MAWI · unlabeled backbone", "data/production/samples/mawi.pcap"),
+}
 
-from classification.infer import get_classifier
+def authorize(x_api_key: str | None = Header(default=None)):
+    expected = os.getenv("TRAFFICSCAN_API_KEY")
+    if expected and not hmac.compare_digest(x_api_key or "", expected):
+        raise HTTPException(401, "Valid API key required")
 
-app = FastAPI(
-    title="TrafficScan AI - PCAP Fingerprint API",
-    description="Real-time Network Packet Capture to 2D Grayscale Image Malware Classification",
-    version="1.0.0"
-)
+def connect():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(DB_PATH, timeout=15)
+    connection.execute("CREATE TABLE IF NOT EXISTS investigations (id TEXT PRIMARY KEY, created_at TEXT, filename TEXT, prediction TEXT, payload TEXT, summary TEXT)")
+    if "summary" not in {row[1] for row in connection.execute("PRAGMA table_info(investigations)")}:
+        connection.execute("ALTER TABLE investigations ADD COLUMN summary TEXT")
+    return connection
 
-# Enable CORS for local development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def save(result):
+    result["id"] = uuid.uuid4().hex
+    result["created_at"] = datetime.now(timezone.utc).isoformat()
+    with connect() as db:
+        summary = json.dumps({"telemetry": result["telemetry"], "counts": result["counts"]})
+        db.execute("INSERT INTO investigations (id,created_at,filename,prediction,payload,summary) VALUES (?, ?, ?, ?, ?, ?)", (result["id"], result["created_at"], result["filename"], result["prediction"], json.dumps(result), summary))
+        db.execute("DELETE FROM investigations WHERE id NOT IN (SELECT id FROM investigations ORDER BY created_at DESC LIMIT 100)")
+    return result
 
-# Predefined samples available in data/raw
-DEMO_SAMPLES = [
-    {
-        "id": "benign",
-        "label": "Benign Traffic",
-        "subtitle": "Normal Office Network Activity (CIC-IDS2017 Monday)",
-        "path": "data/raw/benign/Monday-WorkingHours_slice100MB.pcap",
-        "type": "pcap"
-    },
-    {
-        "id": "ddos",
-        "label": "DDoS Traffic",
-        "subtitle": "High-Volume Denial of Service Attack (Wednesday)",
-        "path": "data/raw/ddos/Wednesday-workingHours_slice100MB.pcap",
-        "type": "pcap"
-    },
-    {
-        "id": "botnet",
-        "label": "Botnet Traffic",
-        "subtitle": "ARES Botnet Command & Control Activity (Friday)",
-        "path": "data/raw/botnet/Friday-WorkingHours_slice100MB.pcap",
-        "type": "pcap"
-    }
-]
+def analyze(source, filename, truncated=False, reserved=False):
+    if not reserved and not ANALYSIS_SLOT.acquire(blocking=False):
+        raise HTTPException(429, "Analysis in progress. Retry shortly.")
+    try:
+        return save(get_flow_classifier().analyze(source, filename, truncated))
+    except (ValueError, OSError) as error:
+        raise HTTPException(422, str(error)) from error
+    finally:
+        if not reserved:
+            ANALYSIS_SLOT.release()
 
-
-class SampleAnalyzeRequest(BaseModel):
-    sample_id: str
-
+@app.middleware("http")
+async def security_headers(request, call_next):
+    if request.url.path.startswith("/api/") and request.url.path not in ("/api/health", "/api/ready"):
+        expected = os.getenv("TRAFFICSCAN_API_KEY")
+        if expected and not hmac.compare_digest(request.headers.get("x-api-key", ""), expected):
+            return JSONResponse({"detail": "Valid API key required"}, status_code=401)
+    if request.url.path == "/api/analyze/upload":
+        length = request.headers.get("content-length")
+        if length and (not length.isdigit() or int(length) > MAX_UPLOAD + 1024 * 1024):
+            return JSONResponse({"detail": "Upload exceeds request size limit"}, status_code=413)
+    upload_request = request.method == "POST" and request.url.path == "/api/analyze/upload"
+    if upload_request and not ANALYSIS_SLOT.acquire(blocking=False):
+        return JSONResponse({"detail": "Analysis in progress. Retry shortly."}, status_code=429)
+    try:
+        response = await call_next(request)
+    finally:
+        if upload_request:
+            ANALYSIS_SLOT.release()
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"
+    if request.url.path in ("/docs", "/redoc"):
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; frame-ancestors 'none'"
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 @app.get("/api/health")
-def health_check() -> dict[str, Any]:
-    """Health check endpoint to verify API and model readiness."""
+def health():
+    state = get_flow_classifier().health()
+    return {**state, "report": {k: v for k, v in state["report"].items() if k != "history"}, "authentication_required": bool(os.getenv("TRAFFICSCAN_API_KEY")), "max_upload_mb": MAX_UPLOAD // 1024 ** 2}
+
+@app.get("/api/ready")
+def readiness():
+    state = get_flow_classifier().health()
+    return JSONResponse({"ready": state["production_ready"], "gates": state["report"].get("gates", {}), "model_available": state["status"] == "online"}, status_code=200 if state["production_ready"] else 503)
+
+@app.get("/api/data", dependencies=[Depends(authorize)])
+def data_status():
+    path = ROOT / "data/external/acquisition.json"
+    from scripts.acquire_production_data import load_manifest
+    return load_manifest(path)
+
+@app.get("/api/samples", dependencies=[Depends(authorize)])
+def samples():
+    return [dict(id=key, label=label, filename=Path(path).name, available=(ROOT / path).is_file()) for key, (label, path) in SAMPLES.items()]
+
+class SampleRequest(BaseModel):
+    sample_id: str
+
+@app.post("/api/analyze/sample", dependencies=[Depends(authorize)])
+def sample(request: SampleRequest):
+    if request.sample_id not in SAMPLES:
+        raise HTTPException(404, "Unknown sample")
+    _, path = SAMPLES[request.sample_id]
+    target = ROOT / path
+    if not target.is_file():
+        raise HTTPException(404, "Sample not acquired")
+    return analyze(target, target.name)
+
+@app.post("/api/analyze/upload", dependencies=[Depends(authorize)])
+def upload(file: UploadFile = File(...)):
     try:
-        classifier = get_classifier()
-        return {
-            "status": "online",
-            "model": "TrafficCNN (3 Conv + 2 Linear)",
-            "classes": classifier.classes,
-            "device": str(classifier.device),
-            "checkpoint": str(classifier.checkpoint_path.name)
-        }
-    except Exception as e:
-        return {
-            "status": "degraded",
-            "error": str(e)
-        }
+        filename = Path((file.filename or "").replace("\\", "/")).name
+        if Path(filename).suffix.lower() not in (".pcap", ".pcapng", ".cap"):
+            raise HTTPException(415, "Upload a PCAP or PCAPNG capture")
+        file.file.seek(0, 2)
+        size = file.file.tell()
+        if size > MAX_UPLOAD:
+            raise HTTPException(413, f"Capture exceeds {MAX_UPLOAD // 1024 ** 2} MB")
+        if not size:
+            raise HTTPException(400, "Capture is empty")
+        file.file.seek(0)
+        return analyze(file.file, filename, reserved=True)
+    finally:
+        file.file.close()
 
+@app.get("/api/investigations", dependencies=[Depends(authorize)])
+def investigations():
+    with connect() as db:
+        rows = db.execute("SELECT id,created_at,filename,prediction,COALESCE(summary,json_object('telemetry',json_extract(payload,'$.telemetry'),'counts',json_extract(payload,'$.counts'))) FROM investigations ORDER BY created_at DESC LIMIT 100").fetchall()
+    return [dict(id=row[0], created_at=row[1], filename=row[2], prediction=row[3], **json.loads(row[4])) for row in rows]
 
-@app.get("/api/samples")
-def get_sample_files() -> list[dict[str, Any]]:
-    """Return list of available demo sample PCAP files."""
-    results = []
-    for s in DEMO_SAMPLES:
-        abs_path = PROJECT_ROOT / s["path"]
-        exists = abs_path.is_file()
-        size_mb = round(abs_path.stat().st_size / (1024 * 1024), 2) if exists else 0
-        results.append({
-            "id": s["id"],
-            "label": s["label"],
-            "subtitle": s["subtitle"],
-            "filename": abs_path.name,
-            "size_mb": size_mb,
-            "available": exists
-        })
-    return results
+@app.get("/api/investigations/{identifier}", dependencies=[Depends(authorize)])
+def investigation(identifier: str):
+    with connect() as db:
+        row = db.execute("SELECT payload FROM investigations WHERE id=?", (identifier,)).fetchone()
+    if not row:
+        raise HTTPException(404, "Investigation not found")
+    return json.loads(row[0])
 
-
-@app.post("/api/analyze/sample")
-def analyze_sample(req: SampleAnalyzeRequest, demo: bool = False) -> dict[str, Any]:
-    """Run malware fingerprinting on one of the preloaded demo samples."""
-    sample = next((s for s in DEMO_SAMPLES if s["id"] == req.sample_id), None)
-    if not sample:
-        raise HTTPException(status_code=404, detail=f"Sample '{req.sample_id}' not found.")
-
-    target_path = PROJECT_ROOT / sample["path"]
-    if not target_path.is_file():
-        raise HTTPException(status_code=404, detail=f"Sample file not found on disk: {target_path}")
-
-    try:
-        if demo:
-            from demo.demo_classifier import predict_demo_image
-            # Just send a dummy byte payload for the demo presentation
-            res = predict_demo_image(target_path.name, b"demo_bytes_payload")
-            res["source_type"] = "sample"
-            res["sample_id"] = sample["id"]
-            res["sample_label"] = sample["label"]
-            res["filename"] = target_path.name
-            return res
-
-        classifier = get_classifier()
-        res = classifier.predict_pcap_file(target_path, max_bytes=4096)
-        res["source_type"] = "sample"
-        res["sample_id"] = sample["id"]
-        res["sample_label"] = sample["label"]
-        res["filename"] = target_path.name
-        return res
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
-
-
-@app.post("/api/analyze/upload")
-async def analyze_uploaded_file(file: UploadFile = File(...), demo: bool = False) -> dict[str, Any]:
-    """Run malware fingerprinting on a user-uploaded PCAP or Image file."""
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="Uploaded file missing filename.")
-
-    content = await file.read()
-    if not content:
-        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
-
-    try:
-        if demo:
-            from demo.demo_classifier import predict_demo_image
-            res = predict_demo_image(file.filename, content)
-            res["source_type"] = "upload"
-            return res
-
-        classifier = get_classifier()
-        res = classifier.predict_uploaded_file(content, file.filename)
-        res["source_type"] = "upload"
-        return res
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to process uploaded file: {str(e)}")
-
-
-# Serve static web frontend if the frontend directory exists
-FRONTEND_DIR = PROJECT_ROOT / "frontend"
-if FRONTEND_DIR.is_dir():
-    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
-
-    @app.get("/")
-    def serve_frontend_index():
-        index_file = FRONTEND_DIR / "index.html"
-        if index_file.is_file():
-            return FileResponse(str(index_file))
-        return {"message": "Frontend directory found, but index.html missing."}
-
-
-if __name__ == "__main__":
-    import uvicorn
-    print("\n[+] Starting TrafficScan AI API server on http://127.0.0.1:8000 ...")
-    uvicorn.run("api.server:app", host="127.0.0.1", port=8000, reload=True)
+app.mount("/static", StaticFiles(directory=ROOT / "frontend"), name="static")
+@app.get("/")
+def index():
+    return FileResponse(ROOT / "frontend/index.html")

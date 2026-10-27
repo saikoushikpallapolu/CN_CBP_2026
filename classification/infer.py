@@ -1,5 +1,6 @@
 """
-classification/infer.py - End-to-end inference engine for PCAP-to-Image malware fingerprinting.
+Historical TrafficCNN inference for reproducing legacy experiments.
+The active API uses classification/production.py and sanitized flow tensors.
 """
 
 from __future__ import annotations
