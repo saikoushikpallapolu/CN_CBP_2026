@@ -1,0 +1,80 @@
+{
+  "baseline": {
+    "accuracy": 0.6991260923845194,
+    "macro_f1": 0.4754113635860537,
+    "packet_weighted_accuracy": 0.5343483686447144,
+    "benign_packet_escalation_rate": 0.24434500932693481
+  },
+  "expanded_gpu_candidate": {
+    "accuracy": 0.9857123040643639,
+    "macro_f1": 0.8745311794641822,
+    "packet_weighted_accuracy": 0.9885643720626831,
+    "benign_packet_escalation_rate": 0.030232412740588188,
+    "expected_calibration_error": 0.14542175014151848,
+    "samples": {
+      "train": 26068,
+      "validation": 635,
+      "test": 7209
+    },
+    "class_counts": {
+      "train": [
+        9838,
+        3716,
+        12514
+      ],
+      "validation": [
+        555,
+        56,
+        24
+      ],
+      "test": [
+        5034,
+        31,
+        2144
+      ]
+    },
+    "sources": {
+      "train": [
+        "cse",
+        "ctu1",
+        "ctu2",
+        "monday",
+        "normal-dns",
+        "wednesday"
+      ],
+      "validation": [
+        "cse21",
+        "ctu9"
+      ],
+      "test": [
+        "ctu10",
+        "friday",
+        "tuesday"
+      ]
+    },
+    "gates": {
+      "accuracy": true,
+      "macro_f1": false,
+      "benign_fpr": false,
+      "model_batch_latency": false,
+      "end_to_end_latency": false,
+      "class_coverage": true,
+      "calibration_coverage": true,
+      "calibration_reliability": false,
+      "training_sample_size": true,
+      "training_source_diversity": true,
+      "identity_invariance": true,
+      "stability_24h": false,
+      "independent_enterprise_audit": false
+    },
+    "environment": {
+      "python": "3.12.10",
+      "torch": "2.14.1+cu130",
+      "numpy": "2.5.4",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "cuda": "13.0"
+    },
+    "dataset_sha256": "96b7cdd058d3f53f4cbd97f4b53b8e8512a4118b91c9ae23169438aad9381d13"
+  },
+  "scope": "Packet weighting uses represented burst packets; limited source-held-out evaluation. Experimental; no enterprise sign-off."
+}

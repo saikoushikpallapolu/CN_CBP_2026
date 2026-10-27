@@ -1,5 +1,7 @@
 # TrafficScan AI: Production Implementation Plan & Engineering Roadmap
 
+> Execution record: [PRODUCTION_IMPLEMENTATION_STATUS.md](PRODUCTION_IMPLEMENTATION_STATUS.md). Targets in this roadmap are aspirational; consult measured evidence and remaining release gates before deployment claims.
+
 ## Executive Summary
 This document establishes the end-to-end technical roadmap to transform **TrafficScan AI** from an academic prototype (74.00% within-source accuracy) into an industry-grade, ultra-low-latency Network Intrusion Detection System (NIDS). 
 

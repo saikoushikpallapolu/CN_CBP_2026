@@ -1,0 +1,40 @@
+{
+  "test_samples": 7209,
+  "test_sources": [
+    "ctu10",
+    "friday",
+    "tuesday"
+  ],
+  "models": {
+    "candidate_flow_resnet.onnx": {
+      "accuracy": 0.9857123040643639,
+      "macro_f1": 0.8745311794641822,
+      "packet_weighted_accuracy": 0.9885644000465402,
+      "benign_packet_escalation_rate": 0.030232413621675367,
+      "rejection_rate": 0.2528783465113053,
+      "expected_calibration_error": 0.14541659184510242,
+      "temperature": 1.895735502243042,
+      "agreement_with_float32": 1.0
+    },
+    "candidate_flow_resnet.int8.onnx": {
+      "accuracy": 0.9862671660424469,
+      "macro_f1": 0.8791789316330014,
+      "packet_weighted_accuracy": 0.9894287186476738,
+      "benign_packet_escalation_rate": 0.030170270942083022,
+      "rejection_rate": 0.23956165903731447,
+      "expected_calibration_error": 0.14443338831778385,
+      "temperature": 1.895735502243042,
+      "agreement_with_float32": 0.9991677070328756
+    },
+    "candidate_flow_resnet.trt.int8.onnx": {
+      "accuracy": 0.9868220280205299,
+      "macro_f1": 0.8839925243024972,
+      "packet_weighted_accuracy": 0.9900270930638432,
+      "benign_packet_escalation_rate": 0.03256276410638827,
+      "rejection_rate": 0.23928422804827298,
+      "expected_calibration_error": 0.14104966723583232,
+      "temperature": 1.895735502243042,
+      "agreement_with_float32": 0.9986128450547926
+    }
+  }
+}

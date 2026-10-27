@@ -2,6 +2,8 @@
 
 Project documentation aligned with the abstract and syllabus.
 
+For the active v2 pipeline, start with the root README and [production implementation status](PRODUCTION_IMPLEMENTATION_STATUS.md). Other design/phase documents describe historical experiments and may refer to the retired single-packet/demo interface.
+
 | Doc | Purpose |
 |-----|---------|
 | `PREREQUISITE_PIPELINE.txt` | **Read first** — how PCAP → bytes → image → CNN works (plain language) |

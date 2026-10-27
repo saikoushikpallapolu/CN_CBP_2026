@@ -1,5 +1,7 @@
 # Cross-Source Data Research Report
 
+> Historical research note. The production implementation subsequently verified bounded PCAP/PCAPNG range acquisition and public S3 HTTPS listing without the AWS CLI. See [current execution status](../docs/PRODUCTION_IMPLEMENTATION_STATUS.md) and `data/production_sources.json` for the active source policy.
+
 ## Current Source A Inventory
 - **Benign:** `Monday-WorkingHours_slice100MB.pcap` (CIC-IDS2017, Monday, July 3, 2017)
 - **Botnet:** `Friday-WorkingHours_slice100MB.pcap` (CIC-IDS2017, Friday, July 7, 2017 - Botnet ARES morning capture)

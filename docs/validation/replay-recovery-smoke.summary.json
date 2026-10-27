@@ -1,0 +1,21 @@
+{
+  "scope": "public/offline dataset replay; no live sensor audit",
+  "requested_hours": 0.001,
+  "completed": true,
+  "iterations": 14,
+  "failures": 0,
+  "max_rss_bytes": 219840512,
+  "started_at": "2026-10-27T18:25:21.089481+00:00",
+  "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+  "device": "cpu",
+  "backend": "pytorch",
+  "captures": [
+    "C:\\Users\\saiko\\OneDrive\\Desktop\\CN_CBP\\CN_CBP_2026\\data\\production\\samples\\monday.pcap"
+  ],
+  "capture_sha256": {
+    "C:\\Users\\saiko\\OneDrive\\Desktop\\CN_CBP\\CN_CBP_2026\\data\\production\\samples\\monday.pcap": "6d206267b0e29a4d0c4a3ced304d4089bfabaf12500eae30fdb02aae38ab7fdc"
+  },
+  "telemetry_write_retries": 0,
+  "elapsed_seconds": 3.610000000000582,
+  "passed": true
+}

@@ -1,0 +1,20 @@
+{
+  "representation": "sanitized-flow-v1",
+  "checked": 3784,
+  "failures": 0,
+  "exact_tensor_invariance": true,
+  "sources": [
+    {
+      "filename": "monday.pcap",
+      "sha256": "39772f3ffde0c750c64966aeaba8ac45d2001a72f3bca310d1addfafc4b90628"
+    },
+    {
+      "filename": "ctu1.pcap",
+      "sha256": "8f29ddb120fdf653ef241253bb4e8b1b47c8a8279b399398c2b9f8e7ff5f7fe0"
+    },
+    {
+      "filename": "capture.pcap",
+      "sha256": "c40b8a5086518d0abc04a5b5f4c04cd7870007179be173c59872be2996507005"
+    }
+  ]
+}

@@ -1,187 +1,101 @@
-# TrafficScan AI
+# TrafficScan
 
-**PCAP-to-image malware fingerprinting.** Raw network captures are turned into grayscale images and classified by a convolutional network as **benign**, **botnet**, or **DDoS**.
+Local network-capture investigations with sanitized flow fingerprints and a compact 1D residual classifier.
 
-Signature rules break when traffic changes shape. TrafficScan treats the byte layout of a packet as a spatial pattern: each byte becomes a pixel, and a small CNN learns which textures belong to normal office traffic, ARES botnet command-and-control, and high-volume denial-of-service. The result is a local web dashboard that accepts a capture or a prebuilt sample and returns a class, a confidence, a risk level, and the fingerprint image itself.
+The active v2 pipeline reads PCAP/PCAPNG, groups bidirectional traffic into bursts of up to 16 packets, extracts 32 protocol-aware bytes per packet, and runs batched inference. MAC/IP identities, ephemeral ports, checksums, TCP sequence identifiers and timestamps are masked before model input. Grayscale fingerprints are rendered by the browser after inference.
 
-This is a Computer Networks course project (Unit II data-link framing, Unit V network security). The reported model is the chronological hold-out result on the 400-byte representation: **74.00% accuracy**, macro F1 **0.7418**.
+**Deployment status is evidence-based.** `/api/ready` returns 503 until all release gates pass. A missing or incompatible checkpoint produces UNKNOWN results while retaining packet/flow evidence. There are no filename-based demo verdicts in the active API. The historical 74% TrafficCNN result is not a result for this architecture.
 
-## Architecture
+The expanded GPU candidate reached **98.57% flow accuracy / 98.86% packet-weighted accuracy / 0.8745 macro F1** on held-out sources. Benign packet escalation is **3.02%**, so the detector remains experimental. The preserved baseline reached 69.91% flow accuracy. See the [measured implementation status](docs/PRODUCTION_IMPLEMENTATION_STATUS.md) and [Kaggle T4 workflow](docs/KAGGLE_GPU.md).
 
-```mermaid
-flowchart TB
-  subgraph sources [Sources]
-    CIC["CIC-IDS2017 slices<br/>100 MiB PCAPs"]
-    Upload["Upload<br/>PCAP or image"]
-    Samples["Bundled samples<br/>benign · botnet · ddos"]
-  end
+## Run
 
-  subgraph bytes [Packet to image]
-    Reader["pcap_reader<br/>Scapy frame bytes"]
-    Window["First 400 bytes<br/>pad with zeros or truncate"]
-    PNG["20×20 grayscale PNG<br/>one packet, one image"]
-  end
-
-  subgraph model [TrafficCNN]
-    Conv["3× Conv 32 / 64 / 128<br/>BatchNorm · ReLU · MaxPool"]
-    Head["Adaptive pool 4×4<br/>Linear 128 · Dropout 0.4"]
-    Classes["benign · botnet · ddos"]
-    CKPT["packet_compact_model.pth"]
-  end
-
-  subgraph app [TrafficScan dashboard]
-    API["FastAPI<br/>api/server.py"]
-    Infer["TrafficClassifier<br/>classification/infer.py"]
-    UI["Browser UI<br/>frontend/"]
-    Demo["Demo mode<br/>filename-based preview"]
-  end
-
-  CIC --> Reader --> Window --> PNG
-  PNG --> Conv --> Head --> Classes
-  Classes --> CKPT
-  Upload --> API
-  Samples --> API
-  API --> Infer
-  CKPT --> Infer
-  API -.-> Demo
-  Infer --> UI
-  Demo -.-> UI
-```
-
-Training and serving share the same representation. Offline scripts in `data_processing/` build the image dataset; `ml/train_packet_compact.py` fits the network on a chronological split and writes the checkpoint. At request time the API loads that checkpoint once, turns the submitted capture into a 20×20 tensor, and returns probabilities plus a zoomed fingerprint for the page.
-
-```mermaid
-sequenceDiagram
-  actor User
-  participant UI as Browser
-  participant API as FastAPI
-  participant Clf as TrafficClassifier
-  participant CNN as TrafficCNN
-
-  User->>UI: Choose a sample or upload a PCAP
-  UI->>API: POST /api/analyze/sample or /api/analyze/upload
-  API->>Clf: First packet, 400 bytes
-  Clf->>Clf: Pad or truncate, reshape to 20×20
-  Clf->>CNN: Grayscale tensor, normalized
-  CNN-->>Clf: Class logits
-  Clf-->>API: Label, confidence, risk, image, hex dump
-  API-->>UI: JSON
-  UI-->>User: Verdict and fingerprint
-```
-
-Demo mode is a presentation path, not a second model. A toggle on the dashboard appends `?demo=true`. The server then answers from `demo/demo_classifier.py` using the known filename. Real inference omits that flag and reads only pixel values from `packet_compact_model.pth`.
-
-## What the fingerprint is
-
-One Ethernet frame becomes one image.
-
-| Step | Rule |
-|------|------|
-| Capture | First packet of the PCAP, raw frame bytes via Scapy |
-| Window | First **400** bytes; shorter frames are zero-padded, longer frames are truncated |
-| Image | Row-major reshape to **20×20**, one byte per pixel, saved as grayscale PNG |
-| Label folders | `benign`, `botnet`, `ddos` |
-
-The training corpus is three 100 MiB slices of [CIC-IDS2017](https://www.unb.ca/cic/datasets/ids-2017.html) (Sharafaldin, Lashkari, Ghorbani, ICISSP 2018), taken from the Hugging Face mirror `bvsam/cic-ids-2017`:
-
-| Class | File | Day |
-|-------|------|-----|
-| benign | `Monday-WorkingHours_slice100MB.pcap` | Monday, normal working hours |
-| ddos | `Wednesday-workingHours_slice100MB.pcap` | Wednesday, DoS / DDoS |
-| botnet | `Friday-WorkingHours_slice100MB.pcap` | Friday, ARES botnet |
-
-Earlier experiments also used a 64×64 / 4,096-byte window. The checkpoint the API loads is the 20×20 compact model, and inference follows that layout.
-
-## Model
-
-`TrafficCNN` in `ml/model.py` is a three-block convolutional network with a small fully connected head. It accepts a single-channel image of any spatial size because the head uses adaptive average pooling to 4×4.
-
-| Block | Layers |
-|-------|--------|
-| Conv 1 | 1 → 32, 3×3, padding 1, BatchNorm, ReLU, MaxPool 2 |
-| Conv 2 | 32 → 64, same pattern |
-| Conv 3 | 64 → 128, same pattern |
-| Head | AdaptiveAvgPool 4×4, Linear 2048 → 128, ReLU, Dropout 0.4, Linear 128 → 3 |
-
-Training (`ml/train_packet_compact.py`) uses Adam at learning rate `0.001`, weight decay `1e-4`, cross-entropy with class weights `[1.10, 1.20, 0.90]`, up to 30 epochs, and early stopping with patience 7. Images are ordered by filename and split per class into the first 1,400 for training, the next 300 for validation, and the remainder for test, so later packets in a capture are not mixed into training.
-
-## Reported result
-
-Evaluated on the chronological hold-out of `data/processed_packet_compact` with `ml/checkpoints/packet_compact_model.pth`:
-
-| Metric | Value |
-|--------|--------|
-| Accuracy | **74.00%** |
-| Macro F1 | **0.7418** |
-
-A random split of the same images reached 94.67%. Adjacent packets inside one capture are highly correlated, so that figure overstates performance on unseen traffic. Cross-capture evaluation is not finished. The 74% chronological number is the result this repository stands behind.
-
-Other representations (4,096-byte streams, 64×64 packet-aligned frames, 16×16 / 256-byte crops, metadata-only features) are recorded in `ml/EXPERIMENT_LOG.md`. The compact 400-byte image is the best chronological result among them.
-
-## Repository
-
-| Path | Role |
-|------|------|
-| `data/raw/` | Source PCAPs, stored with Git LFS |
-| `data/processed_packet_compact/` | 20×20 images used by the current model |
-| `data_processing/` | PCAP reading and byte-to-image conversion |
-| `ml/` | `TrafficCNN`, training scripts, evaluation, checkpoints |
-| `classification/` | Inference: image, probabilities, entropy, hex dump |
-| `api/` | FastAPI service and static file hosting |
-| `frontend/` | Dashboard (`index.html`, `app.js`, `styles.css`) |
-| `demo/` | Presentation-mode classifier and sample images |
-| `docs/` | Design notes, project guide, syllabus mapping |
-
-## Run the dashboard
-
-Python 3.10+ on Windows. GPU is optional; the server falls back to CPU.
+Python 3.10+:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-git lfs pull
-python -m uvicorn api.server:app --reload
+python -m pip install -r requirements-production.txt
+python -m uvicorn api.server:app --host 127.0.0.1 --port 8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000). The header reports engine status, model name, and compute device. Pick a bundled sample or upload a `.pcap`, `.pcapng`, or grayscale image.
+Open [the dashboard](http://127.0.0.1:8000). The interface supports multiple capture uploads, reference captures, flow search, verdict/protocol filters, sorting, pagination, byte-fingerprint inspection, JSON/CSV export, persistent investigations, acquisition provenance and deployment gates. Each analysis is limited to 64 MB, 100,000 packets and 4,096 bursts. Exceeding a limit returns an explicit error rather than a partial verdict.
 
-`requirements.txt` installs NumPy, Pillow, Scapy, PyTorch, torchvision, scikit-learn, FastAPI, and Uvicorn.
+Capture images from older models cannot be uploaded into the flow model: they do not contain session context. Original experimental modules remain for historical reproduction, but `classification/production.py` is the serving engine.
 
-## API
-
-| Method | Path | Purpose |
-|--------|------|---------|
-| `GET` | `/api/health` | Model loaded, class names, device, checkpoint file |
-| `GET` | `/api/samples` | Bundled PCAPs and whether each file is on disk |
-| `POST` | `/api/analyze/sample` | Body `{"sample_id": "benign" \| "ddos" \| "botnet"}` |
-| `POST` | `/api/analyze/upload` | Multipart file: PCAP or PNG/JPEG |
-
-Add `?demo=true` to either analyze route to use the presentation classifier. A real response includes `prediction`, `confidence`, per-class `probabilities`, `risk_level` (`LOW`, `HIGH`, or `CRITICAL`), the fingerprint as a base64 PNG, byte telemetry, and a short hex dump.
-
-Interactive docs are at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) while the server is running.
-
-## Retrain
-
-Build images, then train. Processed trees are large and are not all committed; raw slices come in through Git LFS.
+## Acquire, build, train, evaluate
 
 ```powershell
-python data_processing/packet_compact_convert.py
-python ml/train_packet_compact.py
+python scripts/acquire_production_data.py --mib 32
+python -m scripts.cse_archive
+python -m scripts.cse_archive --member pcap/UCAP172.31.69.25 --max-member-mib 1024
+python -m scripts.prepare_cse
+python -m scripts.cse_archive --day Wednesday-21-02-2018 --archive zip --find 172.31.69.28 --folder data/external/cse21
+python -m scripts.cse_archive --day Wednesday-21-02-2018 --archive zip --member "pcap/UCAP172.31.69.28 part 1" --max-member-mib 2200 --folder data/external/cse21
+python -m scripts.prepare_cse --source cse21 --input data/external/cse21/member.pcap
+python -m scripts.prepare_samples
+python -m data_processing.build_production --max-per-source 20000
+python -m scripts.audit_identity data/production/samples/monday.pcap data/production/samples/ctu1.pcap data/external/friday/capture.pcap
+python -m ml.train_production --epochs 30
+python -m ml.export_production --int8
+python -m ml.evaluate_export
+python -m scripts.benchmark_production data/production/samples/monday.pcap
 ```
 
-The training script writes `ml/checkpoints/packet_compact_model.pth`. Retraining can move the accuracy slightly because early stopping depends on the validation curve. Evaluation procedure and the locked 74% check are in `docs/PROJECT_GUIDE.md`.
+Install `requirements-data.txt` for archive inspection. The CSE command downloads a 968 MB compressed member and extracts an 8.49 GB PCAP. Acquisition validates HTTP range responses and capture block boundaries, records SHA-256 hashes, and stores provenance under `data/external/acquisition.json`. CIC files use PCAPNG internally even when named `.pcap`. CTU bidirectional flow labels are matched by time and bidirectional 5-tuple. Sampled label coverage is recorded; unmatched and background flows are excluded. CIC windows combine published attack times with attacker/victim endpoints, including NAT, rather than assigning labels from filenames. Those schedule-derived labels still require CSV verification before enterprise sign-off. Tuesday contains brute-force attacks, so only a conservative pre-attack interval is used for normal traffic. MAWI must not be treated as automatically clean.
 
-## Limits
+Train, validation and test sources are disjoint. CTU scenario 9 normal/bot captures share one source group. Exact timestamped raw events are deduplicated; naturally identical sanitized fingerprints are retained. Training requires all three classes, uses class-frequency focal loss, cosine annealing and validation early stopping, then fits a temperature on held-out validation logits. Test data never selects the model or temperature. Validation/test coverage and rejection rate are reported; unknown benign flows count as escalations in the false-positive audit. Confidence rejection is a heuristic, not a zero-day detection guarantee.
 
-- Each class currently comes from a single 100 MiB slice, so the model has not been proven on an independent capture.
-- Wednesday and Friday slices begin at the start of the day file. Early packets can precede the labeled attack window.
-- Random train/test splits on one PCAP leak neighboring packets across the split. Use the chronological protocol when quoting accuracy.
-- Demo mode returns scripted high-confidence labels for known filenames. It is for walking through the interface, and it is separate from the checkpoint.
+`ml/checkpoints/flow_resnet.json` contains measured metrics, environment, sources and gates. No target accuracy or throughput is guaranteed. A batch of 64 *flow bursts* is not a batch of 64 packets; model latency excludes capture processing and waiting for context.
 
-## Further reading
+## Optional acceleration
 
-- [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) — setup, reproduction, experiment history
-- [docs/abstract.md](docs/abstract.md) — problem statement
-- [ml/EXPERIMENT_LOG.md](ml/EXPERIMENT_LOG.md) — every representation and split that was tried
-- [docs/HOW_TO_TEST_DEMO.md](docs/HOW_TO_TEST_DEMO.md) — dashboard walkthrough
+```powershell
+Set-Location native
+python setup.py build_ext --inplace
+Set-Location ..
+$env:PYTHONPATH = "$PWD/native"
+```
+
+The extension requires Microsoft C++ Build Tools on Windows or a C++ compiler on Linux. Its portable loop can be compiler-vectorized; explicitly targeting AVX2 requires a compatible host. There is no AVX-512 requirement. Missing native code uses the equivalent Torch normalization path.
+
+```powershell
+$env:TRAFFICSCAN_ONNX = "$PWD/ml/checkpoints/flow_resnet.onnx"
+```
+
+ONNX export checks float32 numerical parity. Static INT8 calibration uses validation samples, never test samples. Quantized prediction agreement is reported and requires independent revalidation. TensorRT requires symmetric, zero-point-zero QDQ; keep its graph separate from the CPU quantized graph. On a CUDA/TensorRT 10 or 11 host:
+
+```text
+python -m ml.export_production --output ml/checkpoints/flow_resnet.trt.onnx --int8 --symmetric
+python -m ml.build_tensorrt ml/checkpoints/flow_resnet.trt.int8.onnx --int8
+python -m ml.evaluate_tensorrt
+```
+
+Set `TRAFFICSCAN_TENSORRT` to the resulting engine. Engine and checkpoint hashes must match. TensorRT compilation and inference require the target GPU and are not validated on CPU. AF_XDP/DPDK ingestion and NIC-level actions require a dedicated Linux/DPDK sensor; this application currently performs offline capture analysis. A subnet or TLS port is never used as proof that a packet is benign.
+
+## Deployment
+
+```powershell
+$env:TRAFFICSCAN_API_KEY = '<your key>'
+docker compose -f deploy/compose.yaml up --build -d
+```
+
+Compose sets `TRAFFICSCAN_REQUIRE_READY=1`, forcing UNKNOWN when release gates fail. The development server permits explicitly marked experimental predictions. The container runs as a non-root user with dropped capabilities, a read-only root filesystem, resource limits and loopback-only port binding. Configure the key through the dashboard's API credentials control. Use a TLS reverse proxy with request body/time limits before network exposure; `deploy/nginx.conf` supplies the location settings. Do not expose the unauthenticated development server publicly. Docker health checks establish liveness; `/api/ready` establishes release readiness. Container builds need a suitable Docker installation and network access.
+
+Investigation evidence is kept in `data/production/investigations.sqlite3`, retaining the latest 100 investigations. Original upload files are not retained. Saved evidence includes endpoints and sanitized byte previews; protect the database as network evidence. Reference captures are generated locally in `data/production/samples/` and excluded from Git with other downloaded data and trained weights.
+
+## Verify
+
+```powershell
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
+node --check frontend/app.js
+python -m scripts.deployment_smoke
+python -m scripts.stability_audit <verified-capture.pcap> --hours 24
+```
+
+The stability tool is a replay audit. Its `.summary.json` records elapsed time, failures and peak observed RSS, and stays incomplete until the full duration elapses. The current audit uses public dataset replay as requested. A real campus traffic/false-positive audit additionally needs an authorized live capture source and independently verified benign labels.
+
+API: `/api/health`, `/api/ready`, `/api/data`, `/api/samples`, `/api/analyze/sample`, `/api/analyze/upload`, `/api/investigations`, `/api/investigations/{id}`. Mutating and evidence endpoints honor `X-API-Key` when configured. [Interactive API documentation](http://127.0.0.1:8000/docs).
+
+See [the original roadmap](docs/PRODUCTION_IMPLEMENTATION_PLAN.md), [implementation status](docs/PRODUCTION_IMPLEMENTATION_STATUS.md), and [source policy](data/production_sources.json). The original experiment history remains in [ml/EXPERIMENT_LOG.md](ml/EXPERIMENT_LOG.md).
+
+Dataset attribution is recorded in [data/DATASET_CITATIONS.md](data/DATASET_CITATIONS.md).

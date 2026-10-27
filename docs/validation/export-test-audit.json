@@ -1,0 +1,30 @@
+{
+  "test_samples": 7209,
+  "test_sources": [
+    "ctu10",
+    "friday",
+    "tuesday"
+  ],
+  "models": {
+    "flow_resnet.onnx": {
+      "accuracy": 0.6991260923845194,
+      "macro_f1": 0.4754113635860537,
+      "packet_weighted_accuracy": 0.5343483536392799,
+      "benign_packet_escalation_rate": 0.2443450161570967,
+      "rejection_rate": 0.34803717575253157,
+      "expected_calibration_error": 0.39369479766383486,
+      "temperature": 1.375256896018982,
+      "agreement_with_float32": 1.0
+    },
+    "flow_resnet.int8.onnx": {
+      "accuracy": 0.6988486613954779,
+      "macro_f1": 0.4716200987452181,
+      "packet_weighted_accuracy": 0.5341821385236774,
+      "benign_packet_escalation_rate": 0.27998384290330597,
+      "rejection_rate": 0.385906505756693,
+      "expected_calibration_error": 0.39612526054570174,
+      "temperature": 1.375256896018982,
+      "agreement_with_float32": 0.9997225690109586
+    }
+  }
+}

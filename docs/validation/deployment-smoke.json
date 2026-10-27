@@ -1,0 +1,14 @@
+{
+  "image": "trafficscan:production",
+  "checks": {
+    "health": true,
+    "readiness_enforced": true,
+    "unauthorized_blocked": true,
+    "authorized_samples": true,
+    "sample_analysis": true,
+    "failed_gates_force_unknown": true,
+    "history_saved": true,
+    "frontend_and_security_headers": true
+  },
+  "passed": true
+}
