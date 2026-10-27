@@ -1,341 +1,336 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrafficScan AI — PCAP-to-Image Malware Fingerprinting</title>
-  <meta name="description" content="Visual cybersecurity pipeline classifying network packet frames into 2D grayscale images using Deep Learning CNNs.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-  <!-- Ambient background glow elements -->
-  <div class="ambient-glow glow-cyan"></div>
-  <div class="ambient-glow glow-indigo"></div>
-
-  <!-- Header -->
-  <header class="app-header">
-    <div class="header-container">
-      <div class="brand">
-        <div class="logo-shield">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="m9 12 2 2 4-4"/>
-          </svg>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101c2c" />
+    <title>TrafficScan | Network investigations</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="TrafficScan home"
+        ><span class="brand-icon">T</span>TrafficScan<span class="brand-dot"
+          >•</span
+        ></a
+      >
+      <div class="workspace">
+        <span class="workspace-icon">N</span>
+        <div>Network workspace<small>LOCAL ENVIRONMENT</small></div>
+      </div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button class="nav active" data-view="investigate">
+          <span>▦</span>Investigations</button
+        ><button class="nav" data-view="history">
+          <span>◷</span>Capture history</button
+        ><button class="nav" data-view="corpus">
+          <span>▤</span>Data sources</button
+        ><button class="nav" data-view="model">
+          <span>◇</span>Model & validation
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="engine-light">
+          <i id="engine-dot"></i><span id="engine-label">Connecting</span>
         </div>
-        <div>
-          <h1 class="brand-title">TrafficScan <span class="highlight">AI</span></h1>
-          <p class="brand-subtitle">PCAP-to-Image Malware Fingerprinting • Unit II Framing & Unit V Security</p>
+        <small id="engine-device">Checking analysis engine</small
+        ><button id="credentials" class="link-button">API credentials ↗</button>
+        <div class="profile">
+          <span>NW</span>
+          <div>Network analyst<small>LOCAL WORKSPACE</small></div>
         </div>
       </div>
-
-      <div class="status-dock" id="statusDock">
-        <div class="status-item" id="systemStatus">
-          <span class="pulse-dot"></span>
-          <span class="status-label">Engine:</span>
-          <span class="status-value" id="engineStatusVal">Connecting...</span>
+    </aside>
+    <div class="shell">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Workspace <span>/</span> <strong id="crumb">Investigations</strong>
         </div>
-        <div class="status-item">
-          <span class="status-label">Model:</span>
-          <span class="status-value" id="modelArchVal">TrafficCNN</span>
+        <div class="top-actions">
+          <span class="local-badge">● Local analysis</span
+          ><button
+            id="refresh"
+            class="icon-button"
+            aria-label="Refresh workspace"
+          >
+            ↻</button
+          ><a
+            class="icon-button"
+            href="/docs"
+            target="_blank"
+            rel="noopener"
+            aria-label="API documentation"
+            >?</a
+          >
         </div>
-        <div class="status-item">
-          <span class="status-label">Compute:</span>
-          <span class="status-value" id="computeDeviceVal">CPU</span>
-        </div>
-        <div class="status-item" style="display: flex; align-items: center; justify-content: center;">
-          <div id="modeShapeToggle" style="width: 18px; height: 18px; background-color: #f59e0b; cursor: pointer; transition: all 0.3s ease; border-radius: 0;"></div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Container -->
-  <main class="main-layout">
-    
-    <!-- Pipeline Explainer Ribbon -->
-    <section class="pipeline-ribbon">
-      <div class="pipeline-step">
-        <span class="step-num">01</span>
-        <span class="step-text">PCAP Packet Stream</span>
-      </div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-step">
-        <span class="step-num">02</span>
-        <span class="step-text">4,096-Byte Extraction</span>
-      </div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-step">
-        <span class="step-num">03</span>
-        <span class="step-text">64×64 Grayscale Matrix</span>
-      </div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-step">
-        <span class="step-num">04</span>
-        <span class="step-text">TrafficCNN Inference</span>
-      </div>
-      <span class="pipeline-arrow">→</span>
-      <div class="pipeline-step highlight-step">
-        <span class="step-num">05</span>
-        <span class="step-text">Threat Verdict</span>
-      </div>
-    </section>
-
-    <div class="dashboard-grid">
-      <!-- Left Column: Upload & Quick Samples -->
-      <aside class="control-panel">
-        
-        <!-- Upload Card -->
-        <div class="cyber-card" id="dropZoneCard">
-          <div class="card-header">
-            <h2>Ingest Capture</h2>
-            <span class="tag">PCAP / PCAPNG</span>
-          </div>
-
-          <div class="drop-zone" id="dropZone">
-            <input type="file" id="fileInput" accept=".pcap,.pcapng,.cap,.png,.jpg" hidden>
-            <div class="drop-content">
-              <div class="upload-icon-container">
-                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-              </div>
-              <p class="drop-title">Drag & Drop PCAP file here</p>
-              <p class="drop-sub">or <button type="button" class="btn-text" id="browseBtn">browse files</button> from your disk</p>
-              <div class="format-badges">
-                <span>.pcap</span>
-                <span>.pcapng</span>
-                <span>.png (Matrix)</span>
-              </div>
+      </header>
+      <main>
+        <div id="notice" class="notice" role="status" hidden></div>
+        <section id="view-investigate" class="view">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">NETWORK INTELLIGENCE</div>
+              <h1>Investigations</h1>
+              <p>From packet capture to actionable evidence.</p>
             </div>
-            <!-- Uploading overlay -->
-            <div class="upload-progress-overlay hidden" id="uploadOverlay">
-              <div class="radar-spinner"></div>
-              <p class="progress-text" id="progressText">Extracting byte frames...</p>
+            <div class="heading-actions">
+              <button id="export" class="button secondary" disabled>
+                ↓ Export report</button
+              ><button id="new" class="button primary">
+                ＋ New investigation
+              </button>
             </div>
           </div>
-        </div>
-
-        <!-- Preloaded Samples Card -->
-        <div class="cyber-card">
-          <div class="card-header">
-            <h2>Preloaded Datasets</h2>
-            <span class="tag tag-demo">CIC-IDS2017</span>
+          <div class="metrics">
+            <article class="metric">
+              <span>Packets analyzed <b>↗</b></span
+              ><strong id="metric-packets">—</strong
+              ><small id="metric-coverage">Awaiting capture</small>
+            </article>
+            <article class="metric">
+              <span>Flow bursts <b>▥</b></span
+              ><strong id="metric-flows">—</strong
+              ><small>Bidirectional · up to 16 packets</small>
+            </article>
+            <article class="metric">
+              <span>Threat detections <b class="red">◈</b></span
+              ><strong id="metric-threats">—</strong
+              ><small id="metric-unknown">Unknown traffic is escalated</small>
+            </article>
+            <article class="metric">
+              <span>Analysis time <b>◷</b></span
+              ><strong id="metric-time">—</strong
+              ><small id="metric-speed">End-to-end processing</small>
+            </article>
           </div>
-          <p class="card-desc">Click any dataset slice below for instant 1-click malware fingerprinting:</p>
-
-          <div class="samples-list" id="samplesList">
-            <!-- Sample Buttons populated dynamically via JS -->
-            <div class="sample-skeleton"></div>
-            <div class="sample-skeleton"></div>
-            <div class="sample-skeleton"></div>
-          </div>
-        </div>
-
-        <!-- Methodology Card -->
-        <div class="cyber-card info-card">
-          <div class="card-header">
-            <h3>How It Works</h3>
-          </div>
-          <p class="text-sm">
-            Each network frame contains headers and payload bytes (0–255). We map every byte to a pixel brightness value. When tiled sequentially into a 64×64 grid, benign traffic forms predictable structural lines, whereas flood attacks (DDoS) and C2 beacons (Botnet) create distinct visual entropy patterns.
-          </p>
-        </div>
-
-      </aside>
-
-      <!-- Right Column: Results & Analysis View -->
-      <section class="results-panel">
-        
-        <!-- Welcome / Empty State -->
-        <div class="cyber-card empty-state" id="emptyState">
-          <div class="radar-scan-graphic">
-            <div class="radar-circle circle-1"></div>
-            <div class="radar-circle circle-2"></div>
-            <div class="radar-circle circle-3"></div>
-            <div class="radar-sweep"></div>
-          </div>
-          <h3>Awaiting Traffic Capture</h3>
-          <p>Upload a <code>.pcap</code> file or click a preloaded dataset on the left to generate the 2D spatial fingerprint and trigger CNN classification.</p>
-        </div>
-
-        <!-- Active Results View (Initially hidden) -->
-        <div class="results-content hidden" id="resultsContent">
-          
-          <!-- Top Row: Threat Verdict & Probabilities -->
-          <div class="verdict-banner" id="verdictBanner">
-            <div class="verdict-status">
-              <div class="verdict-icon-wrap" id="verdictIconWrap">
-                <svg id="verdictIcon" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
+          <div class="analysis-layout">
+            <section class="panel capture-panel">
+              <div class="panel-heading">
+                <h2>Analyze a capture</h2>
+                <span class="muted">01 / INGEST</span>
               </div>
-              <div>
-                <span class="verdict-caption">AI CLASSIFICATION VERDICT</span>
-                <h2 class="verdict-title" id="verdictTitle">DETECTING...</h2>
-                <div class="verdict-tags">
-                  <span class="verdict-tag" id="riskBadge">RISK: UNKNOWN</span>
-                  <span class="verdict-source" id="sourceMeta">File: capture.pcap</span>
-                </div>
+              <label id="dropzone" class="dropzone" for="file"
+                ><span class="upload-icon">↥</span
+                ><strong>Drop your network capture here</strong
+                ><span>or <em>browse files</em></span
+                ><small id="upload-limit"
+                  >PCAP, PCAPNG · up to 64 MB · multiple files supported</small
+                ><input
+                  id="file"
+                  type="file"
+                  accept=".pcap,.pcapng,.cap"
+                  multiple
+              /></label>
+              <div class="capture-footer">
+                <span class="privacy">◈ Captures processed locally</span
+                ><select id="samples" aria-label="Analyze a reference capture">
+                  <option value="">Try a reference capture ↗</option>
+                </select>
               </div>
-            </div>
-
-            <div style="display:flex; gap: 20px;">
-              <div class="confidence-dial">
-                <div class="dial-num" id="confidenceNum">0.0%</div>
-                <span class="dial-label">Model Confidence</span>
+              <div id="queue" class="queue" aria-live="polite" hidden></div>
+            </section>
+            <section class="panel distribution-panel">
+              <div class="panel-heading">
+                <h2>Verdict distribution</h2>
+                <span class="muted">LIVE RESULTS</span>
               </div>
-              <div class="confidence-dial">
-                <div class="dial-num" id="accuracyNum">74.00%</div>
-                <span class="dial-label" id="accuracyLabel">Model Accuracy</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Probability Breakdown Bars -->
-          <div class="cyber-card">
-            <div class="card-header">
-              <h3>Softmax Probability Distribution</h3>
-              <span class="tag">PyTorch Output</span>
-            </div>
-            <div class="prob-grid">
-              
-              <!-- Benign -->
-              <div class="prob-row">
-                <div class="prob-meta">
-                  <span class="prob-class-name benign-text">BENIGN</span>
-                  <span class="prob-pct" id="probBenignPct">0.0%</span>
-                </div>
-                <div class="prob-track">
-                  <div class="prob-bar bar-benign" id="probBenignBar" style="width: 0%"></div>
-                </div>
-              </div>
-
-              <!-- DDoS -->
-              <div class="prob-row">
-                <div class="prob-meta">
-                  <span class="prob-class-name ddos-text">DDOS ATTACK</span>
-                  <span class="prob-pct" id="probDdosPct">0.0%</span>
-                </div>
-                <div class="prob-track">
-                  <div class="prob-bar bar-ddos" id="probDdosBar" style="width: 0%"></div>
-                </div>
-              </div>
-
-              <!-- Botnet -->
-              <div class="prob-row">
-                <div class="prob-meta">
-                  <span class="prob-class-name botnet-text">BOTNET C&C</span>
-                  <span class="prob-pct" id="probBotnetPct">0.0%</span>
-                </div>
-                <div class="prob-track">
-                  <div class="prob-bar bar-botnet" id="probBotnetBar" style="width: 0%"></div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Middle Row: 2D Spatial Fingerprint & Telemetry Metrics -->
-          <div class="visualizer-grid">
-            
-            <!-- Image Fingerprint Card -->
-            <div class="cyber-card image-card">
-              <div class="card-header">
-                <h3>2D Spatial Traffic Fingerprint</h3>
-                <div class="image-controls">
-                  <button class="toggle-btn active" id="btnZoomedView">512×512 HD</button>
-                  <button class="toggle-btn" id="btnNativeView">64×64 Model</button>
-                  <button class="toggle-btn icon-btn" id="btnToggleGrid" title="Toggle Coordinate Grid">#</button>
-                </div>
-              </div>
-
-              <div class="image-viewport" id="imageViewport">
-                <img id="fingerprintImg" src="" alt="Traffic Grayscale Fingerprint" class="traffic-img">
-                <div class="pixel-inspector hidden" id="pixelInspector">
-                  <span id="inspectX">X: 0</span> <span id="inspectY">Y: 0</span> | Val: <span id="inspectVal">0</span>
-                </div>
-              </div>
-              <p class="image-caption">4,096 bytes serialized to a 64×64 matrix where 1 byte (0–255) = 1 pixel luminance.</p>
-            </div>
-
-            <!-- Telemetry Metrics Card -->
-            <div class="cyber-card telemetry-card">
-              <div class="card-header">
-                <h3>Packet & Entropy Telemetry</h3>
-                <span class="tag">Shannon Entropy</span>
-              </div>
-
-              <div class="metrics-grid">
-                
-                <div class="metric-box">
-                  <span class="metric-label">Shannon Entropy</span>
-                  <div class="metric-val" id="metricEntropy">0.000</div>
-                  <div class="entropy-gauge">
-                    <div class="entropy-fill" id="entropyFill" style="width: 0%"></div>
+              <div class="distribution">
+                <div class="donut" id="donut">
+                  <div>
+                    <strong id="donut-total">0</strong
+                    ><small>FLOW BURSTS</small>
                   </div>
-                  <span class="metric-hint" id="entropyHint">Normal structure</span>
                 </div>
-
-                <div class="metric-box">
-                  <span class="metric-label">Capture Extent</span>
-                  <div class="metric-val" id="metricTotalBytes">0 B</div>
-                  <span class="metric-hint">Raw capture payload</span>
-                </div>
-
-                <div class="metric-box">
-                  <span class="metric-label">Fingerprint Matrix</span>
-                  <div class="metric-val">4,096 B</div>
-                  <span class="metric-hint">64 × 64 uint8 bytes</span>
-                </div>
-
-                <div class="metric-box">
-                  <span class="metric-label">Mean Pixel Intensity</span>
-                  <div class="metric-val" id="metricMeanByte">0.0</div>
-                  <span class="metric-hint" id="metricRange">Range: 0 – 255</span>
-                </div>
-
+                <div id="legend" class="legend"></div>
               </div>
-
-              <!-- Quick action to download generated PNG -->
-              <div class="telemetry-actions">
-                <a id="downloadImgBtn" download="traffic_fingerprint.png" class="btn-secondary">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="7 10 12 15 17 10"/>
-                    <line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                  Export Fingerprint PNG
-                </a>
+              <div class="subtle-note" id="calibration-note">
+                Confidence and uncertainty are reported per flow.
+              </div>
+            </section>
+          </div>
+          <section class="panel evidence-panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <h2>Flow evidence</h2>
+                <span id="flow-count" class="count">0</span>
+              </div>
+              <span id="capture-name" class="muted">No capture selected</span>
+            </div>
+            <div class="filters">
+              <label class="search"
+                ><span>⌕</span
+                ><input
+                  id="search"
+                  placeholder="Search IP, port or protocol…"
+                  aria-label="Search flow evidence"
+                /><kbd>/</kbd></label
+              ><select id="verdict" aria-label="Filter verdict">
+                <option value="">All verdicts</option>
+                <option>benign</option>
+                <option>botnet</option>
+                <option>ddos</option>
+                <option>unknown</option></select
+              ><select id="protocol" aria-label="Filter protocol">
+                <option value="">All protocols</option>
+                <option>TCP</option>
+                <option>UDP</option>
+                <option>ICMP</option>
+                <option>ICMPv6</option></select
+              ><select id="sort" aria-label="Sort flow evidence">
+                <option value="id">Capture order</option>
+                <option value="confidence">Highest confidence</option>
+                <option value="bytes">Largest flows</option></select
+              ><button
+                id="csv"
+                class="icon-button"
+                aria-label="Export filtered flows as CSV"
+                disabled
+              >
+                ↓
+              </button>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>VERDICT</th>
+                    <th>SOURCE → DESTINATION</th>
+                    <th>PROTOCOL</th>
+                    <th>PACKETS</th>
+                    <th id="score-heading">MODEL SCORE</th>
+                    <th>INSPECT</th>
+                  </tr>
+                </thead>
+                <tbody id="flows"></tbody>
+              </table>
+            </div>
+            <div id="empty" class="empty">
+              <div class="empty-symbol">▥</div>
+              <h3>Your next investigation starts here</h3>
+              <p>
+                Upload a capture to explore flows, verdicts and byte
+                fingerprints.
+              </p>
+              <span>INGEST <i>→</i> CLASSIFY <i>→</i> INVESTIGATE</span>
+            </div>
+            <div class="pagination">
+              <span id="page-label">No flow evidence</span>
+              <div>
+                <button
+                  id="prev"
+                  class="icon-button"
+                  disabled
+                  aria-label="Previous page"
+                >
+                  ←</button
+                ><button
+                  id="next"
+                  class="icon-button"
+                  disabled
+                  aria-label="Next page"
+                >
+                  →
+                </button>
               </div>
             </div>
-
-          </div>
-
-          <!-- Bottom: Terminal Hex Dump Inspector -->
-          <div class="cyber-card hex-card">
-            <div class="card-header">
-              <div class="terminal-dots">
-                <span class="dot dot-red"></span>
-                <span class="dot dot-yellow"></span>
-                <span class="dot dot-green"></span>
-                <span class="terminal-title">Byte Frame Inspector (First 128 Bytes)</span>
-              </div>
-              <button class="btn-text text-xs" id="copyHexBtn">Copy Hex</button>
+          </section>
+          <footer>
+            <span>TrafficScan / Network intelligence</span
+            ><span>Sanitized bytes. Traceable predictions.</span>
+          </footer>
+        </section>
+        <section id="view-history" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">INVESTIGATION LIBRARY</div>
+              <h1>Capture history</h1>
+              <p>
+                Resume a saved investigation. Latest 100 captures retained
+                locally.
+              </p>
             </div>
-            <pre class="terminal-box" id="hexDumpTerminal">Awaiting packet data...</pre>
           </div>
-
-        </div>
-
-      </section>
+          <div id="history" class="history-grid"></div>
+        </section>
+        <section id="view-corpus" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">DATA PROVENANCE</div>
+              <h1>Data sources</h1>
+              <p>
+                Capture origin, acquisition integrity and label availability.
+              </p>
+            </div>
+          </div>
+          <div id="corpus" class="history-grid"></div>
+        </section>
+        <section id="view-model" class="view" hidden>
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">ENGINE ASSURANCE</div>
+              <h1>Model & validation</h1>
+              <p>Measured performance and deployment gates.</p>
+            </div>
+          </div>
+          <div id="model" class="history-grid"></div>
+        </section>
+      </main>
     </div>
-  </main>
-
-  <script src="/static/app.js"></script>
-</body>
+    <dialog id="detail">
+      <div class="detail-header">
+        <div>
+          <div class="eyebrow">FLOW INSPECTOR</div>
+          <h2 id="detail-title">Flow evidence</h2>
+        </div>
+        <button
+          id="close-detail"
+          class="icon-button"
+          aria-label="Close flow inspector"
+        >
+          ×
+        </button>
+      </div>
+      <div id="detail-summary"></div>
+      <div class="fingerprint-section">
+        <canvas
+          id="fingerprint"
+          width="320"
+          height="160"
+          aria-label="Sanitized grayscale flow fingerprint"
+        ></canvas>
+        <div>
+          <h3>Flow fingerprint</h3>
+          <p>16 packets × 32 sanitized bytes</p>
+          <small
+            >Addresses, ephemeral ports and identity-bearing fields
+            masked.</small
+          >
+        </div>
+      </div>
+      <h3>Class probabilities</h3>
+      <div id="probabilities"></div>
+      <h3>Sanitized byte preview</h3>
+      <pre id="hex"></pre>
+      <button id="export-flow" class="button secondary">
+        ↓ Export flow evidence
+      </button>
+    </dialog>
+    <dialog id="auth-dialog">
+      <h2>Workspace credentials</h2>
+      <p>Enter the API key configured on this server.</p>
+      <form id="auth-form">
+        <label
+          >API key<input id="api-key" type="password" autocomplete="off"
+        /></label>
+        <div class="heading-actions">
+          <button type="button" id="auth-cancel" class="button secondary">
+            Cancel</button
+          ><button class="button primary">Connect</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
 </html>
