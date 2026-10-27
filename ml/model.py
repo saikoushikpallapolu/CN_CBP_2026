@@ -1,4 +1,9 @@
+"""Model entry points. TrafficCNN is retained only for historical experiments.
+
+The serving and source-separated training pipeline uses FlowResNet.
+"""
 import torch.nn as nn
+from ml.production_model import FlowResNet, FocalLoss
 
 
 class TrafficCNN(nn.Module):
