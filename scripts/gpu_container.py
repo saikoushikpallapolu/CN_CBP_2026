@@ -7,7 +7,7 @@ from pathlib import Path
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("image", "compile", "audit", "benchmark", "stability"))
+    parser.add_argument("action", choices=("image", "compile", "audit", "benchmark", "stability", "additional"))
     parser.add_argument("--model", default="flow_resnet")
     parser.add_argument("--data", default="data/production/dataset.npz")
     parser.add_argument("--sm", default="89", choices=("75", "80", "86", "89", "90", "100", "120"))
@@ -40,6 +40,9 @@ def main():
                         "--data", data.relative_to(root).as_posix(), "--output", "artifacts/" + args.model + "-tensorrt-audit.json"])
     elif args.action == "benchmark":
         command.extend(["scripts.benchmark_production", "data/production/samples/monday.pcap", "--output", "artifacts/" + args.model + "-tensorrt-benchmark.json"])
+    elif args.action == "additional":
+        command.extend(["ml.evaluate_additional_attack", "--checkpoint", prefix + ".pth", "--engine", prefix + ".engine",
+                        "--data", data.relative_to(root).as_posix()])
     else:
         command.extend(["scripts.stability_audit", *["data/production/samples/" + name + ".pcap" for name in ("monday", "ctu1", "friday", "cse", "mawi")],
                         "--hours", "24", "--interval", "2", "--output", "artifacts/" + args.model + "-gpu-stability-24h.jsonl"])

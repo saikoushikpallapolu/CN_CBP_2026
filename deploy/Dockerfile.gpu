@@ -9,6 +9,7 @@ COPY api api
 COPY frontend frontend
 COPY ml/build_tensorrt.py ml/build_tensorrt.py
 COPY ml/evaluate_tensorrt.py ml/evaluate_tensorrt.py
+COPY ml/evaluate_additional_attack.py ml/evaluate_additional_attack.py
 COPY scripts/benchmark_production.py scripts/benchmark_production.py
 COPY scripts/stability_audit.py scripts/stability_audit.py
 USER analyst

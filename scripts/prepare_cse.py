@@ -90,7 +90,7 @@ def main():
             accepted_by_attack[active] += 1
             accepted += 1
             timestamps.append(stamp)
-    report = dict(scanned=scanned, accepted=accepted, source=args.source, windows=windows,
+    report = dict(scanned=scanned, accepted=accepted, source=folder.name, capture_day=args.source, windows=windows,
                   prefix_only=args.allow_prefix,
                   attackers=sorted(ATTACKERS), victims=sorted(victims), accepted_by_attack=dict(accepted_by_attack),
                   known_attacker_udp_bins={datetime.fromtimestamp(key, timezone.utc).isoformat(): value for key, value in observed_bins.items()},
@@ -107,7 +107,8 @@ def record_manifest(folder, output, report, timestamps):
     evidence = "prefix_acquisition.json" if report.get("prefix_only") else "extraction.json"
     extraction = json.loads((folder / evidence).read_text())
     name = report["source"]
-    metadata = dict(status="schedule_labeled_subset", source_id="cse2018-" + name, split="train" if name == "cse" else "validation",
+    capture_day = report.get("capture_day", name)
+    metadata = dict(status="schedule_labeled_subset", source_id="cse2018-" + capture_day, split="train" if capture_day == "cse" else "validation",
                            capture=dict(url=extraction["url"], archive_member=extraction["member"]["filename"], packets=len(timestamps),
                                         first_timestamp=timestamps[0], last_timestamp=timestamps[-1], size=output.stat().st_size,
                                         sha256=hashlib.sha256(output.read_bytes()).hexdigest(),

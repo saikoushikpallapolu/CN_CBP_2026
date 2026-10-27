@@ -101,7 +101,7 @@ def main():
         path = ROOT / "data/external" / name / "capture.pcap"
         if not path.exists():
             continue
-        if name in ("cse", "cse21"):
+        if name in ("cse", "cse21", "cse21-hoic"):
             split = metadata["split"]
             from scripts.prepare_cse import schedule_label
             audit = metadata["label_audit"]
@@ -125,7 +125,7 @@ def main():
             labeler = lambda p, name=name: cic_label(name, p)
         sources.append((name, path, split, labeler))
     sources.sort(key=lambda source: {"train": 0, "validation": 1, "test": 2}[source[2]])
-    arrays, labels, groups, splits, packet_counts, hashes = [], [], [], [], [], set()
+    arrays, labels, groups, splits, packet_counts, hashes, origins = [], [], [], [], [], set(), []
     representation_labels = defaultdict(set)
     report = {"representation": REPRESENTATION, "sources": {}, "discarded_duplicates": 0,
               "label_policy": "CTU bidirectional flow intervals; CIC conservative published window + endpoints; unknown excluded"}
@@ -133,7 +133,7 @@ def main():
         count, excluded = 0, 0
         counts = defaultdict(int)
         attack_counts = defaultdict(int)
-        attack_windows = acquired.get(name, {}).get("label_audit", {}).get("windows", []) if name in ("cse", "cse21") else []
+        attack_windows = acquired.get(name, {}).get("label_audit", {}).get("windows", []) if name in ("cse", "cse21", "cse21-hoic") else []
         per_attack_budget = max(1, args.max_per_source // len(attack_windows)) if attack_windows else None
         for packets in flow_bursts(read_capture(path, max_packets=2000000, allow_truncated="slice100MB" in path.name)):
             truth = {labeler(p) for p in packets}
@@ -165,7 +165,8 @@ def main():
             arrays.append(array)
             packet_counts.append(len(packets))
             labels.append(CLASSES.index(label))
-            groups.append("ctu9" if name == "ctu-normal" else name)
+            groups.append("ctu9" if name == "ctu-normal" else "cse21" if name == "cse21-hoic" else name)
+            origins.append(name)
             splits.append(split)
             counts[label] += 1
             if attack:
@@ -187,7 +188,7 @@ def main():
     report["deduplication_policy"] = "Exact raw packet events only; naturally identical sanitized fingerprints retained"
     destination = ROOT / args.output
     destination.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(destination, x=np.stack(arrays), y=np.array(labels), packets=np.array(packet_counts), source=np.array(groups), split=np.array(splits), representation=REPRESENTATION)
+    np.savez_compressed(destination, x=np.stack(arrays), y=np.array(labels), packets=np.array(packet_counts), source=np.array(groups), origin=np.array(origins), split=np.array(splits), representation=REPRESENTATION)
     destination.with_suffix(".json").write_text(json.dumps(report, indent=2))
 
 

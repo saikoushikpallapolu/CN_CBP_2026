@@ -14,14 +14,22 @@ def main():
     parser.add_argument("--checkpoint", default="ml/checkpoints/flow_resnet.pth")
     parser.add_argument("--models", nargs="+", default=["ml/checkpoints/flow_resnet.onnx", "ml/checkpoints/flow_resnet.int8.onnx"])
     parser.add_argument("--output", default="artifacts/export-test-audit.json")
+    parser.add_argument("--split", choices=("test", "validation"), default="test")
+    parser.add_argument("--sources", nargs="+")
     args = parser.parse_args()
     dataset = np.load(args.data, allow_pickle=False)
-    mask = dataset["split"] == "test"
+    mask = dataset["split"] == args.split
+    if args.sources:
+        mask &= np.isin(dataset["source"], args.sources)
+    if not mask.any():
+        raise ValueError("No samples match the requested audit partition/sources")
     x = dataset["x"][mask].astype(np.float32).reshape(-1, 1, 512) / 127.5 - 1
     y = dataset["y"][mask]
     packets = dataset["packets"][mask]
     checksum = hashlib.sha256(Path(args.checkpoint).read_bytes()).hexdigest()
-    report = dict(test_samples=len(y), test_sources=sorted(map(str, set(dataset["source"][mask]))), models={})
+    report = {"partition": args.split, f"{args.split}_samples": len(y),
+              f"{args.split}_sources": sorted(map(str, set(dataset["source"][mask]))),
+              "class_counts": np.bincount(y, minlength=3).tolist(), "checkpoint_sha256": checksum, "models": {}}
     reference = None
     for path in args.models:
         options = ort.SessionOptions()
@@ -47,11 +55,12 @@ def main():
         escalation = (prediction != 0) | rejected
         metrics = dict(accuracy=float(accuracy_score(y, prediction)), macro_f1=float(f1_score(y, prediction, labels=[0, 1, 2], average="macro", zero_division=0)),
                        packet_weighted_accuracy=float(np.average(prediction == y, weights=packets)),
-                       benign_packet_escalation_rate=float(np.average(escalation[benign], weights=packets[benign])),
+                       benign_packet_escalation_rate=float(np.average(escalation[benign], weights=packets[benign])) if benign.any() else None,
                        rejection_rate=float(rejected.mean()), expected_calibration_error=float(ece), temperature=float(metadata["temperature"]))
         if reference is None:
             reference = prediction
         metrics["agreement_with_float32"] = float((prediction == reference).mean())
+        metrics["model_sha256"] = hashlib.sha256(Path(path).read_bytes()).hexdigest()
         report["models"][Path(path).name] = metrics
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
