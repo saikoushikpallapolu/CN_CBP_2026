@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from sklearn.metrics import accuracy_score, f1_score
 from classification.tensorrt_backend import TensorRTBackend
+from classification.artifacts import engine_metadata_path
 from ml.production_model import FlowResNet, probabilities, calibrate_temperature
 
 
@@ -43,7 +44,7 @@ def main():
     backend.metadata.update(temperature=str(calibrate_temperature(validation_logits, validation_y)),
                             calibration_backend="tensorrt", calibration_samples=len(validation_y),
                             calibration_dataset_sha256=hashlib.sha256(Path(args.data).read_bytes()).hexdigest())
-    Path(args.engine).with_suffix(".json").write_text(json.dumps(backend.metadata, indent=2))
+    engine_metadata_path(args.engine).write_text(json.dumps(backend.metadata, indent=2))
     mask = data["split"] == "test"
     x = torch.from_numpy(data["x"][mask].astype(np.float32).reshape(-1, 1, 512) / 127.5 - 1)
     y, packet_counts = data["y"][mask], data["packets"][mask]
@@ -95,6 +96,8 @@ def main():
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(report, indent=2))
+    engine = Path(args.engine)
+    engine.with_name(engine.name + ".audit.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report, indent=2))
 
 

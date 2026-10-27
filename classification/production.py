@@ -2,6 +2,7 @@
 import os
 import hashlib
 import io
+import json
 import time
 from functools import lru_cache
 from pathlib import Path
@@ -24,6 +25,7 @@ class FlowClassifier:
         self.temperature, self.confidence_threshold, self.entropy_threshold = 1., .75, .8
         self.report, self.error, self.backend, self.calibrated = {}, None, "pytorch", False
         self.checkpoint_sha256 = None
+        self.runtime_report = None
         self.require_ready = os.getenv("TRAFFICSCAN_REQUIRE_READY", "0") == "1"
         try:
             if self.path.exists():
@@ -70,18 +72,37 @@ class FlowClassifier:
                     self.calibrated = self.calibrated and self.trt.metadata.get("calibration_valid") == "true"
                     self.backend = "tensorrt"
                     self.device = torch.device("cpu" if getattr(self.trt, "cpu_staging", False) else "cuda")
+                    engine_path = Path(os.environ["TRAFFICSCAN_TENSORRT"])
+                    audit_path = engine_path.with_name(engine_path.name + ".audit.json")
+                    if audit_path.exists():
+                        audit = json.loads(audit_path.read_text())
+                        evidence = audit.get("engine_metadata", {})
+                        if (audit.get("checkpoint_sha256") != self.checkpoint_sha256
+                                or evidence.get("engine_sha256") != self.trt.metadata["engine_sha256"]
+                                or float(evidence.get("temperature", 0)) != self.temperature):
+                            raise ValueError("Runtime audit does not match the active engine and calibration")
+                        self.runtime_report = audit
         except Exception as error:
             self.model, self.error = None, str(error)
 
     def health(self):
         execution_device = "cuda (CPU staging)" if self.backend == "tensorrt" and getattr(self.trt, "cpu_staging", False) else str(self.device)
+        gates = dict(self.report.get("gates", {}))
+        if self.runtime_report:
+            measured = self.runtime_report
+            gates.update(accuracy=measured["accuracy"] > .95 and measured["packet_weighted_accuracy"] > .95,
+                         macro_f1=measured["macro_f1"] > .94, benign_fpr=measured["benign_packet_escalation_rate"] < .001,
+                         calibration_reliability=self.calibrated and measured["expected_calibration_error"] < .05,
+                         model_batch_latency=measured["timings"]["tensorrt"]["batch64_p95_ms"] < 5,
+                         runtime_parity=measured["agreement_with_float32"] >= .99)
+        ready = bool(self.model and self.calibrated and gates and all(gates.values()) and (self.backend == "pytorch" or self.runtime_report))
         return dict(status="online" if self.model else "degraded", model="Flow ResNet-18 · 1D", device=execution_device,
                     checkpoint=self.path.name, checkpoint_sha256=self.checkpoint_sha256, classes=CLASSES, representation=REPRESENTATION, backend=self.backend,
                     verdict_policy="release_gated" if self.require_ready else "experimental",
                     temperature_fitted=bool(self.model and self.calibrated),
                     calibrated=bool(self.model and self.calibrated and self.report.get("calibration_validated", False)),
-                    production_ready=bool(self.model and self.report.get("production_ready") and self.backend == "pytorch"),
-                    error=self.error or (None if self.model else "Trained flow checkpoint unavailable. Analysis returns UNKNOWN."), report=self.report)
+                    production_ready=ready, runtime_report=self.runtime_report,
+                    error=self.error or (None if self.model else "Trained flow checkpoint unavailable. Analysis returns UNKNOWN."), report={**self.report, "gates": gates})
 
     def analyze(self, source, filename, allow_truncated=False):
         start = time.perf_counter()

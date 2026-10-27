@@ -254,3 +254,13 @@ def test_cse_labels_require_endpoint_protocol_and_independent_day():
     packet.destination = "172.31.69.25"
     packet.timestamp += 86400
     assert schedule_label(packet, audit) is None
+
+
+def test_engine_metadata_preserves_training_report(tmp_path):
+    from classification.artifacts import engine_metadata_path
+    training_report = tmp_path / "model.json"
+    training_report.write_text('{"accuracy": 0.98}')
+    engine = tmp_path / "model.engine"
+    engine_metadata_path(engine).write_text('{"engine_sha256": "example"}')
+    assert training_report.read_text() == '{"accuracy": 0.98}'
+    assert engine_metadata_path(engine).name == "model.engine.json"

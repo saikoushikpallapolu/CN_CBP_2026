@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from data_processing.production import REPRESENTATION
+from classification.artifacts import engine_metadata_path
 
 
 def main():
@@ -62,7 +63,7 @@ def main():
         raise RuntimeError("TensorRT engine compilation failed")
     destination = Path(args.output)
     destination.write_bytes(bytes(serialized))
-    destination.with_suffix(".json").write_text(json.dumps({**metadata, "engine_sha256": hashlib.sha256(bytes(serialized)).hexdigest(),
+    engine_metadata_path(destination).write_text(json.dumps({**metadata, "engine_sha256": hashlib.sha256(bytes(serialized)).hexdigest(),
                                                             "precision": "int8_qdq" if args.int8 else "float32", "target_runtime": trt.__version__,
                                                             "gpu": gpu, "compute_capability": capability}, indent=2))
     print(destination)

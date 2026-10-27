@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from data_processing.production import REPRESENTATION
+from classification.artifacts import engine_metadata_path
 
 
 def checked(result):
@@ -26,7 +27,7 @@ class TensorRTCudaBackend:
         from cuda.bindings import runtime as cudart
         self.cuda = cudart
         path = Path(path)
-        self.metadata = json.loads(path.with_suffix(".json").read_text())
+        self.metadata = json.loads(engine_metadata_path(path).read_text())
         serialized = path.read_bytes()
         checkpoint_hash = expected_checkpoint_hash or hashlib.sha256(Path(checkpoint).read_bytes()).hexdigest()
         if self.metadata.get("representation") != REPRESENTATION or self.metadata.get("checkpoint_sha256") != checkpoint_hash:

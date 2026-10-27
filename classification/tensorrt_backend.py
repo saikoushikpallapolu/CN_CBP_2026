@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import torch
 from data_processing.production import REPRESENTATION
+from classification.artifacts import engine_metadata_path
 
 
 class TensorRTBackend:
@@ -12,7 +13,7 @@ class TensorRTBackend:
         if not torch.cuda.is_available():
             raise RuntimeError("TensorRT requires CUDA")
         path = Path(path)
-        metadata = json.loads(path.with_suffix(".json").read_text())
+        metadata = json.loads(engine_metadata_path(path).read_text())
         self.metadata = metadata
         checkpoint_hash = expected_checkpoint_hash or hashlib.sha256(Path(checkpoint).read_bytes()).hexdigest()
         if metadata.get("representation") != REPRESENTATION or metadata.get("checkpoint_sha256") != checkpoint_hash:
