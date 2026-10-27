@@ -1,0 +1,14 @@
+.git
+.venv
+.venv-*
+.runtime
+venv
+data
+demo
+artifacts
+__pycache__
+*.pth
+*.onnx
+*.pcap
+*.pcapng
+.env

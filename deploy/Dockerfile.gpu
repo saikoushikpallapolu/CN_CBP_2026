@@ -1,0 +1,14 @@
+FROM trafficscan:production
+USER root
+RUN pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com "cuda-python>=13,<14" "nvidia-cuda-runtime>=13,<14" && pip install --no-cache-dir --no-deps --extra-index-url https://pypi.nvidia.com "tensorrt-cu13==11.4.0.106" "tensorrt-cu13-bindings==11.4.0.106"
+COPY --from=trt-libs /lib /opt/tensorrt/lib
+COPY --from=trt-libs /manifest.json /opt/tensorrt/manifest.json
+ENV LD_LIBRARY_PATH=/opt/tensorrt/lib:/usr/local/lib/python3.12/site-packages/nvidia/cu13/lib:/usr/local/lib/python3.12/site-packages/nvidia/cuda_runtime/lib:/usr/local/nvidia/lib64
+COPY classification classification
+COPY api api
+COPY frontend frontend
+COPY ml/build_tensorrt.py ml/build_tensorrt.py
+COPY ml/evaluate_tensorrt.py ml/evaluate_tensorrt.py
+COPY scripts/benchmark_production.py scripts/benchmark_production.py
+COPY scripts/stability_audit.py scripts/stability_audit.py
+USER analyst
