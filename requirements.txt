@@ -1,15 +1,6 @@
-# Phase 1 — Data Processing
-numpy
+-r requirements-production.txt
+
+# Historical image/CNN experiments (not used in the production serving path)
 Pillow
 scapy
-
-# Phase 2 — Machine Learning
-torch
 torchvision
-scikit-learn
-
-# Phase 3 — Backend API & Web Dashboard
-fastapi
-uvicorn
-python-multipart
-

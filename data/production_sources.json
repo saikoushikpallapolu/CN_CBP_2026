@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "label_policy": "Never infer truth from filename, host infection alone or capture day. Unknown/background is excluded.",
+  "sources": [
+    {"name": "CTU-13", "reference": "https://www.stratosphereips.org/datasets-ctu13", "scenarios": [1, 2, 9, 10], "labels": "bidirectional binetflow intervals and 5-tuples", "timezone": "Europe/Prague", "acquisition": "scripts/acquire_production_data.py"},
+    {"name": "CIC-IDS2017", "reference": "https://www.unb.ca/cic/datasets/ids-2017.html", "mirror": "https://huggingface.co/datasets/bvsam/cic-ids-2017", "labels": "conservative published window plus attacker and victim endpoints", "timezone": "America/Halifax", "acquisition": "scripts/acquire_production_data.py", "limitations": "Wednesday DoS grouped into ddos taxonomy; publication labels require further flow-CSV verification for sign-off"},
+    {"name": "CSE-CIC-IDS2018", "reference": "https://www.unb.ca/cic/datasets/ids-2018.html", "bucket": "https://cse-cic-ids2018.s3.amazonaws.com/", "status": "requires exact PCAP key, verified flow labels and target attack-window selection"},
+    {"name": "MAWI", "reference": "https://mawi.wide.ad.jp/mawi/", "status": "unlabeled backbone traffic must not be assumed pure benign; require MAWILab annotations and independent audit"},
+    {"name": "UNSW-NB15", "reference": "https://research.unsw.edu.au/projects/unsw-nb15-dataset", "status": "recommended additional source; not required by the plan's acquisition action list"},
+    {"name": "IoT-23", "reference": "https://www.stratosphereips.org/datasets-iot23", "status": "recommended additional source; not required by the plan's acquisition action list"}
+  ]
+}
