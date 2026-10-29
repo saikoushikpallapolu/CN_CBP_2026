@@ -108,6 +108,8 @@ def main():
             if "windows" not in audit:
                 raise ValueError("Re-run prepare_cse to establish independent multi-attack sources")
             labeler = lambda p, audit=audit: schedule_label(p, audit)
+        elif name in ("normal7", "normal20") and metadata.get("status") == "controlled_normal_enrichment":
+            split, labeler = "train", lambda p: "benign"
         elif name == "normal-dns":
             split = "train"
             labeler = lambda p: "benign" if p.protocol == 17 and 53 in (p.sport, p.dport) and "10.0.0.34" in (p.source, p.destination) and ({p.source, p.destination} & {"8.8.8.8", "8.8.4.4"}) else None

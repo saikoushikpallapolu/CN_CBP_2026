@@ -59,5 +59,12 @@ def calibrate_temperature(logits, labels):
 def probabilities(logits, temperature=1.0, confidence_threshold=.75, entropy_threshold=.8):
     p = F.softmax(logits / temperature, dim=1)
     entropy = -(p * p.clamp_min(1e-12).log()).sum(1) / torch.log(torch.tensor(p.shape[1], device=p.device))
-    rejected = (p.max(1).values < confidence_threshold) | (entropy > entropy_threshold)
+    predicted = p.argmax(1)
+    confidence_cutoff = torch.as_tensor(confidence_threshold, device=p.device)
+    entropy_cutoff = torch.as_tensor(entropy_threshold, device=p.device)
+    if confidence_cutoff.ndim:
+        confidence_cutoff = confidence_cutoff[predicted]
+    if entropy_cutoff.ndim:
+        entropy_cutoff = entropy_cutoff[predicted]
+    rejected = (p.max(1).values < confidence_cutoff) | (entropy > entropy_cutoff)
     return p, entropy, rejected
