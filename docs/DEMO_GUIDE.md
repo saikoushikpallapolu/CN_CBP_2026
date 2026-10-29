@@ -1,5 +1,8 @@
 # Test and demonstrate TrafficScan
 
+> Response update: Monitor, simulated blocking/rate-limiting, uncertainty labeling and advisory behavioral evidence are documented in [RESPONSE_AND_BEHAVIOR.md](RESPONSE_AND_BEHAVIOR.md). Its repeated-reference simulation counts supersede earlier scenario counts below.
+
+
 Open http://127.0.0.1:8000 and choose **Traffic stream**. Keep `192.0.2.10`, choose a scenario and click **Connect sensor**. The active model analyzes recorded public frames before replay. No live laptop traffic is captured. The former Test & demo tab has been removed; the separate labeled comparison suite remains available through the CLI/API.
 
 ## Four-minute walkthrough

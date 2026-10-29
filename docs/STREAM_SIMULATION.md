@@ -1,5 +1,8 @@
 # Traffic stream and virtual sensor
 
+> Response update: Monitor, simulated blocking/rate-limiting, uncertainty labeling and advisory behavioral evidence are documented in [RESPONSE_AND_BEHAVIOR.md](RESPONSE_AND_BEHAVIOR.md). Its repeated-reference simulation counts supersede earlier scenario counts below.
+
+
 The main workspace now places an animated packet-activity wave above the existing statistics. The waveform, dots, detection feed, donut and flow table follow one shared replay position. Attack markers use actual model verdicts, not the reference labels or random events.
 
 ## Start a simulation

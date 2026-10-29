@@ -1,5 +1,8 @@
 # TrafficScan
 
+> Response update: Traffic stream now supports monitor-only, simulated blocking/rate-limiting, and pause-on-threat. UNKNOWN is labeled Uncertain / review. Behavioral models were trained and evaluated but remain advisory because promotion checks failed. Known virtual scenarios include explicitly labeled repeated reference continuation. See [response and behavioral evaluation](docs/RESPONSE_AND_BEHAVIOR.md).
+
+
 **Animated workspace:** connect the virtual sensor **192.0.2.10** on the main Traffic stream screen, or upload a capture. [Wave/simulation controls and meaning](docs/STREAM_SIMULATION.md). The virtual sensor is local recorded-data replay; no attack traffic is transmitted.
 
 **Present/test the app:** open **Traffic stream → Connect sensor** for packet-by-packet replay and threat logs. **Model & validation** shows paired timing savings and held-out metrics. [Demo guide](docs/DEMO_GUIDE.md) · [Latest model experiments and limitations](docs/MODEL_IMPROVEMENT_RESULTS.md). The longevity replay is stopped; no live laptop traffic is captured.

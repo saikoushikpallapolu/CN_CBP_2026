@@ -1,5 +1,8 @@
 # TrafficScan review build
 
+> Response update: Monitor, simulated blocking/rate-limiting, uncertainty labeling and advisory behavioral evidence are documented in [RESPONSE_AND_BEHAVIOR.md](RESPONSE_AND_BEHAVIOR.md). Its repeated-reference simulation counts supersede earlier scenario counts below.
+
+
 > Current UI update, 29 October: **Traffic stream** now contains the simulation and packet/threat event log; the Test & demo tab was removed. Model & validation foregrounds paired CPU/GPU timing savings. See [STREAM_SIMULATION.md](STREAM_SIMULATION.md).
 
 > Earlier update, 29 October: the longevity replay was stopped by the user after about 48 minutes/5,970 analyses and was not restarted. The new **Test & demo** workflow is documented in [DEMO_GUIDE.md](DEMO_GUIDE.md). Two new training challengers and a threshold policy were rejected; see [MODEL_IMPROVEMENT_RESULTS.md](MODEL_IMPROVEMENT_RESULTS.md). These updates supersede the running-audit statements below.
