@@ -32,8 +32,6 @@
           <span>▤</span>Data sources</button
         ><button class="nav" data-view="model">
           <span>◇</span>Model & validation
-        </button><button class="nav" data-view="demo">
-          <span>▷</span>Test & demo
         </button>
       </nav>
       <div class="sidebar-bottom">
@@ -128,6 +126,17 @@
               <label class="stream-loop"><input id="stream-loop" type="checkbox" /> Loop</label>
             </div>
             <p id="stream-note" class="stream-note">Recorded samples. Dots group dense packet intervals; ring markers are actual model verdicts.</p>
+          </section>
+          <section class="panel event-log-panel" aria-label="Packet and threat event log">
+            <div class="panel-heading log-heading">
+              <div><h2>Packet & threat log</h2><small id="log-summary">Connect a sensor or upload a capture</small></div>
+              <div class="log-actions">
+                <select id="log-filter" aria-label="Log event type"><option value="all">All events</option><option value="packet">Packets</option><option value="threat">Threats</option><option value="review">Review</option></select>
+                <button id="log-export" class="button secondary" disabled>↓ Export log</button>
+              </div>
+            </div>
+            <div id="packet-log" class="packet-log" role="region" aria-label="Recorded events, newest first" tabindex="0"></div>
+            <div class="log-footer"><span id="log-page">No events yet</span><div><button id="log-older" class="button secondary" disabled>← Older</button><button id="log-newer" class="button secondary" disabled>Newer →</button><button id="log-latest" class="button secondary">Follow latest</button></div></div>
           </section>
           <div class="metrics">
             <article class="metric">
@@ -320,21 +329,7 @@
               <p>Measured performance and deployment gates.</p>
             </div>
           </div>
-          <div id="model" class="history-grid"></div>
-        </section>
-        <section id="view-demo" class="view" hidden>
-          <div class="page-heading">
-            <div><div class="eyebrow">VERIFY THE MODEL</div><h1>Test & demo</h1>
-              <p>Four labeled public captures. Real inference, compared with recorded truth.</p></div>
-            <button id="run-demo" class="button primary">▷ Run demo suite</button>
-          </div>
-          <div class="notice">Offline samples, not live traffic. UNKNOWN means review; it is not a correct attack-type prediction.</div>
-          <div id="demo-results" class="history-grid">
-            <article class="info-card"><h2>1 · Normal</h2><p>Check benign acceptance and false alerts.</p></article>
-            <article class="info-card"><h2>2 · Botnet</h2><p>Check attack recognition and missed traffic.</p></article>
-            <article class="info-card"><h2>3 · DDoS</h2><p>Inspect a known attack fingerprint.</p></article>
-            <article class="info-card"><h2>4 · Unseen HOIC</h2><p>Check uncertainty and escalation.</p></article>
-          </div>
+          <div id="model" class="model-grid"></div>
         </section>
       </main>
     </div>

@@ -29,7 +29,10 @@
     const host = focus && !virtual ? normalizeIP(focus) : "";
     const flows = result.flows.filter(f => !host || normalizeIP(f.source) === host || normalizeIP(f.destination) === host);
     if (!flows.length) throw new Error("This IP has no supported flows in the selected capture.");
-    const records = flows.flatMap(f => f.packet_timeline || Array.from({length: f.packets}, () => [f.timestamp, f.bytes / f.packets]));
+    const packetRows = (result.packet_log?.rows || []).filter(row => !host ||
+      (row[3] && normalizeIP(row[3]) === host) || (row[5] && normalizeIP(row[5]) === host));
+    const records = result.packet_log ? packetRows.map(row => [row[1], row[2]]) :
+      flows.flatMap(f => f.packet_timeline || Array.from({length: f.packets}, () => [f.timestamp, f.bytes / f.packets]));
     const original = !host && result.timeline;
     const start = original ? original.start : records.reduce((n,r) => Math.min(n,r[0]), Infinity);
     const packetEnd = records.reduce((n,r) => Math.max(n,r[0]), -Infinity);
@@ -38,19 +41,29 @@
     const bins = (original ? original.bins : binsFor(records, start, end)).map((b, index) => ({...b, progress: progress(b.timestamp), index}));
     const events = flows.map(f => ({ flow: f, progress: progress(f.ready_timestamp ?? f.timestamp) }))
       .sort((a, b) => a.progress - b.progress || a.flow.id - b.flow.id);
-    return { bins, events, start, end, focus: host || (virtual ? focus : ""),
-      scope: host || !original ? "Represented flow packets" : "All recorded packets",
+    const packetEvents = packetRows.map(row => ({id: `packet-${row[0]}`, kind: "packet", timestamp: row[1], progress: progress(row[1]),
+        sequence: row[0], bytes: row[2], source: row[3], sport: row[4], destination: row[5], dport: row[6], protocol: row[7]}))
+      .sort((a,b) => a.progress - b.progress || a.sequence - b.sequence);
+    const logEvents = [...packetEvents, ...events.filter(e => e.flow.prediction !== "benign").map(e => ({
+      id: `flow-${e.flow.id}`, kind: e.flow.prediction === "unknown" ? "review" : "threat",
+      timestamp: e.flow.ready_timestamp ?? e.flow.timestamp, progress: e.progress, flow: e.flow
+    }))].sort((a,b) => a.progress - b.progress || (a.kind === "packet" ? 0 : 1) - (b.kind === "packet" ? 0 : 1));
+    return { bins, events, packetEvents, logEvents, start, end, focus: host || (virtual ? focus : ""),
+      logAvailable: !!result.packet_log,
+      scope: host && result.packet_log ? "All recorded packets for this host" : host || !original ? "Represented flow packets" : "All recorded packets",
       totalPackets: bins.reduce((n,b) => n + b.count, 0), result };
   }
   function snapshot(model, position) {
     const progress = clamp(position);
     const bins = model.bins.filter(b => b.progress <= progress);
     const events = model.events.filter(e => e.progress <= progress);
+    const log = model.logEvents.filter(e => e.progress <= progress);
+    const packets = model.logAvailable ? log.reduce((n,e) => n + (e.kind === "packet" ? 1 : 0), 0) : bins.reduce((n,b) => n + b.count, 0);
     const flows = events.map(e => e.flow);
     const counts = Object.fromEntries(verdicts.map(key => [key, 0]));
     flows.forEach(f => counts[f.prediction]++);
-    return { flows, counts, bins, packets: bins.reduce((n,b) => n + b.count, 0),
-      bytes: bins.reduce((n,b) => n + b.bytes, 0), represented: flows.reduce((n,f) => n + f.packets, 0),
+    return { flows, counts, bins, log, packets,
+      bytes: model.logAvailable ? log.reduce((n,e) => n + (e.kind === "packet" ? e.bytes : 0), 0) : bins.reduce((n,b) => n + b.bytes, 0), represented: flows.reduce((n,f) => n + f.packets, 0),
       captureTimestamp: model.start + clamp((progress - .02) / .96) * (model.end - model.start) };
   }
   const api = { prepare, snapshot, normalizeIP, clamp };

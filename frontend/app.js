@@ -7,8 +7,10 @@ const state = {
   page: 0,
   busy: false,
   key: sessionStorage.getItem("traffic-key") || "",
-  demo: null,
   visible: null,
+  logPage: 0,
+  logKey: "",
+  logModel: null,
 };
 const colors = {
   benign: "#0a957a",
@@ -39,6 +41,7 @@ function renderReplay(frame, replay, position) {
   $("metric-unknown").textContent = `${number(frame.counts.unknown)} unknown · review required`;
   $("metric-speed").textContent = `Analysis: ${state.result.telemetry.analysis_ms} ms · precomputed`;
   renderDistribution(); renderFlows();
+  renderPacketLog();
   const detections = frame.flows.filter(f => f.prediction !== "benign").slice(-5).reverse();
   const key = detections.map(f => f.id).join(",");
   if (key !== lastFeedKey) {
@@ -55,6 +58,38 @@ function renderReplay(frame, replay, position) {
     $("stream-announcement").textContent = `${frame.counts.botnet + frame.counts.ddos} attack predictions and ${frame.counts.unknown} review verdicts revealed.`;
   }
   $("traffic-wave").setAttribute("aria-label", `Replay: ${frame.packets} packets, ${frame.flows.length} flows, ${frame.counts.botnet + frame.counts.ddos} attack predictions, ${frame.counts.unknown} review verdicts.`);
+}
+function renderPacketLog() {
+  const replay = streamPlayer.model, frame = state.visible;
+  if (state.logModel !== replay) { state.logModel = replay; state.logPage = 0; state.logKey = ""; }
+  const filter = $("log-filter").value || "all";
+  const events = (frame?.log || []).filter(e => filter === "all" || e.kind === filter);
+  const pages = Math.ceil(events.length / 200);
+  state.logPage = Math.max(0, Math.min(state.logPage, Math.max(0, pages - 1)));
+  const key = `${events.length}:${events.at(-1)?.id}:${filter}:${state.logPage}`;
+  $("log-summary").textContent = !replay ? "Connect a sensor or upload a capture" : !replay.logAvailable
+    ? "Legacy capture · packet log unavailable; flow verdicts only. Re-analyze for packet logging."
+    : `${number(frame.packets)} packets · ${number(frame.counts.botnet + frame.counts.ddos)} threats · ${number(frame.counts.unknown)} review · recorded replay`;
+  $("log-export").disabled = !events.length;
+  $("log-older").disabled = state.logPage + 1 >= pages;
+  $("log-newer").disabled = state.logPage === 0;
+  $("log-page").textContent = events.length ? `${number(events.length)} events · newest first · page ${state.logPage + 1} / ${pages}` : "Waiting for events";
+  if (state.logKey === key) return;
+  state.logKey = key;
+  const host = $("packet-log"); host.replaceChildren();
+  if (!events.length) host.append(node("p", "Packet arrivals and model threats will appear here as the replay advances.", "log-empty"));
+  const end = Math.max(0, events.length - state.logPage * 200);
+  for (const event of events.slice(Math.max(0, end - 200), end).reverse()) {
+    const entry = node(event.flow ? "button" : "div", undefined, `log-entry log-${event.kind}`);
+    const clock = new Date(event.timestamp * 1000).toISOString().slice(11, 23);
+    const details = event.flow || event;
+    const endpoints = details.source ? `${endpointText(details.source, details.sport)} → ${endpointText(details.destination, details.dport)}` : "Unsupported frame · retained in capture log";
+    entry.append(node("time", clock), node("span", event.kind.toUpperCase(), "log-kind"),
+      node("span", event.kind === "packet" ? `#${event.sequence} · ${event.protocol} · ${event.bytes} B` : `${labels[event.flow.prediction]} · Flow ${event.flow.id} · ${(event.flow.confidence * 100).toFixed(1)}%`, "log-detail"),
+      node("span", endpoints, "log-endpoints"));
+    if (event.flow) { entry.title = "Inspect flow evidence"; entry.addEventListener("click", () => inspectFlow(event.flow)); }
+    host.append(entry);
+  }
 }
 function node(tag, text, className) {
   const n = document.createElement(tag);
@@ -160,6 +195,7 @@ async function refresh() {
 }
 function reset() {
   streamPlayer.clear(); state.visible = null; lastFeedKey = "";
+  state.logPage = 0; state.logKey = ""; renderPacketLog();
   $("sensor-status").hidden = true;
   $("stream-events").replaceChildren(node("p", "Verdicts appear as each flow's packet context arrives.", "feed-empty"));
   state.result = null;
@@ -186,6 +222,7 @@ function reset() {
 }
 function showResult(result, playback = {}) {
   streamPlayer.stop(); state.visible = null; lastFeedKey = "unset";
+  state.logPage = 0; state.logKey = "";
   $("score-heading").textContent = result.model?.production_ready
     ? "CONFIDENCE"
     : "MODEL SCORE";
@@ -492,6 +529,38 @@ function renderModel() {
   host.replaceChildren();
   if (!state.health) return;
   const h = state.health;
+  const r = h.report || {}, audit = h.runtime_report || r;
+  const timing = h.runtime_report?.timings;
+  const baseline = timing?.pytorch_cpu, accelerated = timing?.tensorrt;
+  const validTiming = baseline?.batch64_p50_ms > 0 && accelerated?.batch64_p50_ms > 0;
+  const hero = node("div", undefined, "model-highlights");
+  function highlight(label, value, detail) {
+    const item = node("article", undefined, "model-highlight");
+    item.append(node("span", label), node("strong", value), node("small", detail)); hero.append(item);
+  }
+  highlight("Model inference speedup", validTiming ? `${(baseline.batch64_p50_ms / accelerated.batch64_p50_ms).toFixed(1)}×` : "Not measured", "Median · CPU PyTorch → GPU TensorRT");
+  highlight("Time saved / 64 flows", validTiming ? `${(baseline.batch64_p50_ms - accelerated.batch64_p50_ms).toFixed(3)} ms` : "Not measured", validTiming ? `${((1 - accelerated.batch64_p50_ms / baseline.batch64_p50_ms) * 100).toFixed(2)}% less model inference time` : "A paired benchmark is required");
+  highlight("Held-out flow accuracy", audit.accuracy == null ? "Not measured" : `${(audit.accuracy * 100).toFixed(2)}%`, `${number(h.runtime_report?.test_samples || r.samples?.test || 0)} test flows · before UNKNOWN rejection`);
+  highlight("Macro F1", audit.macro_f1 == null ? "Not measured" : audit.macro_f1.toFixed(4), "Equal weight for each class");
+  host.append(hero);
+  const performance = node("article", undefined, "info-card model-wide");
+  performance.append(node("h2", "Measured time savings"));
+  if (validTiming) {
+    const table = node("table", undefined, "timing-table");
+    const header = node("tr");
+    for (const title of ["64-flow model batch", "PyTorch CPU", "TensorRT GPU", "Time saved", "Speedup"]) header.append(node("th", title));
+    const head = node("thead"); head.append(header); table.append(head);
+    const body = node("tbody");
+    for (const [label, key] of [["Median", "batch64_p50_ms"], ["p95", "batch64_p95_ms"]]) {
+      const row = node("tr"), cpu = baseline[key], gpu = accelerated[key];
+      for (const value of [label, `${cpu.toFixed(3)} ms`, `${gpu.toFixed(3)} ms`, `${(cpu - gpu).toFixed(3)} ms (${((1 - gpu / cpu) * 100).toFixed(2)}%)`, `${(cpu / gpu).toFixed(2)}×`]) row.append(node("td", value));
+      body.append(row);
+    }
+    table.append(body); const wrap = node("div", undefined, "timing-scroll"); wrap.append(table); performance.append(wrap);
+    performance.append(node("p", `Paired audit: ${h.runtime_report.gpu}. Same checkpoint, 64-flow batches; includes GPU transfers. Excludes capture parsing, flow-context waiting, HTTP and packet-log rendering. These are measured model timings, not end-to-end savings or a competitor benchmark.`));
+  } else performance.append(node("p", "No paired CPU/GPU timing audit is available for this checkpoint. Savings are not estimated."));
+  if (state.result) performance.append(kv("Latest capture analysis", `${state.result.telemetry.analysis_ms} ms · ${number(state.result.telemetry.packet_count)} packets · precomputed before replay`));
+  host.append(performance);
   const card = node("article", undefined, "info-card");
   card.append(
     node("h2", "Analysis engine"),
@@ -505,7 +574,6 @@ function renderModel() {
   host.append(card);
   const metrics = node("article", undefined, "info-card");
   metrics.append(node("h2", h.runtime_report ? "TensorRT evaluation" : "Independent-source evaluation"));
-  const r = h.report || {};
   const measured = h.runtime_report
     ? { ...h.runtime_report, batch64_p95_ms: h.runtime_report.timings?.tensorrt?.batch64_p95_ms,
         temperature: h.runtime_report.engine_metadata?.temperature }
@@ -514,6 +582,7 @@ function renderModel() {
     ["Flow accuracy", "accuracy"],
     ["Represented packet accuracy", "packet_weighted_accuracy"],
     ["Macro F1", "macro_f1"],
+    ["Flows sent for review", "rejection_rate"],
     ["Benign packets escalated", "benign_packet_escalation_rate"],
     ["Calibration error", "expected_calibration_error"],
     [`${h.runtime_report ? "GPU" : "PyTorch"} p95 / 64 flows (ms)`, "batch64_p95_ms"],
@@ -530,6 +599,20 @@ function renderModel() {
       ),
     );
   host.append(metrics);
+  const strengths = node("article", undefined, "info-card");
+  strengths.append(node("h2", "Why this approach helps"),
+    kv("Direct byte representation", "512 bytes / flow · no PNG encoding"),
+    kv("Bounded flow context", "First 16 packets · 32 bytes each"),
+    kv("Batched inference", "Up to 64 flow bursts per call"),
+    kv("Identity invariance", `${number(r.identity_audit?.checked || 0)} checked · ${number(r.identity_audit?.failures || 0)} failures`),
+    node("p", "Strengths are supported by this implementation and audit. A universal ‘best model’ claim is not established by these tests."));
+  host.append(strengths);
+  const scope = node("article", undefined, "info-card");
+  scope.append(node("h2", "Validation scope"), kv("Training / validation / test", `${number(r.samples?.train || 0)} / ${number(r.samples?.validation || 0)} / ${number(r.samples?.test || 0)}`),
+    kv("Test class counts", (r.class_counts?.test || []).map((n,i) => `${labels[["benign", "botnet", "ddos"][i]]}: ${number(n)}`).join(" · ") || "Not measured"),
+    kv("GPU / float32 class agreement", h.runtime_report?.agreement_with_float32 == null ? "Not measured" : `${(h.runtime_report.agreement_with_float32 * 100).toFixed(3)}%`),
+    node("p", "Class imbalance makes accuracy alone insufficient. UNKNOWN is a review outcome, not a correct attack-type prediction. Production approval remains pending."));
+  host.append(scope);
   const gates = node("article", undefined, "info-card");
   gates.append(node("h2", "Deployment gates"));
   const requirements = r.gates || {
@@ -562,7 +645,6 @@ function switchView(name) {
     history: "Capture history",
     corpus: "Data sources",
     model: "Model & validation",
-    demo: "Test & demo",
   }[name];
   if (name === "history") history();
   if (name === "corpus") corpus();
@@ -604,48 +686,16 @@ $("sensor-clear").addEventListener("click", () => {
 });
 for (const nav of document.querySelectorAll(".nav"))
   nav.addEventListener("click", () => switchView(nav.dataset.view));
-$("run-demo").addEventListener("click", async () => {
-  const button = $("run-demo");
-  button.disabled = true;
-  button.textContent = "Running real inference…";
-  try {
-    const report = await api("/api/demo", { method: "POST" });
-    state.demo = report;
-    $("demo-results").replaceChildren();
-    for (const item of report.cases) {
-      const card = node("article", undefined, "info-card");
-      const pct = (value) => `${(value * 100).toFixed(1)}%`;
-      card.append(node("h2", item.title), kv("Recorded truth", labels[item.expected_class]),
-        kv("Capture group", item.source_group),
-        kv("Flows", item.flow_count), kv("Correct class", pct(item.class_match_rate)),
-        kv("Unknown / review", pct(item.unknown_rate)));
-      if (item.expected_class === "benign") {
-        card.append(kv("False attack alerts", pct(item.benign_attack_alert_rate)),
-          kv("Total review rate", pct(item.benign_review_rate)));
-      } else card.append(kv("Attack escalation", pct(item.attack_escalation_rate)));
-      card.append(kv("Analysis time", `${item.analysis_ms} ms`));
-      if (item.id === "demo-ddos") card.append(node("p", "Training-source reference; not an independent accuracy test."));
-      const inspect = node("button", "Inspect capture ↗", "button secondary");
-      inspect.addEventListener("click", async () => {
-        if (state.busy) return;
-        setBusy(true);
-        try {
-          showResult(await api("/api/analyze/sample", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sample_id: item.id }) }));
-          switchView("investigate");
-        } catch (error) { notice(error.message, true); }
-        finally { setBusy(false); }
-      });
-      card.append(inspect);
-      $("demo-results").append(card);
-    }
-    const exportCard = node("article", undefined, "info-card");
-    exportCard.append(node("h2", "Evidence"), node("p", report.scope));
-    const exportButton = node("button", "↓ Export demo report", "button secondary");
-    exportButton.addEventListener("click", () => download(report, "trafficscan-demo.json"));
-    exportCard.append(exportButton);
-    $("demo-results").append(exportCard);
-  } catch (error) { notice(error.message, true); }
-  finally { button.disabled = false; button.textContent = "▷ Run demo suite"; }
+$("log-filter").addEventListener("change", () => { state.logPage = 0; renderPacketLog(); });
+$("log-older").addEventListener("click", () => { state.logPage++; renderPacketLog(); });
+$("log-newer").addEventListener("click", () => { state.logPage--; renderPacketLog(); });
+$("log-latest").addEventListener("click", () => { state.logPage = 0; renderPacketLog(); });
+$("log-export").addEventListener("click", () => {
+  const filter = $("log-filter").value || "all";
+  const events = (state.visible?.log || []).filter(e => filter === "all" || e.kind === filter);
+  download({filename: state.result?.filename, source: state.result?.simulation || "capture",
+    scope: "Events revealed at the current replay position; verdicts are flow-level predictions",
+    filter, events: events.map(({progress, ...event}) => event)}, "trafficscan-event-log.json");
 });
 $("file").addEventListener("change", (event) =>
   uploadFiles(event.target.files),

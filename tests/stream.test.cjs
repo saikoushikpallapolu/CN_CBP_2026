@@ -54,3 +54,19 @@ test('host focus retains an idle/capture-end wait before a partial verdict', () 
   assert.equal(replay.snapshot(model,.5).flows.length,0);
   assert.equal(replay.snapshot(model,1).flows.length,1);
 });
+
+test('exact packet logs include unsupported and unrepresented packets without premature threats', () => {
+  const logged = {...result, packet_log: {version: 1, rows: [
+    [1,10,60,'10.0.0.1',1,'10.0.0.2',2,'TCP',1],
+    [2,12,30,null,null,null,null,'Unsupported',1],
+    [3,20,90,'10.0.0.1',1,'10.0.0.2',2,'TCP',1]]}};
+  const model = replay.prepare(logged);
+  const middle = replay.snapshot(model,.3);
+  assert.equal(middle.packets,2);
+  assert.equal(middle.bytes,90);
+  assert.equal(middle.log.filter(e => e.kind === 'threat').length,0);
+  assert.equal(replay.snapshot(model,1).log.length,4);
+  const host = replay.prepare(logged, '10.0.0.1');
+  assert.equal(replay.snapshot(host,1).packets,2);
+  assert.equal(replay.snapshot(host,1).bytes,150);
+});

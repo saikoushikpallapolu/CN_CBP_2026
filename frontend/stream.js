@@ -31,7 +31,8 @@ class TrafficStream {
     document.getElementById("stream-source").textContent = focus ? `${focus} · ${result.filename}` : result.filename;
     document.getElementById("stream-mode").textContent = result.simulation ? "VIRTUAL SENSOR" : "CAPTURE REPLAY";
     document.getElementById("stream-empty").hidden = true;
-    document.getElementById("stream-note").textContent = `${next.scope}. ${result.simulation ? "Retimed public samples; no network traffic sent." : result.timeline ? "Original capture timing fitted to 30 seconds." : "Legacy flow-context replay; full packet timing unavailable."} Verdicts are computed before playback. Loop repeats the same samples.`;
+    const references = result.simulation?.phases?.map(p => `${p.reference.replace("demo-", "")} (${p.packet_count ?? "?"} packets)`).join(" → ") || "Reference sequence";
+    document.getElementById("stream-note").textContent = `${next.scope}. ${result.simulation ? `${references}. Content ${result.simulation.content_sha256?.slice(0, 12) || "legacy"}. Retimed public samples; no network traffic sent.` : result.timeline ? "Original capture timing fitted to 30 seconds." : "Legacy flow-context replay; full packet timing unavailable."} Verdicts are computed before playback. Loop repeats the same samples.`;
     document.getElementById("stream-play").disabled = false;
     document.getElementById("stream-restart").disabled = false;
     document.getElementById("stream-seek").disabled = false;

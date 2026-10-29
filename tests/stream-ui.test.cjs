@@ -16,6 +16,7 @@ function workspace(result, {reduced = false, failure} = {}) {
       setAttribute() {}, append(...items) { this.children.push(...items); },
       replaceChildren(...items) { this.children = items; },
       get firstChild() { return this.children[0]; },
+      get lastChild() { return this.children.at(-1); },
       querySelector(selector) { return this[selector] ||= element(); },
       addEventListener(type, listener) { this.listeners[type] = listener; },
       click() { return this.listeners.click?.({target: this}); },
@@ -57,6 +58,7 @@ const result = {
   counts: {benign: 0, botnet: 0, ddos: 1, unknown: 0}, model_available: true,
   telemetry: {analysis_ms: 10, packet_count: 2, flow_count: 1, packets_per_second: 200},
   coverage: {analyzed_ip_packets: 2},
+  packet_log: {version: 1, rows: [[1,10,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1], [2,20,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1]]},
   timeline: {start: 10, end: 20, bins: [{timestamp: 10, count: 1, bytes: 60}, {timestamp: 20, count: 1, bytes: 60}]},
   flows: [{id: 1, prediction: 'ddos', source: '10.0.0.1', destination: '10.0.0.2',
     sport: 80, dport: 90, protocol: 'TCP', packets: 2, confidence: .99, ready_timestamp: 20}]
@@ -124,6 +126,62 @@ test('uploaded captures with reduced motion wait for explicit Play', () => {
   assert.equal(app.read('streamPlayer.playing'), false);
   app.elements.get('stream-play').click();
   assert.equal(app.read('streamPlayer.playing'), true);
+});
+
+test('packet log follows playback, filters threats, and clears future events on rewind', async () => {
+  const app = workspace(result);
+  await app.elements.get('sensor-connect').click();
+  app.read('streamPlayer.seek(.5)');
+  assert.equal(app.read('state.visible.log.length'), 1);
+  assert.equal(app.elements.get('packet-log').children.length, 1);
+  assert.equal(app.elements.get('packet-log').children[0].children[1].textContent, 'PACKET');
+  app.read('streamPlayer.seek(1)');
+  assert.equal(app.elements.get('packet-log').children.length, 3);
+  assert.equal(app.elements.get('packet-log').children[0].children[1].textContent, 'THREAT');
+  app.elements.get('log-filter').value = 'threat';
+  app.elements.get('log-filter').listeners.change();
+  assert.equal(app.elements.get('packet-log').children.length, 1);
+  app.read('streamPlayer.seek(0)');
+  assert.equal(app.read('state.visible.log.length'), 0);
+  assert.equal(app.elements.get('log-export').disabled, true);
+});
+
+test('model screen foregrounds paired measurements without claiming universal superiority', () => {
+  const app = workspace(result);
+  app.context.health = {report: {gates: {accuracy: true}}, runtime_report: {
+    accuracy: .98654, macro_f1: .88377, test_samples: 7209,
+    timings: {pytorch_cpu: {batch64_p50_ms: 12.955, batch64_p95_ms: 13.816},
+      tensorrt: {batch64_p50_ms: .581, batch64_p95_ms: .779}}}};
+  app.read('state.health = health; renderModel()');
+  const highlights = app.elements.get('model').children[0].children;
+  assert.equal(highlights[0].children[1].textContent, '22.3×');
+  assert.equal(highlights[1].children[1].textContent, '12.374 ms');
+  assert.equal(highlights[2].children[1].textContent, '98.65%');
+  assert.equal(app.elements.has('view-demo'), false);
+  app.context.health.runtime_report = null;
+  app.read('renderModel()');
+  assert.equal(app.elements.get('model').children[0].children[0].children[1].textContent, 'Not measured');
+});
+
+test('log pagination retains every event and dropdown requests its selected sequence', async () => {
+  const many = {...result, packet_log: {rows: Array.from({length: 600}, (_,i) => [i+1,10+i/60,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1])}};
+  const app = workspace(many);
+  app.elements.get('sensor-scenario').value = 'botnet';
+  await app.elements.get('sensor-connect').click();
+  assert.equal(JSON.parse(app.requests.find(r => r.url === '/api/simulate').options.body).scenario, 'botnet');
+  app.read('streamPlayer.seek(1)');
+  assert.equal(app.read('state.visible.log.length'), 601);
+  assert.equal(app.elements.get('packet-log').children.length, 200);
+  app.elements.get('log-older').click(); app.elements.get('log-older').click(); app.elements.get('log-older').click();
+  assert.equal(app.elements.get('packet-log').children.length, 1);
+  assert.equal(app.elements.get('log-older').disabled, true);
+  app.elements.get('log-latest').click();
+  assert.equal(app.read('state.logPage'), 0);
+  app.read('download = value => { globalThis.exportedLog = value; }');
+  app.elements.get('log-export').click();
+  assert.equal(app.read('exportedLog.events.length'), 601);
+  app.read('streamPlayer.seek(0)'); app.elements.get('log-export').click();
+  assert.equal(app.read('exportedLog.events.length'), 0);
 });
 
 test('real GPU response renders through Connect and conserves all results',
