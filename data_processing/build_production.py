@@ -96,7 +96,7 @@ def main():
     acquired = load_manifest(manifest_path)
     sources = [("monday", ROOT / "data/raw/benign/Monday-WorkingHours_slice100MB.pcap", "train", lambda p: "benign")]
     for name, metadata in acquired.items():
-        if metadata.get("status") in ("unlabeled_ood_only", "pending_archive_extraction"):
+        if metadata.get("status") in ("unlabeled_ood_only", "pending_archive_extraction", "behavior_controlled_normal"):
             continue
         path = ROOT / "data/external" / name / "capture.pcap"
         if not path.exists():

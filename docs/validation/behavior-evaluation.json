@@ -1,0 +1,320 @@
+{
+  "status": "advisory_only",
+  "training_flows": 20231,
+  "normal_training_flows": 3223,
+  "feature_context": "Causal latest 128 packets and rolling 1-second destination activity; no IP/port/absolute-time features",
+  "threshold_selection": "Maximum per-source validation-normal 99th percentile; test/challenge excluded",
+  "data": [
+    {
+      "source": "monday",
+      "split": "train",
+      "flows": 6000,
+      "sha256": "f1e3059cbfc1fafea425ccb4202ce1cbfe09d17c0fce98195638e52d880ecb46"
+    },
+    {
+      "source": "normal7-behavior",
+      "split": "train",
+      "flows": 223,
+      "sha256": "012f5bc1d8232c7b0890d1c7d9c1b4baeeefa6b82c1ff4e18368748d4f0ba3b8"
+    },
+    {
+      "source": "normal-dns",
+      "split": "train",
+      "flows": 1788,
+      "sha256": "7fbefbe1a18867bc683f59890cbc0124e5f6166e5aa13035fcf1ccf2f06f7ae4"
+    },
+    {
+      "source": "ctu1",
+      "split": "train",
+      "flows": 752,
+      "sha256": "afd4b1c87ceb23c34cd0233ad1d7f508750aa2be7abb9bb924134a7461d3cdd2"
+    },
+    {
+      "source": "ctu2",
+      "split": "train",
+      "flows": 2964,
+      "sha256": "ef28a016fbfa3d59896d6f82a717eb07091b2e14fc24a929c0b1f1c7a7601eb8"
+    },
+    {
+      "source": "wednesday",
+      "split": "train",
+      "flows": 2504,
+      "sha256": "b174c6a9c790e41fa124e8c57ec634bd91a4a0b31dab4e4775e7954988aea8df"
+    },
+    {
+      "source": "cse",
+      "split": "train",
+      "flows": 6000,
+      "sha256": "129e85a4cb0f3202165eed09f0fab04afac9f97624fa7ac3f676b1837d5b815d"
+    },
+    {
+      "source": "ctu-normal",
+      "split": "validation",
+      "flows": 555,
+      "sha256": "476c2d768494b7cf73cd795a4e5fa99755fae61d38ea7ad2a7e884893167ee35"
+    },
+    {
+      "source": "ctu9",
+      "split": "validation",
+      "flows": 56,
+      "sha256": "a27cf23379dde85126a8a38a824fdb7dbfe0d9f7746ac841c1702ac1d06b3d08"
+    },
+    {
+      "source": "cse21",
+      "split": "validation",
+      "flows": 21,
+      "sha256": "784aa56f4f7994f2fdc3be47d7110d532bd6916814a1cdbe701a46727536e1be"
+    },
+    {
+      "source": "normal9-behavior",
+      "split": "test",
+      "flows": 86,
+      "sha256": "39fae2c5c731abf860f41c157faeaddf69d88f97d379c03056c172b56c7055c9"
+    },
+    {
+      "source": "ctu10",
+      "split": "test",
+      "flows": 31,
+      "sha256": "44bb65a53d5b838d45cf3b26b804c7099096c632306acda0e6a6a4406f16d219"
+    },
+    {
+      "source": "friday",
+      "split": "test",
+      "flows": 2144,
+      "sha256": "c40b8a5086518d0abc04a5b5f4c04cd7870007179be173c59872be2996507005"
+    },
+    {
+      "source": "cse21-hoic",
+      "split": "challenge",
+      "flows": 6000,
+      "sha256": "6e106b98c2b5e9f57a4be95d33cb390a30f56f6ab09d6f3b8ce42e587d72080b"
+    }
+  ],
+  "per_source": {
+    "cse": {
+      "split": "train",
+      "flows": 6000,
+      "class_counts": [
+        0,
+        0,
+        6000
+      ],
+      "accuracy": 1.0,
+      "macro_f1": 0.3333333333333333,
+      "benign_false_attack_rate": null,
+      "attack_recall": 1.0,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.0
+    },
+    "cse21": {
+      "split": "validation",
+      "flows": 21,
+      "class_counts": [
+        0,
+        0,
+        21
+      ],
+      "accuracy": 0.0,
+      "macro_f1": 0.0,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.0,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.0
+    },
+    "cse21-hoic": {
+      "split": "challenge",
+      "flows": 6000,
+      "class_counts": [
+        0,
+        0,
+        6000
+      ],
+      "accuracy": 1.0,
+      "macro_f1": 0.3333333333333333,
+      "benign_false_attack_rate": null,
+      "attack_recall": 1.0,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.0
+    },
+    "ctu-normal": {
+      "split": "validation",
+      "flows": 555,
+      "class_counts": [
+        555,
+        0,
+        0
+      ],
+      "accuracy": 0.6666666666666666,
+      "macro_f1": 0.26666666666666666,
+      "benign_false_attack_rate": 0.3333333333333333,
+      "attack_recall": null,
+      "benign_anomaly_rate": 0.010810810810810811,
+      "attack_anomaly_rate": null
+    },
+    "ctu1": {
+      "split": "train",
+      "flows": 752,
+      "class_counts": [
+        0,
+        752,
+        0
+      ],
+      "accuracy": 0.9840425531914894,
+      "macro_f1": 0.33065236818588023,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.9840425531914894,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.02526595744680851
+    },
+    "ctu10": {
+      "split": "test",
+      "flows": 31,
+      "class_counts": [
+        0,
+        31,
+        0
+      ],
+      "accuracy": 0.06451612903225806,
+      "macro_f1": 0.04040404040404041,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.06451612903225806,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.0
+    },
+    "ctu2": {
+      "split": "train",
+      "flows": 2964,
+      "class_counts": [
+        0,
+        2964,
+        0
+      ],
+      "accuracy": 0.9895411605937922,
+      "macro_f1": 0.33158102990221017,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.9895411605937922,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.01282051282051282
+    },
+    "ctu9": {
+      "split": "validation",
+      "flows": 56,
+      "class_counts": [
+        0,
+        56,
+        0
+      ],
+      "accuracy": 0.39285714285714285,
+      "macro_f1": 0.18803418803418803,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.39285714285714285,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.03571428571428571
+    },
+    "friday": {
+      "split": "test",
+      "flows": 2144,
+      "class_counts": [
+        0,
+        0,
+        2144
+      ],
+      "accuracy": 0.20662313432835822,
+      "macro_f1": 0.11416054632135035,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.20662313432835822,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.7350746268656716
+    },
+    "monday": {
+      "split": "train",
+      "flows": 6000,
+      "class_counts": [
+        6000,
+        0,
+        0
+      ],
+      "accuracy": 0.9901666666666666,
+      "macro_f1": 0.33168634676046116,
+      "benign_false_attack_rate": 0.009833333333333333,
+      "attack_recall": null,
+      "benign_anomaly_rate": 0.009,
+      "attack_anomaly_rate": null
+    },
+    "normal-dns": {
+      "split": "train",
+      "flows": 1788,
+      "class_counts": [
+        1788,
+        0,
+        0
+      ],
+      "accuracy": 0.9927293064876958,
+      "macro_f1": 0.3321171297595659,
+      "benign_false_attack_rate": 0.00727069351230425,
+      "attack_recall": null,
+      "benign_anomaly_rate": 0.0022371364653243847,
+      "attack_anomaly_rate": null
+    },
+    "normal7-behavior": {
+      "split": "train",
+      "flows": 223,
+      "class_counts": [
+        223,
+        0,
+        0
+      ],
+      "accuracy": 0.968609865470852,
+      "macro_f1": 0.32801822323462415,
+      "benign_false_attack_rate": 0.03139013452914798,
+      "attack_recall": null,
+      "benign_anomaly_rate": 0.13004484304932734,
+      "attack_anomaly_rate": null
+    },
+    "normal9-behavior": {
+      "split": "test",
+      "flows": 86,
+      "class_counts": [
+        86,
+        0,
+        0
+      ],
+      "accuracy": 0.7325581395348837,
+      "macro_f1": 0.28187919463087246,
+      "benign_false_attack_rate": 0.26744186046511625,
+      "attack_recall": null,
+      "benign_anomaly_rate": 0.046511627906976744,
+      "attack_anomaly_rate": null
+    },
+    "wednesday": {
+      "split": "train",
+      "flows": 2504,
+      "class_counts": [
+        0,
+        0,
+        2504
+      ],
+      "accuracy": 0.9996006389776357,
+      "macro_f1": 0.333266759869516,
+      "benign_false_attack_rate": null,
+      "attack_recall": 0.9996006389776357,
+      "benign_anomaly_rate": null,
+      "attack_anomaly_rate": 0.15415335463258786
+    }
+  },
+  "limitations": [
+    "HOIC is an already-inspected challenge, not a new untouched test",
+    "No independent enterprise audit",
+    "Small source-specific subsets",
+    "Retimed simulations change rate/timing features",
+    "Advisory evidence cannot establish maliciousness"
+  ],
+  "promotion_gates": {
+    "benign_false_alerts": false,
+    "attack_recall": false,
+    "benign_anomalies": false,
+    "independent_enterprise_audit": false
+  },
+  "json_runtime_parity": true,
+  "artifact_sha256": "4abb052788873ddc75229ea6992c4bba545ce2ae715ef0e39cfff3082a7011da"
+}

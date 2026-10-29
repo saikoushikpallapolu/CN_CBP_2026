@@ -22,6 +22,8 @@ def main():
         if path.parts[0] in folders or name in root_files or name.startswith("requirements") and name.endswith(".txt") or name in {"data/DATASET_CITATIONS.md", "data/production_sources.json"}:
             selected[name] = root / name
     suffixes = (".pth", ".json", ".onnx", ".int8.onnx", ".trt.onnx", ".trt.int8.onnx", ".engine", ".engine.json", ".engine.audit.json")
+    behavior = root / "ml/checkpoints/behavior_detector.json"
+    if behavior.is_file(): selected["ml/checkpoints/behavior_detector.json"] = behavior
     for model in ("flow_resnet", "candidate_flow_resnet"):
         for suffix in suffixes:
             name = "ml/checkpoints/" + model + suffix
