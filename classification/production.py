@@ -12,6 +12,8 @@ from data_processing.production import REPRESENTATION, burst_array, flow_bursts,
 from ml.production_model import FlowResNet, probabilities
 from classification.tensor import normalize_batch
 from classification.timeline import packet_timeline
+from classification.behavior import BehaviorContext, BehaviorDetector, FEATURES
+from classification.response import response_policy
 
 ROOT = Path(__file__).resolve().parents[1]
 CLASSES = ["benign", "botnet", "ddos"]
@@ -28,6 +30,7 @@ class FlowClassifier:
         self.checkpoint_sha256 = None
         self.runtime_report = None
         self.require_ready = os.getenv("TRAFFICSCAN_REQUIRE_READY", "0") == "1"
+        self.behavior = BehaviorDetector(os.getenv("TRAFFICSCAN_BEHAVIOR", str(self.path.parent / "behavior_detector.json")))
         try:
             if self.path.exists():
                 payload = self.path.read_bytes()
@@ -103,6 +106,7 @@ class FlowClassifier:
                     temperature_fitted=bool(self.model and self.calibrated),
                     calibrated=bool(self.model and self.calibrated and self.report.get("calibration_validated", False)),
                     production_ready=ready, runtime_report=self.runtime_report,
+                    behavior=self.behavior.health(),
                     error=self.error or (None if self.model else "Trained flow checkpoint unavailable. Analysis returns UNKNOWN."), report={**self.report, "gates": gates})
 
     def analyze(self, source, filename, allow_truncated=False):
@@ -111,14 +115,16 @@ class FlowClassifier:
         protocols = {}
         activity = []
         packet_rows = []
+        behavior_context = BehaviorContext()
         def log_packet(packet, stamp, raw, linktype):
+            behavior_context.observe(packet, stamp, raw, linktype)
             # Compact rows retain every observed frame, including unsupported
             # packets and packets beyond the first 16 used by the classifier.
             packet_rows.append([packet_count, stamp, len(raw),
                                 packet.source if packet else None, packet.sport if packet else None,
                                 packet.destination if packet else None, packet.dport if packet else None,
                                 {6: "TCP", 17: "UDP", 1: "ICMP", 58: "ICMPv6"}.get(packet.protocol, str(packet.protocol)) if packet else "Unsupported",
-                                linktype])
+                                linktype, raw[packet.transport_offset + 13] if packet and packet.protocol == 6 else None])
         def records():
             nonlocal packet_count, total_bytes, first, last
             for stamp, raw, linktype in read_capture(source, max_packets=100001, allow_truncated=allow_truncated):
@@ -131,9 +137,10 @@ class FlowClassifier:
                 last = stamp if last is None else max(last, stamp)
                 yield stamp, raw, linktype
         results, pending, pending_packets, pending_ready = [], [], [], []
-        model_ms = 0.
+        pending_behavior, pending_sequence = [], []
+        model_ms, behavior_ms = 0., 0.
         def flush():
-            nonlocal model_ms
+            nonlocal model_ms, behavior_ms
             if not pending:
                 return
             began = time.perf_counter()
@@ -155,11 +162,17 @@ class FlowClassifier:
                     if self.require_ready and not self.health()["production_ready"]:
                         rejected[:] = True
             model_ms += (time.perf_counter() - began) * 1000
+            behavior_started = time.perf_counter()
+            behavior = self.behavior.predict(pending_behavior)
+            behavior_ms += (time.perf_counter() - behavior_started) * 1000
             for index, packets in enumerate(pending_packets):
                 packet = packets[0]
                 protocol = {6: "TCP", 17: "UDP", 1: "ICMP", 58: "ICMPv6"}.get(packet.protocol, str(packet.protocol))
                 protocols[protocol] = protocols.get(protocol, 0) + len(packets)
                 prediction = "unknown" if rejected[index] else CLASSES[int(probs[index].argmax())]
+                uncertainty = None
+                if prediction == "unknown":
+                    uncertainty = "model_unavailable" if not self.model else "calibration_unavailable" if not self.calibrated else "release_gates_pending" if self.require_ready and not self.health()["production_ready"] else "low_confidence_or_high_entropy"
                 results.append(dict(id=len(results) + 1, prediction=prediction, confidence=float(probs[index].max()),
                                     suggested_class=CLASSES[int(probs[index].argmax())] if self.model else None,
                                     probabilities={name: float(probs[index][i]) for i, name in enumerate(CLASSES)},
@@ -167,12 +180,17 @@ class FlowClassifier:
                                     sport=packet.sport, dport=packet.dport, protocol=protocol, packets=len(packets),
                                     bytes=sum(len(p.raw) for p in packets), timestamp=packet.timestamp,
                                     ready_timestamp=pending_ready[index],
+                                    ready_sequence=pending_sequence[index], behavior=behavior[index],
+                                    behavior_features=dict(zip(FEATURES, map(float, pending_behavior[index]))),
+                                    uncertainty_reason=uncertainty,
                                     packet_timeline=[[p.timestamp, len(p.raw)] for p in packets],
                                     fingerprint=arrays[index].flatten().tolist(),
                                     hex_dump=[" ".join(f"{v:02x}" for v in row) for row in arrays[index][:4]]))
+                results[-1]["response"] = response_policy(results[-1])
             pending.clear()
             pending_packets.clear()
             pending_ready.clear()
+            pending_behavior.clear(); pending_sequence.clear()
         for packets in flow_bursts(records(), on_packet=log_packet):
             if len(results) + len(pending) >= 4096:
                 raise ValueError("Capture exceeds 4,096 flow-burst limit; split the capture")
@@ -181,6 +199,7 @@ class FlowClassifier:
             # Partial bursts become usable on idle/eviction/capture-end, not
             # retroactively at the arrival of their last represented packet.
             pending_ready.append(max(last or packets[-1].timestamp, max(p.timestamp for p in packets)))
+            pending_behavior.append(behavior_context.features(packets[0])); pending_sequence.append(packet_count)
             if len(pending) == 64:
                 flush()
         flush()
@@ -191,11 +210,11 @@ class FlowClassifier:
         elapsed = (time.perf_counter() - start) * 1000
         return dict(filename=filename, prediction=prediction, model_available=bool(self.model), calibrated=self.health()["calibrated"],
                     representation=REPRESENTATION, counts=counts, flows=results, timeline=packet_timeline(activity),
-                    packet_log=dict(version=1, columns=["sequence", "timestamp", "bytes", "source", "sport", "destination", "dport", "protocol", "linktype"],
+                    packet_log=dict(version=2, columns=["sequence", "timestamp", "bytes", "source", "sport", "destination", "dport", "protocol", "linktype", "tcp_flags"],
                                     rows=packet_rows, scope="Every recorded frame; packet receipt is separate from flow-level prediction"),
                     telemetry=dict(packet_count=packet_count, flow_count=len(results), total_bytes=total_bytes,
                                    duration_seconds=(last - first) if first is not None else 0, protocols=protocols,
-                                   analysis_ms=round(elapsed, 2), model_ms=round(model_ms, 2), packets_per_second=round(packet_count / max(elapsed / 1000, 1e-9))),
+                                   analysis_ms=round(elapsed, 2), model_ms=round(model_ms, 2), behavior_ms=round(behavior_ms, 2), packets_per_second=round(packet_count / max(elapsed / 1000, 1e-9))),
                     coverage=dict(analyzed_ip_packets=sum(r["packets"] for r in results), total_packets=packet_count), model=self.health())
 
 

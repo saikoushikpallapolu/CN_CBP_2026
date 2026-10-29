@@ -369,3 +369,19 @@ def test_virtual_scenarios_select_distinct_packet_content(tmp_path, monkeypatch)
         assert metadata["content_sha256"] == actual
         hashes.add(actual)
     assert len(hashes) == 4
+
+
+def test_virtual_continuation_is_labeled_and_does_not_create_new_model_context(tmp_path, monkeypatch):
+    import classification.simulation as simulation
+    monkeypatch.setattr(simulation, "load_cases", lambda root: None)
+    folder = tmp_path / "data/production/samples"
+    folder.mkdir(parents=True)
+    for index, name in enumerate(("demo-normal", "demo-ddos", "demo-botnet", "demo-unseen")):
+        (folder / (name + ".pcap")).write_bytes(pcap([frame(sport=55000+index,flags=16)] * 16))
+    capture, metadata = simulation.virtual_capture(tmp_path, "mixed")
+    raw = capture.getvalue()
+    assert metadata["synthetic_continuation_packets"] == 32
+    assert metadata["packet_count"] == 96
+    assert len(list(read_capture(io.BytesIO(raw)))) == 96
+    bursts = list(flow_bursts(read_capture(io.BytesIO(raw))))
+    assert len(bursts) == 4 and all(len(burst) == 16 for burst in bursts)
