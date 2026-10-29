@@ -35,18 +35,20 @@ Older saved investigations without full packet timelines still replay their repr
 
 This is a visualization of already-computed inference, not live packet-by-packet inference. Playback compression does not change the uploaded file's timestamps. Simulation intentionally retimes reference packets and marks that distinction. Pausing, seeking and looping do not retrain or rerun the model.
 
-Playback pauses when a tab becomes hidden or when another main screen is opened. Reduced-motion users get an explicit Play control instead of autoplay. The canvas is display-scaled for high-DPI devices and bounds visible markers; equivalent detection buttons and live status text provide a keyboard-accessible inspection path.
+Playback pauses when a tab becomes hidden or when another main screen is opened. Reduced-motion users get an explicit Play control for uploaded captures. Clicking **Connect sensor** or **Restart** explicitly starts playback, including with reduced motion enabled; decorative attack pulses remain suppressed for that preference. Connection progress and failures appear immediately below the sensor controls, and a failed request enables retry. The canvas is display-scaled for high-DPI devices and bounds visible markers; equivalent detection buttons and live status text provide a keyboard-accessible inspection path.
 
 ## Verification
 
 Replay core tests cover zero initial/final counts, no premature detections, deterministic backward seeking, IPv4/IPv6 focus, legacy history, zero-duration captures, and delayed partial-flow readiness. Backend tests cover 100,000-packet binning, timeline count/byte conservation, and virtual-address validation. GPU HTTP checks verify all four scenarios, authentication and forced UNKNOWN under failed release gates. An actual GPU response was also replayed through the JavaScript core and its final counts matched the API exactly.
+
+Controller regression checks execute the three shipped JavaScript files against a minimal DOM and controlled animation clock. They exercise Connect through completion, explicit start with reduced motion, connection failures, pause, seeking, restart, loop and reset. All four actual GPU scenario responses also completed this controller playback with identical final packet, flow and verdict counts. These checks do not inspect browser rendering. The page and static assets now revalidate on refresh to pick up a redeployed version.
 
 The wave timing is deterministic from the response; no random traffic or fabricated attack alerts are generated. Model accuracy limitations remain unchanged. Visual appearance is pending the user's review because local browser automation was disabled, and the user chose to review it manually.
 
 Run the checks:
 
 ```text
-node --test tests/stream.test.cjs
+node --test tests/stream.test.cjs tests/stream-ui.test.cjs
 python -m pytest -q
 python -m scripts.deployment_smoke --gpu --model candidate_flow_resnet
 ```
