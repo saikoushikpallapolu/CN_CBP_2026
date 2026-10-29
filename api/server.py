@@ -117,6 +117,30 @@ class SampleRequest(BaseModel):
     sample_id: str
 
 
+class SimulationRequest(BaseModel):
+    scenario: str = "mixed"
+    address: str = "192.0.2.10"
+
+
+@app.post("/api/simulate", dependencies=[Depends(authorize)])
+def simulate(request: SimulationRequest):
+    from classification.simulation import virtual_capture, VIRTUAL_SENSOR
+    if request.address != VIRTUAL_SENSOR:
+        raise HTTPException(422, "This virtual sensor uses 192.0.2.10. Other IPs can be focused inside an uploaded capture.")
+    if not ANALYSIS_SLOT.acquire(blocking=False):
+        raise HTTPException(429, "Analysis in progress. Retry shortly.")
+    try:
+        capture, metadata = virtual_capture(ROOT, request.scenario)
+        with capture:
+            result = get_flow_classifier().analyze(capture, "virtual-" + request.scenario + ".pcap")
+        result["simulation"] = metadata
+        return save(result)
+    except (ValueError, OSError) as error:
+        raise HTTPException(422, str(error)) from error
+    finally:
+        ANALYSIS_SLOT.release()
+
+
 @app.post("/api/demo", dependencies=[Depends(authorize)])
 def demonstration():
     from classification.demo import load_cases, compare_case

@@ -63,6 +63,14 @@ def main():
             checks["demo_preserves_release_gates"] = len(cases) == 4 and all(case["unknown_rate"] == 1 for case in cases)
         elif args.gpu:
             checks["demo_preserves_release_gates"] = False
+        if args.gpu:
+            checks["virtual_sensor_auth"] = requests.post(base + "/api/simulate", json={"scenario":"mixed"}, timeout=10).status_code == 401
+            simulation = requests.post(base + "/api/simulate", headers=headers, json={"scenario":"mixed"}, timeout=60)
+            checks["virtual_sensor_release_gates"] = (simulation.status_code == 200 and simulation.json()["counts"]["unknown"] == len(simulation.json()["flows"]))
+            if simulation.status_code == 200:
+                replay = simulation.json()
+                checks["timeline_packet_totals"] = sum(b["count"] for b in replay["timeline"]["bins"]) == replay["telemetry"]["packet_count"]
+                checks["simulation_sends_no_network_traffic"] = replay["simulation"]["network_transmission"] is False
         page = requests.get(base, timeout=10)
         checks["frontend_and_security_headers"] = page.status_code == 200 and "Content-Security-Policy" in page.headers
         destination = root / ("artifacts/deployment-smoke-gpu.json" if args.gpu else "artifacts/deployment-smoke.json")

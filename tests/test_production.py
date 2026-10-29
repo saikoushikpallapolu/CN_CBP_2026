@@ -299,3 +299,29 @@ def test_class_specific_policy_uses_predicted_class():
     assert baseline.tolist() == [True, True]
     assert selected.tolist() == [False, True]
     assert torch.equal(baseline, probabilities(logits, confidence_threshold=[.75]*3, entropy_threshold=[.8]*3)[2])
+
+
+def test_replay_timeline_preserves_packet_counts_and_partial_flow_readiness(monkeypatch, tmp_path):
+    from classification.production import FlowClassifier
+    monkeypatch.setenv("TRAFFICSCAN_CHECKPOINT", str(tmp_path / "absent.pth"))
+    monkeypatch.delenv("TRAFFICSCAN_TENSORRT", raising=False)
+    engine = FlowClassifier()
+    result = engine.analyze(io.BytesIO(pcap([frame(flags=16), frame(sport=55001, flags=16)])), "capture.pcap")
+    assert sum(b["count"] for b in result["timeline"]["bins"]) == 2
+    assert sum(b["bytes"] for b in result["timeline"]["bins"]) == result["telemetry"]["total_bytes"]
+    assert all(f["ready_timestamp"] == result["timeline"]["end"] for f in result["flows"])
+    assert sum(len(f["packet_timeline"]) for f in result["flows"]) == 2
+
+
+def test_large_packet_timeline_is_bounded():
+    from classification.timeline import packet_timeline
+    timeline = packet_timeline([(float(i),60) for i in range(100000)])
+    assert len(timeline["bins"]) <= 512
+    assert sum(b["count"] for b in timeline["bins"]) == 100000
+    assert timeline["start"] == 0 and timeline["end"] == 99999
+
+
+def test_virtual_sensor_never_connects_to_arbitrary_ips(client):
+    response = client.post("/api/simulate", json={"address":"8.8.8.8","scenario":"mixed"})
+    assert response.status_code == 422
+    assert "virtual sensor" in response.json()["detail"]

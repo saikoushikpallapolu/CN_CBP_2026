@@ -11,6 +11,7 @@ import torch
 from data_processing.production import REPRESENTATION, burst_array, flow_bursts, read_capture
 from ml.production_model import FlowResNet, probabilities
 from classification.tensor import normalize_batch
+from classification.timeline import packet_timeline
 
 ROOT = Path(__file__).resolve().parents[1]
 CLASSES = ["benign", "botnet", "ddos"]
@@ -108,6 +109,7 @@ class FlowClassifier:
         start = time.perf_counter()
         packet_count, total_bytes, first, last = 0, 0, None, None
         protocols = {}
+        activity = []
         def records():
             nonlocal packet_count, total_bytes, first, last
             for stamp, raw, linktype in read_capture(source, max_packets=100001, allow_truncated=allow_truncated):
@@ -115,10 +117,11 @@ class FlowClassifier:
                 if packet_count > 100000:
                     raise ValueError("Capture exceeds 100,000 packet limit; split the capture")
                 total_bytes += len(raw)
+                activity.append((stamp, len(raw)))
                 first = stamp if first is None else min(first, stamp)
                 last = stamp if last is None else max(last, stamp)
                 yield stamp, raw, linktype
-        results, pending, pending_packets = [], [], []
+        results, pending, pending_packets, pending_ready = [], [], [], []
         model_ms = 0.
         def flush():
             nonlocal model_ms
@@ -154,15 +157,21 @@ class FlowClassifier:
                                     entropy=float(entropies[index]), source=packet.source, destination=packet.destination,
                                     sport=packet.sport, dport=packet.dport, protocol=protocol, packets=len(packets),
                                     bytes=sum(len(p.raw) for p in packets), timestamp=packet.timestamp,
+                                    ready_timestamp=pending_ready[index],
+                                    packet_timeline=[[p.timestamp, len(p.raw)] for p in packets],
                                     fingerprint=arrays[index].flatten().tolist(),
                                     hex_dump=[" ".join(f"{v:02x}" for v in row) for row in arrays[index][:4]]))
             pending.clear()
             pending_packets.clear()
+            pending_ready.clear()
         for packets in flow_bursts(records()):
             if len(results) + len(pending) >= 4096:
                 raise ValueError("Capture exceeds 4,096 flow-burst limit; split the capture")
             pending.append(burst_array(packets))
             pending_packets.append(packets)
+            # Partial bursts become usable on idle/eviction/capture-end, not
+            # retroactively at the arrival of their last represented packet.
+            pending_ready.append(max(last or packets[-1].timestamp, max(p.timestamp for p in packets)))
             if len(pending) == 64:
                 flush()
         flush()
@@ -172,7 +181,7 @@ class FlowClassifier:
         prediction = next((name for name in ["ddos", "botnet", "unknown", "benign"] if counts[name]), "unknown")
         elapsed = (time.perf_counter() - start) * 1000
         return dict(filename=filename, prediction=prediction, model_available=bool(self.model), calibrated=self.health()["calibrated"],
-                    representation=REPRESENTATION, counts=counts, flows=results,
+                    representation=REPRESENTATION, counts=counts, flows=results, timeline=packet_timeline(activity),
                     telemetry=dict(packet_count=packet_count, flow_count=len(results), total_bytes=total_bytes,
                                    duration_seconds=(last - first) if first is not None else 0, protocols=protocols,
                                    analysis_ms=round(elapsed, 2), model_ms=round(model_ms, 2), packets_per_second=round(packet_count / max(elapsed / 1000, 1e-9))),
