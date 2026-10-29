@@ -332,3 +332,40 @@ def test_workspace_assets_revalidate_after_deploy(client):
         response = client.get(url)
         assert response.status_code == 200
         assert response.headers["cache-control"] == "no-cache"
+
+
+def test_packet_log_includes_context_excess_and_unsupported_frames(monkeypatch, tmp_path):
+    from classification.production import FlowClassifier
+    monkeypatch.setenv("TRAFFICSCAN_CHECKPOINT", str(tmp_path / "missing.pth"))
+    monkeypatch.delenv("TRAFFICSCAN_TENSORRT", raising=False)
+    # 20 ACK packets: only the first 16 represent the flow; the ARP frame
+    # remains in the packet log even though it is outside model coverage.
+    unsupported = b"\xaa" * 12 + b"\x08\x06" + b"\x00" * 28
+    frames = [frame(flags=16)] * 20 + [unsupported]
+    result = FlowClassifier().analyze(io.BytesIO(pcap(frames)), "logged.pcap")
+    rows = result["packet_log"]["rows"]
+    assert len(rows) == result["telemetry"]["packet_count"] == 21
+    assert [row[0] for row in rows] == list(range(1, 22))
+    assert sum(row[2] for row in rows) == result["telemetry"]["total_bytes"]
+    assert sum(f["packets"] for f in result["flows"]) == 16
+    assert rows[-1][3] is None and rows[-1][7] == "Unsupported"
+
+
+def test_virtual_scenarios_select_distinct_packet_content(tmp_path, monkeypatch):
+    import hashlib
+    import classification.simulation as simulation
+    monkeypatch.setattr(simulation, "load_cases", lambda root: None)
+    folder = tmp_path / "data/production/samples"
+    folder.mkdir(parents=True)
+    for index, name in enumerate(("demo-normal", "demo-ddos", "demo-botnet", "demo-unseen")):
+        (folder / (name + ".pcap")).write_bytes(pcap([frame(payload=bytes([index]), flags=16)] * (index + 1)))
+    hashes = set()
+    for scenario, sources in simulation.SCENARIOS.items():
+        capture, metadata = simulation.virtual_capture(tmp_path, scenario)
+        rows = list(read_capture(capture))
+        assert [phase["reference"] for phase in metadata["phases"]] == list(sources)
+        assert metadata["packet_count"] == len(rows)
+        actual = hashlib.sha256(b"".join(struct.pack("<I", len(raw)) + raw for stamp, raw, link in rows)).hexdigest()
+        assert metadata["content_sha256"] == actual
+        hashes.add(actual)
+    assert len(hashes) == 4

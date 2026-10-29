@@ -274,7 +274,7 @@ def read_capture(source, max_packets=200000, allow_truncated=False):
             stream.close()
 
 
-def flow_bursts(records, max_flows=2048, idle_seconds=30):
+def flow_bursts(records, max_flows=2048, idle_seconds=30, on_packet=None):
     """First 16 observed packets per session, bounded by idle time and table size.
 
     Completed sessions retain bounded tombstones so later packets do not become
@@ -283,6 +283,8 @@ def flow_bursts(records, max_flows=2048, idle_seconds=30):
     active, completed = OrderedDict(), OrderedDict()
     for timestamp, raw, linktype in records:
         packet = parse_packet(raw, timestamp, linktype)
+        if on_packet is not None:
+            on_packet(packet, timestamp, raw, linktype)
         if packet is None:
             continue
         key = packet.key

@@ -110,6 +110,15 @@ class FlowClassifier:
         packet_count, total_bytes, first, last = 0, 0, None, None
         protocols = {}
         activity = []
+        packet_rows = []
+        def log_packet(packet, stamp, raw, linktype):
+            # Compact rows retain every observed frame, including unsupported
+            # packets and packets beyond the first 16 used by the classifier.
+            packet_rows.append([packet_count, stamp, len(raw),
+                                packet.source if packet else None, packet.sport if packet else None,
+                                packet.destination if packet else None, packet.dport if packet else None,
+                                {6: "TCP", 17: "UDP", 1: "ICMP", 58: "ICMPv6"}.get(packet.protocol, str(packet.protocol)) if packet else "Unsupported",
+                                linktype])
         def records():
             nonlocal packet_count, total_bytes, first, last
             for stamp, raw, linktype in read_capture(source, max_packets=100001, allow_truncated=allow_truncated):
@@ -164,7 +173,7 @@ class FlowClassifier:
             pending.clear()
             pending_packets.clear()
             pending_ready.clear()
-        for packets in flow_bursts(records()):
+        for packets in flow_bursts(records(), on_packet=log_packet):
             if len(results) + len(pending) >= 4096:
                 raise ValueError("Capture exceeds 4,096 flow-burst limit; split the capture")
             pending.append(burst_array(packets))
@@ -182,6 +191,8 @@ class FlowClassifier:
         elapsed = (time.perf_counter() - start) * 1000
         return dict(filename=filename, prediction=prediction, model_available=bool(self.model), calibrated=self.health()["calibrated"],
                     representation=REPRESENTATION, counts=counts, flows=results, timeline=packet_timeline(activity),
+                    packet_log=dict(version=1, columns=["sequence", "timestamp", "bytes", "source", "sport", "destination", "dport", "protocol", "linktype"],
+                                    rows=packet_rows, scope="Every recorded frame; packet receipt is separate from flow-level prediction"),
                     telemetry=dict(packet_count=packet_count, flow_count=len(results), total_bytes=total_bytes,
                                    duration_seconds=(last - first) if first is not None else 0, protocols=protocols,
                                    analysis_ms=round(elapsed, 2), model_ms=round(model_ms, 2), packets_per_second=round(packet_count / max(elapsed / 1000, 1e-9))),

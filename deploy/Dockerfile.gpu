@@ -5,6 +5,7 @@ COPY --from=trt-libs /lib /opt/tensorrt/lib
 COPY --from=trt-libs /manifest.json /opt/tensorrt/manifest.json
 ENV LD_LIBRARY_PATH=/opt/tensorrt/lib:/usr/local/lib/python3.12/site-packages/nvidia/cu13/lib:/usr/local/lib/python3.12/site-packages/nvidia/cuda_runtime/lib:/usr/local/nvidia/lib64
 COPY classification classification
+COPY data_processing data_processing
 COPY api api
 COPY frontend frontend
 COPY ml/build_tensorrt.py ml/build_tensorrt.py
