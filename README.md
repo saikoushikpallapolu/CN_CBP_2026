@@ -1,5 +1,7 @@
 # TrafficScan
 
+**Present/test the app:** open **Test & demo → Run demo suite**. [Demo guide](docs/DEMO_GUIDE.md) · [Latest model experiments and limitations](docs/MODEL_IMPROVEMENT_RESULTS.md). The longevity replay is stopped; no live laptop traffic is captured.
+
 **GPU review build:** [localhost:8000](http://127.0.0.1:8000) · [Review guide](docs/REVIEW_GUIDE.md) · [Final measured report](docs/FINAL_REVIEW_REPORT.md). Start/stop with `python -m scripts.review_app start` / `stop`.
 
 Local network-capture investigations with sanitized flow fingerprints and a compact 1D residual classifier.

@@ -612,7 +612,7 @@ Once Source B is available:
 ---
 
 ## Next Experiments
-*(No proposed experiments at this time)*
+See [the 29 October improvement experiment record](../docs/MODEL_IMPROVEMENT_RESULTS.md). The existing deployed checkpoint remains unchanged after two failed training challengers and a rejected confidence-policy experiment.
 
 ---
 

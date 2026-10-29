@@ -2,6 +2,8 @@
 
 Open **http://127.0.0.1:8000**. The local GPU service is running.
 
+For a presentation, use **Test & demo → Run demo suite**. See [the four-minute demo guide](DEMO_GUIDE.md) and [the latest improvement experiments](MODEL_IMPROVEMENT_RESULTS.md).
+
 1. Choose **CSE 2018 · LOIC attack window** for a real malicious reference, or **Monday · normal baseline** for normal traffic. Friday contains mixed traffic; its name does not determine predictions.
 2. Inspect a flow for sanitized grayscale/hex evidence and class scores.
 3. Search/filter the table, export JSON/CSV, and reopen saved investigations from **Capture history**.
@@ -25,4 +27,4 @@ Docker Desktop must be running. History lives in `artifacts/review/`. `start --r
 
 On a fresh machine, install dependencies and build the documented Docker images first. Rebuild TensorRT for a different GPU/runtime. See [GPU deployment](GPU_DEPLOYMENT.md) and [Kaggle training](KAGGLE_GPU.md).
 
-The 24-hour replay remains in progress; keep the PC and Docker running. Expected uninterrupted completion: **29 October 2026, 00:09 IST**.
+The longevity replay was stopped at the user's request after approximately 48 minutes and 5,970 analyses without recorded inference errors. No full-duration pass is claimed; it has not been restarted. A presentation does not require a 24-hour replay.

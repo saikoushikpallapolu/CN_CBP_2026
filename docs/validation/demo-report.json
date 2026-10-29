@@ -1,0 +1,385 @@
+{
+  "scope": "Small public recorded-capture demo; not a full accuracy benchmark or live traffic test",
+  "model": {
+    "status": "online",
+    "model": "Flow ResNet-18 \u00b7 1D",
+    "device": "cuda (CPU staging)",
+    "checkpoint": "candidate_flow_resnet.pth",
+    "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+    "classes": [
+      "benign",
+      "botnet",
+      "ddos"
+    ],
+    "representation": "sanitized-flow-v1",
+    "backend": "tensorrt",
+    "verdict_policy": "experimental",
+    "temperature_fitted": true,
+    "calibrated": false,
+    "production_ready": false,
+    "runtime_report": {
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "cuda": null,
+      "torch": "2.14.1+cpu",
+      "provider": "cuda-python pinned staging",
+      "engine_metadata": {
+        "onnx.infer": "onnxruntime.quant",
+        "onnx.quant.pre_process": "onnxruntime.quant",
+        "representation": "sanitized-flow-v1",
+        "temperature": "1.7969890832901",
+        "calibration_valid": "true",
+        "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+        "precision": "int8_qdq",
+        "bias_precision": "float32",
+        "engine_sha256": "91e0d9096de2d1272ff03cd4df4553bc2bb16480b470723ea38d1568a3c80597",
+        "target_runtime": "11.4.0.106",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "compute_capability": [
+          8,
+          9
+        ],
+        "calibration_backend": "tensorrt",
+        "calibration_samples": 635,
+        "calibration_dataset_sha256": "96b7cdd058d3f53f4cbd97f4b53b8e8512a4118b91c9ae23169438aad9381d13"
+      },
+      "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+      "scope": "Synchronized 64-flow inference; CUDA Python includes host/device transfers; excludes ingestion and flow context waiting",
+      "timings": {
+        "pytorch_cpu": {
+          "batch64_p50_ms": 12.955018500065307,
+          "batch64_p95_ms": 13.8161121498797
+        },
+        "tensorrt": {
+          "batch64_p50_ms": 0.5807359998470929,
+          "batch64_p95_ms": 0.7792424999593095
+        }
+      },
+      "test_samples": 7209,
+      "agreement_with_float32": 0.9988902760438341,
+      "max_logit_error": 3.5593442916870117,
+      "expected_calibration_error": 0.13124554141382355,
+      "accuracy": 0.9865445970314884,
+      "macro_f1": 0.8837669961569373,
+      "packet_weighted_accuracy": 0.9897943919019996,
+      "benign_packet_escalation_rate": 0.02982848620432513,
+      "rejection_rate": 0.2231932282447815
+    },
+    "error": null,
+    "report": {
+      "accuracy": 0.9857123040643639,
+      "macro_f1": 0.8745311794641822,
+      "benign_escalation_rate": 0.035756852477788925,
+      "expected_calibration_error": 0.14542175014151848,
+      "packet_weighted_accuracy": 0.9885643720626831,
+      "benign_packet_escalation_rate": 0.030232412740588188,
+      "metric_unit": "flow burst; packet-weighted accuracy and benign escalation also reported",
+      "experimental_rejection_rate": 0.252878338098526,
+      "rejection_rate": 0.252878338098526,
+      "accepted_accuracy": 0.9998143315315247,
+      "confusion_matrix": [
+        [
+          5016,
+          4,
+          14
+        ],
+        [
+          14,
+          17,
+          0
+        ],
+        [
+          71,
+          0,
+          2073
+        ]
+      ],
+      "temperature": 1.895735502243042,
+      "batch64_p50_ms": 14.746650005690753,
+      "batch64_p95_ms": 18.023419995734002,
+      "device": "cuda",
+      "validation_objective": "mean classwise cross entropy",
+      "coverage": {
+        "train": [
+          0,
+          1,
+          2
+        ],
+        "validation": [
+          0,
+          1,
+          2
+        ],
+        "test": [
+          0,
+          1,
+          2
+        ]
+      },
+      "samples": {
+        "train": 26068,
+        "validation": 635,
+        "test": 7209
+      },
+      "sources": {
+        "train": [
+          "cse",
+          "ctu1",
+          "ctu2",
+          "monday",
+          "normal-dns",
+          "wednesday"
+        ],
+        "validation": [
+          "cse21",
+          "ctu9"
+        ],
+        "test": [
+          "ctu10",
+          "friday",
+          "tuesday"
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.021711609772704404,
+          "validation_loss": 0.4558633863925934
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.003281974603744268,
+          "validation_loss": 0.42086052894592285
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.007696373969752933,
+          "validation_loss": 0.897319495677948
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.0028605943930682877,
+          "validation_loss": 0.29799404740333557
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.0017717871167932055,
+          "validation_loss": 0.6770720481872559
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.008758482150280507,
+          "validation_loss": 0.41208651661872864
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.00200951155977914,
+          "validation_loss": 0.7016698718070984
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.002937351964045079,
+          "validation_loss": 2.1058928966522217
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.003922574212003169,
+          "validation_loss": 0.675734281539917
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.002693734320527095,
+          "validation_loss": 0.37880733609199524
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.0025923538949508143,
+          "validation_loss": 0.7807801365852356
+        }
+      ],
+      "limitations": [
+        "CIC Wednesday DoS is grouped with DDoS",
+        "Subsets do not establish population-wide performance",
+        "Temperature/entropy rejection does not guarantee zero-day detection"
+      ],
+      "identity_audit": {
+        "representation": "sanitized-flow-v1",
+        "checked": 3784,
+        "failures": 0,
+        "exact_tensor_invariance": true,
+        "sources": [
+          {
+            "filename": "monday.pcap",
+            "sha256": "39772f3ffde0c750c64966aeaba8ac45d2001a72f3bca310d1addfafc4b90628"
+          },
+          {
+            "filename": "ctu1.pcap",
+            "sha256": "8f29ddb120fdf653ef241253bb4e8b1b47c8a8279b399398c2b9f8e7ff5f7fe0"
+          },
+          {
+            "filename": "capture.pcap",
+            "sha256": "c40b8a5086518d0abc04a5b5f4c04cd7870007179be173c59872be2996507005"
+          }
+        ]
+      },
+      "calibration_valid": true,
+      "class_counts": {
+        "train": [
+          9838,
+          3716,
+          12514
+        ],
+        "validation": [
+          555,
+          56,
+          24
+        ],
+        "test": [
+          5034,
+          31,
+          2144
+        ]
+      },
+      "training_sources_per_class": {
+        "benign": [
+          "monday",
+          "normal-dns"
+        ],
+        "botnet": [
+          "ctu1",
+          "ctu2"
+        ],
+        "ddos": [
+          "cse",
+          "wednesday"
+        ]
+      },
+      "environment": {
+        "python": "3.12.10",
+        "torch": "2.14.1+cu130",
+        "numpy": "2.5.4",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "cuda": "13.0"
+      },
+      "peak_cuda_allocated_bytes": 65156608,
+      "training_and_evaluation_seconds": 281.7556171999895,
+      "dataset_sha256": "96b7cdd058d3f53f4cbd97f4b53b8e8512a4118b91c9ae23169438aad9381d13",
+      "latency_scope": "Model-only batch of 64 flow bursts; excludes ingestion and waiting for flow context",
+      "gates": {
+        "accuracy": true,
+        "macro_f1": false,
+        "benign_fpr": false,
+        "model_batch_latency": true,
+        "end_to_end_latency": false,
+        "class_coverage": true,
+        "calibration_coverage": true,
+        "calibration_reliability": false,
+        "training_sample_size": true,
+        "training_source_diversity": true,
+        "identity_invariance": true,
+        "stability_24h": false,
+        "independent_enterprise_audit": false,
+        "runtime_parity": true
+      },
+      "calibration_validated": false,
+      "production_ready": false
+    }
+  },
+  "selection": "First 32 label-consistent bursts; no model scores or predictions used",
+  "cases": [
+    {
+      "id": "demo-normal",
+      "title": "Normal traffic",
+      "expected_class": "benign",
+      "source_group": "ctu9",
+      "label_basis": "Published controlled normal capture",
+      "flow_count": 32,
+      "counts": {
+        "benign": 24,
+        "botnet": 0,
+        "ddos": 0,
+        "unknown": 8
+      },
+      "class_match_rate": 0.75,
+      "unknown_rate": 0.25,
+      "benign_attack_alert_rate": 0.0,
+      "benign_review_rate": 0.25,
+      "attack_escalation_rate": null,
+      "analysis_ms": 45.78,
+      "capture_sha256": "414c8e515aea1e7ff6d6a0e34fe16131286a193d49e4f9a5f8699a82559acf6d"
+    },
+    {
+      "id": "demo-botnet",
+      "title": "Botnet traffic",
+      "expected_class": "botnet",
+      "source_group": "ctu10",
+      "label_basis": "Official bidirectional flow intervals and endpoints",
+      "flow_count": 31,
+      "counts": {
+        "benign": 0,
+        "botnet": 16,
+        "ddos": 0,
+        "unknown": 15
+      },
+      "class_match_rate": 0.5161290322580645,
+      "unknown_rate": 0.4838709677419355,
+      "benign_attack_alert_rate": null,
+      "benign_review_rate": null,
+      "attack_escalation_rate": 1.0,
+      "analysis_ms": 12.63,
+      "capture_sha256": "4401fdb563be59cf165928ba703df6b63f24e37fdfe962ea40e5d925b86b5ad9"
+    },
+    {
+      "id": "demo-ddos",
+      "title": "Known LOIC DDoS",
+      "expected_class": "ddos",
+      "source_group": "cse2018-tuesday",
+      "label_basis": "Published schedule and endpoints; training-source demonstration, not independent accuracy evidence",
+      "flow_count": 32,
+      "counts": {
+        "benign": 0,
+        "botnet": 0,
+        "ddos": 32,
+        "unknown": 0
+      },
+      "class_match_rate": 1.0,
+      "unknown_rate": 0.0,
+      "benign_attack_alert_rate": null,
+      "benign_review_rate": null,
+      "attack_escalation_rate": 1.0,
+      "analysis_ms": 11.5,
+      "capture_sha256": "5504db0425f88df94908a08d7f550f02711d0db748e88c8e0cf3789562890385"
+    },
+    {
+      "id": "demo-unseen",
+      "title": "Unseen HOIC attack",
+      "expected_class": "ddos",
+      "source_group": "cse21",
+      "label_basis": "Published HOIC schedule and endpoints; UNKNOWN is an escalation",
+      "flow_count": 32,
+      "counts": {
+        "benign": 0,
+        "botnet": 0,
+        "ddos": 0,
+        "unknown": 32
+      },
+      "class_match_rate": 0.0,
+      "unknown_rate": 1.0,
+      "benign_attack_alert_rate": null,
+      "benign_review_rate": null,
+      "attack_escalation_rate": 1.0,
+      "analysis_ms": 12.51,
+      "capture_sha256": "47b99f06a40afb2ba74637b78f245d925119eea3a489f49c4a81f2a335ee6d9a"
+    }
+  ],
+  "upload_parity": {
+    "passed": true,
+    "uploaded_as": "totally-normal-traffic.pcap",
+    "counts": {
+      "benign": 0,
+      "botnet": 0,
+      "ddos": 32,
+      "unknown": 0
+    },
+    "scope": "Identical bytes, verdicts and fingerprints; names do not determine predictions"
+  }
+}

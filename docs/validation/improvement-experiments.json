@@ -1,0 +1,383 @@
+{
+  "active_checkpoint_unchanged": true,
+  "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+  "balanced": {
+    "experiment": "source_class_balanced_smoothed_CE_partial_context",
+    "seed": 123,
+    "selection": "source/class mean validation NLL",
+    "baseline_validation": {
+      "accuracy": 0.0279433261603117,
+      "macro_f1": 0.2888502803569756,
+      "benign_attack_alert_rate": 0.18122385442256927,
+      "benign_unknown_rate": 0.5740062594413757,
+      "benign_escalation_rate": 0.7552301287651062,
+      "attack_escalation_recall": 1.0,
+      "known_attack_recall": 0.004151690751314163,
+      "confusion_matrix": [
+        [
+          418,
+          137,
+          0
+        ],
+        [
+          2,
+          54,
+          0
+        ],
+        [
+          0,
+          17150,
+          25
+        ]
+      ],
+      "derived_per_class": {
+        "benign": {
+          "precision": 0.9952380952380953,
+          "recall": 0.7531531531531531,
+          "f1": 0.8574358974358975,
+          "support": 555
+        },
+        "botnet": {
+          "precision": 0.003114007266016954,
+          "recall": 0.9642857142857143,
+          "f1": 0.006207966890843249,
+          "support": 56
+        },
+        "ddos": {
+          "precision": 1.0,
+          "recall": 0.001455604075691412,
+          "f1": 0.0029069767441860465,
+          "support": 17175
+        }
+      }
+    },
+    "challenger_validation": {
+      "accuracy": 0.02445743791759014,
+      "macro_f1": 0.2639857236053775,
+      "benign_attack_alert_rate": 0.30177825689315796,
+      "benign_unknown_rate": 0.5776673555374146,
+      "benign_escalation_rate": 0.8794456124305725,
+      "attack_escalation_recall": 1.0,
+      "known_attack_recall": 0.0030832835473120213,
+      "confusion_matrix": [
+        [
+          362,
+          192,
+          1
+        ],
+        [
+          7,
+          49,
+          0
+        ],
+        [
+          0,
+          17151,
+          24
+        ]
+      ],
+      "derived_per_class": {
+        "benign": {
+          "precision": 0.981029810298103,
+          "recall": 0.6522522522522523,
+          "f1": 0.7835497835497836,
+          "support": 555
+        },
+        "botnet": {
+          "precision": 0.0028173873045078198,
+          "recall": 0.875,
+          "f1": 0.005616689591930307,
+          "support": 56
+        },
+        "ddos": {
+          "precision": 0.96,
+          "recall": 0.0013973799126637554,
+          "f1": 0.0027906976744186047,
+          "support": 17175
+        }
+      }
+    },
+    "temperature": 1.999908208847046,
+    "eligible_for_test": false,
+    "test_partition_evaluated": false,
+    "history": [
+      {
+        "epoch": 1,
+        "source_class_balanced_validation_nll": 1.0296106338500977
+      },
+      {
+        "epoch": 2,
+        "source_class_balanced_validation_nll": 1.2714167833328247
+      },
+      {
+        "epoch": 3,
+        "source_class_balanced_validation_nll": 1.272904872894287
+      },
+      {
+        "epoch": 4,
+        "source_class_balanced_validation_nll": 1.2909687757492065
+      },
+      {
+        "epoch": 5,
+        "source_class_balanced_validation_nll": 1.37800931930542
+      },
+      {
+        "epoch": 6,
+        "source_class_balanced_validation_nll": 1.2181419134140015
+      },
+      {
+        "epoch": 7,
+        "source_class_balanced_validation_nll": 1.2703900337219238
+      },
+      {
+        "epoch": 8,
+        "source_class_balanced_validation_nll": 1.3734773397445679
+      },
+      {
+        "epoch": 9,
+        "source_class_balanced_validation_nll": 1.3471072912216187
+      },
+      {
+        "epoch": 10,
+        "source_class_balanced_validation_nll": 1.3289397954940796
+      },
+      {
+        "epoch": 11,
+        "source_class_balanced_validation_nll": 1.324975848197937
+      },
+      {
+        "epoch": 12,
+        "source_class_balanced_validation_nll": 1.2881996631622314
+      },
+      {
+        "epoch": 13,
+        "source_class_balanced_validation_nll": 1.248557209968567
+      },
+      {
+        "epoch": 14,
+        "source_class_balanced_validation_nll": 1.2195777893066406
+      },
+      {
+        "epoch": 15,
+        "source_class_balanced_validation_nll": 1.226317048072815
+      }
+    ],
+    "training_samples": 26068,
+    "validation_samples": 17786,
+    "dataset_sha256": "cb024f4ef76fb35e4f09b936309fa8275dc8e39091af14b0d9de0c3b95db2df0",
+    "limitation": "Validation includes previously inspected HOIC; independent test needed before promotion"
+  },
+  "normal_enriched": {
+    "experiment": "enriched_normal_focal",
+    "seed": 123,
+    "selection": "source/class mean validation NLL",
+    "baseline_validation": {
+      "accuracy": 0.0279433261603117,
+      "macro_f1": 0.2888502803569756,
+      "benign_attack_alert_rate": 0.18122385442256927,
+      "benign_unknown_rate": 0.5740062594413757,
+      "benign_escalation_rate": 0.7552301287651062,
+      "attack_escalation_recall": 1.0,
+      "known_attack_recall": 0.004151690751314163,
+      "confusion_matrix": [
+        [
+          418,
+          137,
+          0
+        ],
+        [
+          2,
+          54,
+          0
+        ],
+        [
+          0,
+          17150,
+          25
+        ]
+      ],
+      "derived_per_class": {
+        "benign": {
+          "precision": 0.9952380952380953,
+          "recall": 0.7531531531531531,
+          "f1": 0.8574358974358975,
+          "support": 555
+        },
+        "botnet": {
+          "precision": 0.003114007266016954,
+          "recall": 0.9642857142857143,
+          "f1": 0.006207966890843249,
+          "support": 56
+        },
+        "ddos": {
+          "precision": 1.0,
+          "recall": 0.001455604075691412,
+          "f1": 0.0029069767441860465,
+          "support": 17175
+        }
+      }
+    },
+    "challenger_validation": {
+      "accuracy": 0.027830878272652626,
+      "macro_f1": 0.15380465781953667,
+      "benign_attack_alert_rate": 0.33211296796798706,
+      "benign_unknown_rate": 0.4063807427883148,
+      "benign_escalation_rate": 0.7384937405586243,
+      "attack_escalation_recall": 1.0,
+      "known_attack_recall": 0.004267821554094553,
+      "confusion_matrix": [
+        [
+          415,
+          140,
+          0
+        ],
+        [
+          3,
+          53,
+          0
+        ],
+        [
+          17140,
+          8,
+          27
+        ]
+      ],
+      "derived_per_class": {
+        "benign": {
+          "precision": 0.02363594942476364,
+          "recall": 0.7477477477477478,
+          "f1": 0.045823441726936455,
+          "support": 555
+        },
+        "botnet": {
+          "precision": 0.263681592039801,
+          "recall": 0.9464285714285714,
+          "f1": 0.4124513618677043,
+          "support": 56
+        },
+        "ddos": {
+          "precision": 1.0,
+          "recall": 0.0015720524017467249,
+          "f1": 0.003139169863969306,
+          "support": 17175
+        }
+      }
+    },
+    "temperature": 1.7969890832901,
+    "eligible_for_test": false,
+    "test_partition_evaluated": false,
+    "history": [
+      {
+        "epoch": 1,
+        "source_class_balanced_validation_nll": 1.6953374147415161
+      },
+      {
+        "epoch": 2,
+        "source_class_balanced_validation_nll": 1.2170742750167847
+      },
+      {
+        "epoch": 3,
+        "source_class_balanced_validation_nll": 1.2116161584854126
+      },
+      {
+        "epoch": 4,
+        "source_class_balanced_validation_nll": 1.2994029521942139
+      },
+      {
+        "epoch": 5,
+        "source_class_balanced_validation_nll": 1.400373935699463
+      },
+      {
+        "epoch": 6,
+        "source_class_balanced_validation_nll": 1.4887480735778809
+      },
+      {
+        "epoch": 7,
+        "source_class_balanced_validation_nll": 1.0613847970962524
+      },
+      {
+        "epoch": 8,
+        "source_class_balanced_validation_nll": 0.9311124682426453
+      },
+      {
+        "epoch": 9,
+        "source_class_balanced_validation_nll": 1.1177560091018677
+      },
+      {
+        "epoch": 10,
+        "source_class_balanced_validation_nll": 0.9640248417854309
+      },
+      {
+        "epoch": 11,
+        "source_class_balanced_validation_nll": 0.8400128483772278
+      },
+      {
+        "epoch": 12,
+        "source_class_balanced_validation_nll": 0.7699132561683655
+      },
+      {
+        "epoch": 13,
+        "source_class_balanced_validation_nll": 0.8829771876335144
+      },
+      {
+        "epoch": 14,
+        "source_class_balanced_validation_nll": 0.966730535030365
+      },
+      {
+        "epoch": 15,
+        "source_class_balanced_validation_nll": 0.9589446187019348
+      }
+    ],
+    "training_samples": 26135,
+    "validation_samples": 17786,
+    "dataset_sha256": "b30d6ee07d91ae7617044a2f0381ca4f94f179649e3345f17af6b085384a0f5a",
+    "limitation": "Validation includes previously inspected HOIC; independent test needed before promotion"
+  },
+  "decision_policy": {
+    "checkpoint_sha256": "ba8f4d4d46f020b114fd49b6c6615e279441cb32eebc3c26e567aeda58129602",
+    "engine_sha256": "91e0d9096de2d1272ff03cd4df4553bc2bb16480b470723ea38d1568a3c80597",
+    "temperature": 1.7969890832901,
+    "confidence_thresholds": [
+      0.5,
+      0.75,
+      0.75
+    ],
+    "entropy_thresholds": [
+      0.95,
+      0.8,
+      0.8
+    ],
+    "selected_on": "validation only; minimize benign escalation under <=0.5 percentage point attack-recall loss",
+    "baseline_validation": {
+      "benign_escalation": 0.7526150627615062,
+      "false_attack_alerts": 0.18226987447698745,
+      "benign_unknown": 0.5703451882845189,
+      "attack_escalation": 0.9999941934397483,
+      "correct_attack_type": 0.004151690580017304
+    },
+    "selected_validation": {
+      "benign_escalation": 0.43436192468619245,
+      "false_attack_alerts": 0.18226987447698745,
+      "benign_unknown": 0.252092050209205,
+      "attack_escalation": 0.999976773758993,
+      "correct_attack_type": 0.004151690580017304
+    },
+    "baseline_regression": {
+      "benign_escalation": 0.02982848620432513,
+      "false_attack_alerts": 9.321401938851603e-05,
+      "benign_unknown": 0.029735272184936615,
+      "attack_escalation": 1.0,
+      "correct_attack_type": 0.3438650416383716
+    },
+    "selected_regression": {
+      "benign_escalation": 0.002361421824509073,
+      "false_attack_alerts": 9.321401938851603e-05,
+      "benign_unknown": 0.002268207805120557,
+      "attack_escalation": 0.9832016869795204,
+      "correct_attack_type": 0.3438650416383716
+    },
+    "dataset_sha256": "cb024f4ef76fb35e4f09b936309fa8275dc8e39091af14b0d9de0c3b95db2df0",
+    "limitation": "Regression test previously inspected during research; new independent traffic needed for certification",
+    "validated_improvement": false
+  }
+}

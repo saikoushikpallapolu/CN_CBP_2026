@@ -1,5 +1,7 @@
 # Dataset attribution
 
+- **CTU-Normal-7 enrichment experiment:** MCFP / Stratosphere Laboratory, [controlled Linux P2P/web/messaging capture](https://mcfp.felk.cvut.cz/publicDatasets/CTU-Normal-7/). A bounded 16 MiB subset was used only in a rejected training challenger; the deployed model was preserved.
+
 - **CTU-13:** Sebastian Garcia, Martin Grill, Jan Stiborek and Alejandro Zunino. “An empirical comparison of botnet detection methods.” Computers & Security 45 (2014), 100–123. [DOI](https://doi.org/10.1016/j.cose.2014.05.011), [dataset](https://www.stratosphereips.org/datasets-ctu13).
 - **CTU normal captures:** Sebastian Garcia, Malware Capture Facility Project / Stratosphere Laboratory. [Normal datasets](https://www.stratosphereips.org/datasets-normal), including CTU-Normal-4-only-DNS and the scenario-9 normal capture.
 - **CIC-IDS2017:** Iman Sharafaldin, Arash Habibi Lashkari and Ali A. Ghorbani. “Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization.” ICISSP 2018. [Original dataset and schedules](https://www.unb.ca/cic/datasets/ids-2017.html). PCAP byte ranges were obtained through the [bvsam mirror](https://huggingface.co/datasets/bvsam/cic-ids-2017).

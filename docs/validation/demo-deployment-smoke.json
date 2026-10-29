@@ -1,0 +1,16 @@
+{
+  "image": "trafficscan:gpu",
+  "checks": {
+    "health": true,
+    "gpu_runtime_verified": true,
+    "readiness_enforced": true,
+    "unauthorized_blocked": true,
+    "authorized_samples": true,
+    "sample_analysis": true,
+    "failed_gates_force_unknown": true,
+    "history_saved": true,
+    "demo_preserves_release_gates": true,
+    "frontend_and_security_headers": true
+  },
+  "passed": true
+}
