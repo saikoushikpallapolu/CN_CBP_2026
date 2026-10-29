@@ -1,0 +1,76 @@
+{
+  "python_linux": "25 passed",
+  "replay_core": "6 passed",
+  "gpu_http": {
+    "image": "trafficscan:gpu",
+    "checks": {
+      "health": true,
+      "gpu_runtime_verified": true,
+      "readiness_enforced": true,
+      "unauthorized_blocked": true,
+      "authorized_samples": true,
+      "sample_analysis": true,
+      "failed_gates_force_unknown": true,
+      "history_saved": true,
+      "demo_preserves_release_gates": true,
+      "virtual_sensor_auth": true,
+      "virtual_sensor_release_gates": true,
+      "timeline_packet_totals": true,
+      "simulation_sends_no_network_traffic": true,
+      "frontend_and_security_headers": true
+    },
+    "passed": true
+  },
+  "scenarios": {
+    "mixed": {
+      "counts": {
+        "benign": 15,
+        "botnet": 1,
+        "ddos": 32,
+        "unknown": 41
+      },
+      "packets": 1019,
+      "flows": 89,
+      "duration": 30.0,
+      "timeline_bins": 107
+    },
+    "ddos": {
+      "counts": {
+        "benign": 15,
+        "botnet": 0,
+        "ddos": 32,
+        "unknown": 13
+      },
+      "packets": 852,
+      "flows": 60,
+      "duration": 22.0,
+      "timeline_bins": 94
+    },
+    "botnet": {
+      "counts": {
+        "benign": 16,
+        "botnet": 1,
+        "ddos": 0,
+        "unknown": 14
+      },
+      "packets": 741,
+      "flows": 31,
+      "duration": 22.0,
+      "timeline_bins": 111
+    },
+    "unknown": {
+      "counts": {
+        "benign": 15,
+        "botnet": 0,
+        "ddos": 0,
+        "unknown": 45
+      },
+      "packets": 916,
+      "flows": 60,
+      "duration": 22.0,
+      "timeline_bins": 111
+    }
+  },
+  "model_weights_unchanged": true,
+  "visual_review": "User will review manually; browser automation disabled"
+}
