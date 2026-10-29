@@ -325,3 +325,10 @@ def test_virtual_sensor_never_connects_to_arbitrary_ips(client):
     response = client.post("/api/simulate", json={"address":"8.8.8.8","scenario":"mixed"})
     assert response.status_code == 422
     assert "virtual sensor" in response.json()["detail"]
+
+
+def test_workspace_assets_revalidate_after_deploy(client):
+    for url in ("/", "/static/stream-core.js", "/static/stream.js", "/static/app.js"):
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.headers["cache-control"] == "no-cache"

@@ -115,6 +115,9 @@ function setBusy(busy) {
   $("file").disabled = busy;
   $("new").disabled = busy;
   $("sensor-connect").disabled = busy;
+  $("sensor-connect").textContent = busy ? "Connecting…" : $("sensor-address").value.trim() === "192.0.2.10" ? "↗ Connect sensor" : "⌕ Focus host";
+  for (const id of ["sensor-address", "sensor-scenario", "sensor-clear"]) $(id).disabled = busy;
+  $("sensor-connect").setAttribute("aria-busy", String(busy));
   $("queue").hidden = !busy;
 }
 async function refresh() {
@@ -157,6 +160,7 @@ async function refresh() {
 }
 function reset() {
   streamPlayer.clear(); state.visible = null; lastFeedKey = "";
+  $("sensor-status").hidden = true;
   $("stream-events").replaceChildren(node("p", "Verdicts appear as each flow's packet context arrives.", "feed-empty"));
   state.result = null;
   state.page = 0;
@@ -180,7 +184,7 @@ function reset() {
   renderDistribution();
   renderFlows();
 }
-function showResult(result) {
+function showResult(result, playback = {}) {
   streamPlayer.stop(); state.visible = null; lastFeedKey = "unset";
   $("score-heading").textContent = result.model?.production_ready
     ? "CONFIDENCE"
@@ -228,7 +232,7 @@ function showResult(result) {
   renderDistribution();
   renderFlows();
   $("export").title = "Export the full analyzed capture, including flow results not yet revealed in playback";
-  streamPlayer.load(result);
+  streamPlayer.load(result, "", playback);
 }
 function renderDistribution() {
   const counts = state.visible?.counts || state.result?.counts || {
@@ -567,18 +571,26 @@ function switchView(name) {
 }
 $("sensor-connect").addEventListener("click", async () => {
   if (state.busy) return;
+  const status = $("sensor-status");
+  status.hidden = false;
+  status.classList.remove("error");
+  status.textContent = "Preparing traffic and running model inference…";
   try {
     const address = TrafficReplay.normalizeIP($("sensor-address").value);
     if (address === "192.0.2.10") {
       setBusy(true); $("queue").textContent = "Preparing virtual sensor · real model inference…";
       showResult(await api("/api/simulate", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, scenario: $("sensor-scenario").value }) }));
+        body: JSON.stringify({ address, scenario: $("sensor-scenario").value }) }), {autoplay: true});
       switchView("investigate");
     } else {
       if (!state.result) throw new Error("Upload a capture first, then focus an IP from that capture. Use 192.0.2.10 for the virtual sensor.");
-      lastFeedKey = "unset"; streamPlayer.load(state.result, address);
+      lastFeedKey = "unset"; streamPlayer.load(state.result, address, {autoplay: true});
     }
-  } catch (error) { notice(error.message, true); }
+    status.textContent = "Connected · recorded traffic loaded. No packets are sent over the network.";
+  } catch (error) {
+    status.textContent = `Unable to start: ${error.message}`;
+    status.classList.add("error"); notice(error.message, true);
+  }
   finally { setBusy(false); }
 });
 $("sensor-address").addEventListener("keydown", event => { if (event.key === "Enter") $("sensor-connect").click(); });

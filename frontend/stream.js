@@ -25,7 +25,7 @@ class TrafficStream {
     });
     this.draw(0);
   }
-  load(result, focus = "") {
+  load(result, focus = "", {autoplay = !this.reduced.matches} = {}) {
     const next = TrafficReplay.prepare(result, focus);
     this.stop(); this.model = next; this.position = 0;
     document.getElementById("stream-source").textContent = focus ? `${focus} · ${result.filename}` : result.filename;
@@ -36,7 +36,10 @@ class TrafficStream {
     document.getElementById("stream-restart").disabled = false;
     document.getElementById("stream-seek").disabled = false;
     this.publish(); this.draw(0);
-    if (!this.reduced.matches) this.toggle();
+    // An explicit Connect/Play action may start playback even with reduced
+    // motion enabled; decorative pulses still respect that preference.
+    if (autoplay) this.toggle();
+    this.publish();
   }
   clear() {
     this.stop(); this.model = null; this.position = 0;
@@ -45,6 +48,10 @@ class TrafficStream {
     document.getElementById("stream-mode").textContent = "READY TO REPLAY";
     for (const id of ["stream-play", "stream-restart", "stream-seek"]) document.getElementById(id).disabled = true;
     document.getElementById("stream-seek").value = 0;
+    document.getElementById("stream-position").textContent = "0.0 / 30 s";
+    document.getElementById("stream-clock").textContent = "— UTC";
+    document.getElementById("stream-state").textContent = "Waiting";
+    document.getElementById("stream-announcement").textContent = "";
     this.draw(0);
   }
   stop() {
@@ -63,7 +70,7 @@ class TrafficStream {
     if (!this.model) return;
     this.position = TrafficReplay.clamp(value); this.lastFrame = 0;
     this.publish(); this.draw(performance.now());
-    if (play && !this.playing && !this.reduced.matches) this.toggle();
+    if (play && !this.playing) this.toggle();
   }
   tick(time) {
     if (!this.playing) return;

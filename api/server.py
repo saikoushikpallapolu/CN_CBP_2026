@@ -91,6 +91,9 @@ async def security_headers(request, call_next):
         response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; frame-ancestors 'none'"
     if request.url.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
+    elif request.url.path == "/" or request.url.path.startswith("/static/"):
+        # Revalidate the page and its scripts together after a local redeploy.
+        response.headers["Cache-Control"] = "no-cache"
     return response
 
 @app.get("/api/health")

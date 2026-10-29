@@ -22,6 +22,8 @@
 .sensor-bar select { font-size: 11px; }
 .sensor-bar .sensor-connect { color: #071d25; background: #69e2c9; border: 0; height: 35px; padding: 0 15px; font-size: 11px; white-space: nowrap; }
 .sensor-bar .sensor-connect:hover { background: #9cefdc; }
+.sensor-status { margin: 0; padding: 0 22px 12px; background: #142638; color: #9cefdc; font-size: 11px; line-height: 1.6; }
+.sensor-status.error { color: #ff9baa; }
 .stream-visual { display: grid; grid-template-columns: minmax(0, 1fr) 245px; }
 .wave-wrap { position: relative; min-width: 0; background: radial-gradient(ellipse at 48% 64%, #173442 0, #101f2f 68%); }
 #traffic-wave { width: 100%; height: 276px; display: block; cursor: crosshair; }
