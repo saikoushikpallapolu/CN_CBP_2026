@@ -27,7 +27,7 @@ The source-separated train/test arrays were not mixed with validation. Source id
 
 ## Delivered testing improvements
 
-The app now has **Test & demo**, with real capture hashes, separately recorded ground truth, exact-class comparisons, UNKNOWN rates, false attack alerts, escalation rates, capture inspection and report export. Labels are never inputs to inference. The same captured bytes uploaded under a misleading benign filename produce the same verdicts and fingerprints.
+The labeled comparison API/CLI (previously exposed in the **Test & demo** tab) provides real capture hashes, separately recorded ground truth, exact-class comparisons, UNKNOWN rates, false attack alerts, escalation rates, capture inspection and report export. Labels are never inputs to inference. The same captured bytes uploaded under a misleading benign filename produce the same verdicts and fingerprints.
 
 See [the demo guide](DEMO_GUIDE.md) and `docs/validation/demo-report.json`. Experiment summaries are in `docs/validation/improvement-experiments.json`; full local candidate reports are in `ml/checkpoints/improved_flow_resnet.json` and `ml/checkpoints/enriched_flow_resnet.json`. Neither candidate replaced the deployed checkpoint.
 

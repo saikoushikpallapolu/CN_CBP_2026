@@ -1,6 +1,8 @@
 # TrafficScan review build
 
-> Latest update, 29 October: the longevity replay was stopped by the user after about 48 minutes/5,970 analyses and was not restarted. The new **Test & demo** workflow is documented in [DEMO_GUIDE.md](DEMO_GUIDE.md). Two new training challengers and a threshold policy were rejected; see [MODEL_IMPROVEMENT_RESULTS.md](MODEL_IMPROVEMENT_RESULTS.md). These updates supersede the running-audit statements below.
+> Current UI update, 29 October: **Traffic stream** now contains the simulation and packet/threat event log; the Test & demo tab was removed. Model & validation foregrounds paired CPU/GPU timing savings. See [STREAM_SIMULATION.md](STREAM_SIMULATION.md).
+
+> Earlier update, 29 October: the longevity replay was stopped by the user after about 48 minutes/5,970 analyses and was not restarted. The new **Test & demo** workflow is documented in [DEMO_GUIDE.md](DEMO_GUIDE.md). Two new training challengers and a threshold policy were rejected; see [MODEL_IMPROVEMENT_RESULTS.md](MODEL_IMPROVEMENT_RESULTS.md). These updates supersede the running-audit statements below.
 
 Updated 28 October 2026. **The local GPU product is running at http://127.0.0.1:8000.** It is ready for functional review; enterprise production sign-off has not passed.
 

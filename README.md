@@ -2,7 +2,7 @@
 
 **Animated workspace:** connect the virtual sensor **192.0.2.10** on the main Traffic stream screen, or upload a capture. [Wave/simulation controls and meaning](docs/STREAM_SIMULATION.md). The virtual sensor is local recorded-data replay; no attack traffic is transmitted.
 
-**Present/test the app:** open **Test & demo → Run demo suite**. [Demo guide](docs/DEMO_GUIDE.md) · [Latest model experiments and limitations](docs/MODEL_IMPROVEMENT_RESULTS.md). The longevity replay is stopped; no live laptop traffic is captured.
+**Present/test the app:** open **Traffic stream → Connect sensor** for packet-by-packet replay and threat logs. **Model & validation** shows paired timing savings and held-out metrics. [Demo guide](docs/DEMO_GUIDE.md) · [Latest model experiments and limitations](docs/MODEL_IMPROVEMENT_RESULTS.md). The longevity replay is stopped; no live laptop traffic is captured.
 
 **GPU review build:** [localhost:8000](http://127.0.0.1:8000) · [Review guide](docs/REVIEW_GUIDE.md) · [Final measured report](docs/FINAL_REVIEW_REPORT.md). Start/stop with `python -m scripts.review_app start` / `stop`.
 

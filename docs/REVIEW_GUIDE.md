@@ -4,7 +4,7 @@ Open **http://127.0.0.1:8000**. The local GPU service is running.
 
 The main screen is now **Traffic stream**. Connect **192.0.2.10** to watch a virtual normal/attack sequence, or upload a capture for timestamped playback. See [the stream/simulation guide](STREAM_SIMULATION.md). This is replay, not a live network connection.
 
-For a presentation, use **Test & demo → Run demo suite**. See [the four-minute demo guide](DEMO_GUIDE.md) and [the latest improvement experiments](MODEL_IMPROVEMENT_RESULTS.md).
+For a presentation, use **Traffic stream → Connect sensor**, then show **Packet & threat log** and **Model & validation**. See [the four-minute demo guide](DEMO_GUIDE.md) and [the latest improvement experiments](MODEL_IMPROVEMENT_RESULTS.md).
 
 1. Choose **CSE 2018 · LOIC attack window** for a real malicious reference, or **Monday · normal baseline** for normal traffic. Friday contains mixed traffic; its name does not determine predictions.
 2. Inspect a flow for sanitized grayscale/hex evidence and class scores.

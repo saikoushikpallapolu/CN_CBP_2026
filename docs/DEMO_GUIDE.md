@@ -1,15 +1,15 @@
 # Test and demonstrate TrafficScan
 
-Open http://127.0.0.1:8000 and choose **Test & demo → Run demo suite**. This runs the actual active model on four small public recorded captures, then compares predictions with separately stored labels. No live laptop traffic is captured. No verdict is selected from a filename or injected for presentation.
+Open http://127.0.0.1:8000 and choose **Traffic stream**. Keep `192.0.2.10`, choose a scenario and click **Connect sensor**. The active model analyzes recorded public frames before replay. No live laptop traffic is captured. The former Test & demo tab has been removed; the separate labeled comparison suite remains available through the CLI/API.
 
-## A four-minute presentation
+## Four-minute walkthrough
 
-1. **Explain the input:** “We inspect saved network traffic, group the first 16 packets of a connection, mask identifying fields, and create a byte fingerprint.” This is an offline demonstration of the GPU pipeline.
-2. **Run Test & demo:** Show each case's exact-class match, UNKNOWN rate and attack escalation. Explain that correctly naming an attack and sending unknown traffic for review are different outcomes.
-3. **Inspect known LOIC:** Click **Inspect capture**, open a flow, and show its fingerprint, hex preview and class scores. This is a known training-source reference, not independent accuracy evidence.
-4. **Inspect unseen HOIC:** It is escalated as UNKNOWN. Say: “The model cannot reliably identify this attack family; it sends it for review.” Do not call UNKNOWN a correct DDoS prediction.
-5. **Show normal and botnet results:** Discuss missed recognition and false alerts honestly. Export the demo report, then open a saved investigation from Capture history.
-6. **Show Model & validation:** Explain the limited held-out results and failed release gates. The app is experimental. It is not blocking or forwarding live network packets.
+1. **Connect Mixed traffic:** Show the wave and counters advancing together. The source note identifies normal, botnet, known DDoS and unseen-attack references, counts and the content checksum.
+2. **Show Packet & threat log:** Each recorded packet has its own timestamp, sequence, protocol, length and endpoints. THREAT and REVIEW entries appear when a flow verdict is ready. Packet arrival alone is not an attack prediction.
+3. **Pause and inspect:** Filter Threats or Review; click an event to inspect the flow. Seek backwards and show future events disappear. Export log saves all revealed matching events, including those outside the visible 200-row page.
+4. **Change the scenario and reconnect:** DDoS, Botnet and Unseen attack use different reference combinations. The normal baseline is intentionally shared; these are repeatable recorded sequences, not fresh network traffic.
+5. **Show Model & validation:** Show the CPU/GPU timing comparison, time saved per 64 flows, held-out accuracy, macro F1, review rates and pending gates. The model is experimental. Savings exclude parsing, logging and flow-context waiting.
+6. **Upload or reopen:** Upload a capture or use Capture history. Older investigations lack complete packet logs; re-analyze their captures to get the new packet view.
 
 ## Recorded small-demo results
 
