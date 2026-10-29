@@ -46,7 +46,7 @@
 .feed-event.ddos { border-left-color: #ff697b; }.feed-event.botnet { border-left-color: #f7bc57; }
 .feed-event small { display: block; flex-basis: 100%; font-family: Consolas, monospace; color: #8fa8bb; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .feed-event .badge { font-size: 8px; padding: 3px 5px; }
-.stream-controls { display: flex; align-items: center; gap: 12px; border-top: 1px solid #294052; padding: 13px 20px; }
+.stream-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border-top: 1px solid #294052; padding: 13px 20px; }
 .stream-control, .stream-icon { background: #20384a; border: 1px solid #365366; border-radius: 6px; color: #d8eaf5; height: 32px; padding: 0 12px; font-size: 11px; white-space: nowrap; }
 .stream-icon { padding: 0 10px; }
 .stream-control:hover, .stream-icon:hover { background: #2d4b60; }
@@ -82,6 +82,8 @@
 .log-entry { display: grid; grid-template-columns: 98px 65px 205px minmax(180px,1fr); gap: 12px; align-items: center; padding: 8px 16px; font: 11px Consolas, monospace; border: 0; border-bottom: 1px solid #203244; background: transparent; color: inherit; width: 100%; text-align: left; min-width: 630px; }
 .log-entry time { color: #7f9db2; }.log-kind { font-size: 9px; letter-spacing: 1px; color: #5cd9bf; }
 .log-threat { background: #ff697b12; }.log-threat .log-kind { color: #ff8190; }.log-review .log-kind { color: #c4b79c; }
+.log-action .log-kind { color: #80baff; }.log-drop .log-detail { color: #ff8190; }.log-action { background: #7ab5ff0a; }
+.response-summary { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 20px; background: #192e40; font-size: 10px; color: #a9c2d3; }.response-summary strong { font-weight: 500; color: #7fe0ca; }
 button.log-entry:hover { background: #294052; }.log-endpoints { color: #8facbf; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .log-empty { padding: 24px; font-size: 12px; color: #8facbf; }
 .log-footer { justify-content: space-between; padding: 12px 16px; color: var(--muted); font-size: 11px; flex-wrap: wrap; }

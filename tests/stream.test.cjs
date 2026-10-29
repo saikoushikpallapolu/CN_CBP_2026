@@ -70,3 +70,44 @@ test('exact packet logs include unsupported and unrepresented packets without pr
   assert.equal(replay.snapshot(host,1).packets,2);
   assert.equal(replay.snapshot(host,1).bytes,150);
 });
+
+test('simulated drops begin after the decision, isolate the tuple, expire and reset at a new SYN', () => {
+  const attack = {...result.flows[1], source:'10.0.0.1',destination:'10.0.0.2',sport:80,dport:90,protocol:'TCP',
+    ready_timestamp:12,ready_sequence:2,confidence:.99,entropy:.1,
+    response:{simulate:'would_block',monitor:'alert',block_ttl_seconds:30}};
+  const rows = [
+    [1,10,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1,16],
+    [2,12,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1,16],
+    [3,12,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1,16],
+    [4,13,60,'10.0.0.2',90,'10.0.0.1',80,'TCP',1,16],
+    [5,14,60,'10.0.0.3',80,'10.0.0.2',90,'TCP',1,16],
+    [6,50,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1,16]
+  ];
+  const data={...result,flows:[attack],timeline:{start:10,end:50,bins:[]},packet_log:{rows}};
+  const model = replay.prepare(data);
+  const monitor = replay.snapshot(model,1,'monitor');
+  assert.equal(monitor.response.dropped,0);
+  const simulated = replay.snapshot(model,1,'simulate');
+  assert.deepEqual(simulated.log.filter(e=>e.disposition==='would_drop').map(e=>e.sequence),[3,4]);
+  assert.equal(simulated.response.forwarded,4);
+  assert.equal(simulated.response.blockedFlows,1);
+  assert.equal(replay.snapshot(model,0,'simulate').response.dropped,0);
+  const synRows = [...rows.slice(0,3), [4,13,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1,2], rows[3]];
+  const syn = replay.snapshot(replay.prepare({...data,packet_log:{rows:synRows}}),1,'simulate');
+  assert.deepEqual(syn.log.filter(e=>e.disposition==='would_drop').map(e=>e.sequence),[3]);
+  const uncertain = replay.snapshot(replay.prepare({...data,flows:[{...attack,prediction:'unknown',response:{simulate:'review',monitor:'review'}}]}),1,'simulate');
+  assert.equal(uncertain.response.dropped,0);
+});
+
+test('simulated rate limits pass five post-decision packets per connection window', () => {
+  const attack={...result.flows[1],source:'10.0.0.1',destination:'10.0.0.2',sport:80,dport:90,protocol:'TCP',ready_timestamp:10,
+    ready_sequence:1,confidence:.99,entropy:.1,response:{simulate:'would_block',monitor:'alert',rate_limit:'would_rate_limit',rate_limit_packets_per_second:5}};
+  const rows=Array.from({length:13},(_,i)=>[i+1,10+i/100,60,'10.0.0.1',80,'10.0.0.2',90,'TCP',1,16]);
+  const model=replay.prepare({...result,flows:[attack],packet_log:{rows}});
+  const limited=replay.snapshot(model,1,'rate_limit');
+  assert.equal(limited.response.dropped,7);
+  assert.equal(limited.response.forwarded,6);
+  assert.equal(limited.response.rateLimitedFlows,1);
+  assert.equal(replay.snapshot(model,1,'simulate').response.dropped,12);
+  assert.equal(replay.snapshot(model,1,'monitor').response.dropped,0);
+});

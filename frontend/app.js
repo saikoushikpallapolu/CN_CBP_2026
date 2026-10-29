@@ -22,7 +22,7 @@ const labels = {
   benign: "Benign",
   botnet: "Botnet",
   ddos: "DDoS",
-  unknown: "Unknown",
+  unknown: "Uncertain / review",
 };
 const number = (value) => new Intl.NumberFormat().format(value);
 const endpointText = (address, port) =>
@@ -38,7 +38,11 @@ function renderReplay(frame, replay, position) {
   const seconds = Math.max(0, frame.captureTimestamp - replay.start);
   $("metric-time").textContent = seconds < 60 ? `${seconds.toFixed(1)} s` : `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
   $("metric-coverage").textContent = `${number(frame.represented)} packets fingerprinted`;
-  $("metric-unknown").textContent = `${number(frame.counts.unknown)} unknown · review required`;
+  $("metric-unknown").textContent = `${number(frame.counts.unknown)} uncertain · review required`;
+  $("response-state").textContent = frame.response.mode === "monitor" ? "Monitor only · no blocking" : "Simulated prevention · monitoring continues";
+  $("response-counts").textContent = frame.response.mode !== "monitor"
+    ? `${frame.response.mode === "rate_limit" ? `${number(frame.response.rateLimitedFlows)} would-rate-limit decisions (5/s)` : `${number(frame.response.blockedFlows)} would-block decisions`} · ${number(frame.response.dropped)} packets would drop · ${number(frame.response.forwarded)} would pass`
+    : `${number(frame.packets)} packets observed · 0 blocked`;
   $("metric-speed").textContent = `Analysis: ${state.result.telemetry.analysis_ms} ms · precomputed`;
   renderDistribution(); renderFlows();
   renderPacketLog();
@@ -66,7 +70,7 @@ function renderPacketLog() {
   const events = (frame?.log || []).filter(e => filter === "all" || e.kind === filter);
   const pages = Math.ceil(events.length / 200);
   state.logPage = Math.max(0, Math.min(state.logPage, Math.max(0, pages - 1)));
-  const key = `${events.length}:${events.at(-1)?.id}:${filter}:${state.logPage}`;
+  const key = `${events.length}:${events.at(-1)?.id}:${filter}:${state.logPage}:${frame?.response.mode}`;
   $("log-summary").textContent = !replay ? "Connect a sensor or upload a capture" : !replay.logAvailable
     ? "Legacy capture · packet log unavailable; flow verdicts only. Re-analyze for packet logging."
     : `${number(frame.packets)} packets · ${number(frame.counts.botnet + frame.counts.ddos)} threats · ${number(frame.counts.unknown)} review · recorded replay`;
@@ -80,12 +84,12 @@ function renderPacketLog() {
   if (!events.length) host.append(node("p", "Packet arrivals and model threats will appear here as the replay advances.", "log-empty"));
   const end = Math.max(0, events.length - state.logPage * 200);
   for (const event of events.slice(Math.max(0, end - 200), end).reverse()) {
-    const entry = node(event.flow ? "button" : "div", undefined, `log-entry log-${event.kind}`);
+    const entry = node(event.flow ? "button" : "div", undefined, `log-entry log-${event.kind}${event.disposition === "would_drop" ? " log-drop" : ""}`);
     const clock = new Date(event.timestamp * 1000).toISOString().slice(11, 23);
     const details = event.flow || event;
     const endpoints = details.source ? `${endpointText(details.source, details.sport)} → ${endpointText(details.destination, details.dport)}` : "Unsupported frame · retained in capture log";
     entry.append(node("time", clock), node("span", event.kind.toUpperCase(), "log-kind"),
-      node("span", event.kind === "packet" ? `#${event.sequence} · ${event.protocol} · ${event.bytes} B` : `${labels[event.flow.prediction]} · Flow ${event.flow.id} · ${(event.flow.confidence * 100).toFixed(1)}%`, "log-detail"),
+      node("span", event.kind === "packet" ? `#${event.sequence} · ${event.bytes} B · ${event.disposition === "would_drop" ? "WOULD DROP" : event.protocol}` : event.kind === "action" ? `${event.action.replaceAll("_", " ").toUpperCase()} · Flow ${event.flow.id}` : `${labels[event.flow.prediction]} · Flow ${event.flow.id} · ${(event.flow.confidence * 100).toFixed(1)}%`, "log-detail"),
       node("span", endpoints, "log-endpoints"));
     if (event.flow) { entry.title = "Inspect flow evidence"; entry.addEventListener("click", () => inspectFlow(event.flow)); }
     host.append(entry);
@@ -211,7 +215,9 @@ function reset() {
   $("capture-name").textContent = "No capture selected";
   $("metric-coverage").textContent = "Awaiting capture";
   $("metric-speed").textContent = "Waiting for replay";
-  $("metric-unknown").textContent = "Unknown traffic is escalated";
+  $("metric-unknown").textContent = "Uncertain predictions need review";
+  $("response-state").textContent = "Simulation only · no firewall changes";
+  $("response-counts").textContent = "0 would drop · 0 observed";
   $("export").disabled = true;
   $("csv").disabled = true;
   $("search").value = "";
@@ -248,7 +254,7 @@ function showResult(result, playback = {}) {
   $("metric-coverage").textContent =
     `${number(result.coverage.analyzed_ip_packets)} packets fingerprinted`;
   $("metric-unknown").textContent =
-    `${number(result.counts.unknown)} unknown · review required`;
+    `${number(result.counts.unknown)} uncertain · review required`;
   $("metric-speed").textContent =
     `${number(t.packets_per_second)} packets/s · observed`;
   $("capture-name").textContent = result.filename;
@@ -397,6 +403,16 @@ function inspectFlow(flow) {
         : "Model unavailable",
     ),
   );
+  const response = flow.response;
+  if (response) $("detail-summary").append(kv("Response policy", `${response.monitor} / simulated: ${response.simulate.replaceAll("_", " ")}`), kv("Decision reason", response.reason.replaceAll("_", " ")));
+  if (flow.prediction === "unknown") $("detail-summary").append(node("p", "Uncertain is not a confirmed attack. Review the packet context and independent evidence."));
+  if (flow.behavior?.available) {
+    $("detail-summary").append(kv("Behavioral suggestion", `${labels[flow.behavior.suggested_class]} · ${(flow.behavior.confidence * 100).toFixed(1)}% · uncalibrated advisory`),
+      kv("Novelty evidence", `${flow.behavior.anomaly_score.toFixed(3)} / threshold ${flow.behavior.anomaly_threshold.toFixed(3)} · ${flow.behavior.anomalous ? "unusual" : "below threshold"}`));
+    const f = flow.behavior_features || {};
+    $("detail-summary").append(kv("Destination activity / last 1 s", `${Math.round(Math.expm1(f.log_destination_packets_1s || 0))} packets · ${Math.round(Math.expm1(f.log_destination_flows_1s || 0))} connections`),
+      node("p", "Behavioral models are advisory: validation checks failed. These signals neither confirm an attack nor trigger blocking."));
+  }
   const ctx = $("fingerprint").getContext("2d");
   flow.fingerprint.forEach((byte, index) => {
     ctx.fillStyle = `rgb(${byte},${byte},${byte})`;
@@ -508,8 +524,8 @@ async function corpus() {
           "Label source",
           source.labels
             ? "Flow intervals"
-            : source.status?.startsWith("verified_normal")
-              ? "Controlled normal capture"
+            : source.status?.startsWith("verified_normal") || ["controlled_normal_enrichment", "behavior_controlled_normal"].includes(source.status)
+              ? `Publisher-designated normal · ${source.split || "recorded"}`
               : source.status === "schedule_labeled_subset"
                 ? "Schedule + endpoints"
                 : "Unknown / pending",
@@ -538,9 +554,9 @@ function renderModel() {
     const item = node("article", undefined, "model-highlight");
     item.append(node("span", label), node("strong", value), node("small", detail)); hero.append(item);
   }
-  highlight("Model inference speedup", validTiming ? `${(baseline.batch64_p50_ms / accelerated.batch64_p50_ms).toFixed(1)}×` : "Not measured", "Median · CPU PyTorch → GPU TensorRT");
+  highlight("Byte-model inference speedup", validTiming ? `${(baseline.batch64_p50_ms / accelerated.batch64_p50_ms).toFixed(1)}×` : "Not measured", "Median · CPU PyTorch → GPU TensorRT");
   highlight("Time saved / 64 flows", validTiming ? `${(baseline.batch64_p50_ms - accelerated.batch64_p50_ms).toFixed(3)} ms` : "Not measured", validTiming ? `${((1 - accelerated.batch64_p50_ms / baseline.batch64_p50_ms) * 100).toFixed(2)}% less model inference time` : "A paired benchmark is required");
-  highlight("Held-out flow accuracy", audit.accuracy == null ? "Not measured" : `${(audit.accuracy * 100).toFixed(2)}%`, `${number(h.runtime_report?.test_samples || r.samples?.test || 0)} test flows · before UNKNOWN rejection`);
+  highlight("Held-out flow accuracy", audit.accuracy == null ? "Not measured" : `${(audit.accuracy * 100).toFixed(2)}%`, `${number(h.runtime_report?.test_samples || r.samples?.test || 0)} test flows · before uncertainty rejection`);
   highlight("Macro F1", audit.macro_f1 == null ? "Not measured" : audit.macro_f1.toFixed(4), "Equal weight for each class");
   host.append(hero);
   const performance = node("article", undefined, "info-card model-wide");
@@ -557,9 +573,11 @@ function renderModel() {
       body.append(row);
     }
     table.append(body); const wrap = node("div", undefined, "timing-scroll"); wrap.append(table); performance.append(wrap);
-    performance.append(node("p", `Paired audit: ${h.runtime_report.gpu}. Same checkpoint, 64-flow batches; includes GPU transfers. Excludes capture parsing, flow-context waiting, HTTP and packet-log rendering. These are measured model timings, not end-to-end savings or a competitor benchmark.`));
+    performance.append(node("p", `Paired audit: ${h.runtime_report.gpu}. Same byte-model checkpoint, 64-flow batches; includes GPU transfers. Excludes behavioral models, capture parsing, flow-context waiting, HTTP and log rendering. These are model timings, not end-to-end savings or a competitor benchmark.`));
   } else performance.append(node("p", "No paired CPU/GPU timing audit is available for this checkpoint. Savings are not estimated."));
-  if (state.result) performance.append(kv("Latest capture analysis", `${state.result.telemetry.analysis_ms} ms · ${number(state.result.telemetry.packet_count)} packets · precomputed before replay`));
+  if (state.result) performance.append(kv("Latest capture analysis", `${state.result.telemetry.analysis_ms} ms · ${number(state.result.telemetry.packet_count)} packets · precomputed before replay`),
+    kv("Byte-model processing", `${state.result.telemetry.model_ms ?? "Not measured"} ms`),
+    kv("Behavioral inference", `${state.result.telemetry.behavior_ms ?? "Not measured"} ms · advisory; feature extraction is included in total analysis`));
   host.append(performance);
   const card = node("article", undefined, "info-card");
   card.append(
@@ -611,8 +629,31 @@ function renderModel() {
   scope.append(node("h2", "Validation scope"), kv("Training / validation / test", `${number(r.samples?.train || 0)} / ${number(r.samples?.validation || 0)} / ${number(r.samples?.test || 0)}`),
     kv("Test class counts", (r.class_counts?.test || []).map((n,i) => `${labels[["benign", "botnet", "ddos"][i]]}: ${number(n)}`).join(" · ") || "Not measured"),
     kv("GPU / float32 class agreement", h.runtime_report?.agreement_with_float32 == null ? "Not measured" : `${(h.runtime_report.agreement_with_float32 * 100).toFixed(3)}%`),
-    node("p", "Class imbalance makes accuracy alone insufficient. UNKNOWN is a review outcome, not a correct attack-type prediction. Production approval remains pending."));
+    node("p", "Class imbalance makes accuracy alone insufficient. Uncertain is a review outcome, not a correct attack-type prediction. Production approval remains pending."));
   host.append(scope);
+  const behavior = node("article", undefined, "info-card model-wide");
+  behavior.append(node("h2", "Behavioral detection · advisory only"));
+  const b = h.behavior;
+  if (b?.available && b.report) {
+    behavior.append(kv("Architecture", "Behavioral random forest + normal-only isolation forest"),
+      kv("Training flows", number(b.report.training_flows)),
+      kv("Features", "Timing, packet lengths, direction, TCP flags and destination activity"),
+      kv("Promotion", "Not approved · separate evidence only"));
+    const table = node("table", undefined, "timing-table");
+    const header = node("tr");
+    for (const title of ["Independent source", "Flows", "Attack recall", "Benign false alerts", "Anomaly rate"]) header.append(node("th", title));
+    const head = node("thead"); head.append(header); table.append(head); const body = node("tbody");
+    const pct = v => v == null ? "—" : `${(v * 100).toFixed(2)}%`;
+    for (const [source, row] of Object.entries(b.report.per_source)) {
+      if (row.split === "train") continue;
+      const tr = node("tr");
+      for (const value of [`${source} · ${row.split}`, number(row.flows), pct(row.attack_recall), pct(row.benign_false_attack_rate), pct(row.benign_anomaly_rate ?? row.attack_anomaly_rate)]) tr.append(node("td", value));
+      body.append(tr);
+    }
+    table.append(body); const wrap = node("div", undefined, "timing-scroll"); wrap.append(table); behavior.append(wrap,
+      node("p", "Anomaly rate is the fraction flagged as unusual, not accuracy. A high behavioral suggestion score is not calibrated confidence. HOIC is an already-inspected challenge, not a new untouched benchmark. Retiming changes behavioral features."));
+  } else behavior.append(node("p", b?.error || "Behavioral artifact unavailable. The byte model still runs; no anomaly evidence is fabricated."));
+  host.append(behavior);
   const gates = node("article", undefined, "info-card");
   gates.append(node("h2", "Deployment gates"));
   const requirements = r.gates || {
@@ -694,7 +735,8 @@ $("log-export").addEventListener("click", () => {
   const filter = $("log-filter").value || "all";
   const events = (state.visible?.log || []).filter(e => filter === "all" || e.kind === filter);
   download({filename: state.result?.filename, source: state.result?.simulation || "capture",
-    scope: "Events revealed at the current replay position; verdicts are flow-level predictions",
+    scope: "Events revealed at the current replay position; verdicts are flow-level predictions; prevention is counterfactual only",
+    response_mode: state.visible?.response.mode,
     filter, events: events.map(({progress, ...event}) => event)}, "trafficscan-event-log.json");
 });
 $("file").addEventListener("change", (event) =>

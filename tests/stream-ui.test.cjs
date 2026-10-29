@@ -20,6 +20,7 @@ function workspace(result, {reduced = false, failure} = {}) {
       querySelector(selector) { return this[selector] ||= element(); },
       addEventListener(type, listener) { this.listeners[type] = listener; },
       click() { return this.listeners.click?.({target: this}); },
+      showModal() { this.open = true; }, close() { this.open = false; },
       getBoundingClientRect() { return {width: 800, height: 276, left: 0, top: 0}; },
       getContext() { return new Proxy({}, {get: (_, key) => key === 'createLinearGradient'
         ? () => ({addColorStop() {}}) : () => {}}); }
@@ -184,14 +185,43 @@ test('log pagination retains every event and dropdown requests its selected sequ
   assert.equal(app.read('exportedLog.events.length'), 0);
 });
 
+test('pause-on-threat stops exactly at the verdict and resumes past it', async () => {
+  const data={...result,flows:[{...result.flows[0],ready_timestamp:15}]};
+  const app=workspace(data);
+  app.elements.get('pause-threat').checked=true;
+  await app.elements.get('sensor-connect').click();
+  for(let time=1;time<20000;time+=100) app.advance(time);
+  assert.equal(app.read('streamPlayer.position'),.5);
+  assert.equal(app.read('streamPlayer.playing'),false);
+  assert.equal(app.elements.get('stream-state').textContent,'Paused on threat');
+  app.elements.get('stream-play').click();
+  app.advance(21001);app.advance(21101);
+  assert.ok(app.read('streamPlayer.position')>.5);
+});
+
 test('real GPU response renders through Connect and conserves all results',
   {skip: !process.env.TRAFFICSCAN_REPLAY_RESULT}, async () => {
   const actual = JSON.parse(fs.readFileSync(process.env.TRAFFICSCAN_REPLAY_RESULT, 'utf8'));
   const app = workspace(actual);
+  app.elements.get('response-mode').value = 'simulate';
   await app.elements.get('sensor-connect').click();
   assert.equal(app.read('streamPlayer.playing'), true, app.elements.get('sensor-status').textContent);
   for (let t = 1; t < 31000; t += 100) app.advance(t);
   assert.deepEqual(JSON.parse(app.read('JSON.stringify(state.visible.counts)')), actual.counts);
   assert.equal(app.read('state.visible.packets'), actual.telemetry.packet_count);
   assert.equal(app.read('state.visible.flows.length'), actual.telemetry.flow_count);
+  const expectedBlocks = actual.flows.filter(f => f.response?.simulate === 'would_block').length;
+  assert.equal(app.read('state.visible.response.blockedFlows'), expectedBlocks);
+  if (actual.simulation?.synthetic_continuation_packets && expectedBlocks)
+    assert.ok(app.read('state.visible.response.dropped') > 0);
+  app.elements.get('response-mode').value = 'monitor';
+  app.elements.get('response-mode').listeners.change();
+  assert.equal(app.read('state.visible.response.dropped'), 0);
+  app.context.selectedFlow = actual.flows[0]; app.read('inspectFlow(selectedFlow)');
+  assert.equal(app.elements.get('detail').open, true);
+  if (process.env.TRAFFICSCAN_REPLAY_HEALTH) {
+    app.context.realHealth = JSON.parse(fs.readFileSync(process.env.TRAFFICSCAN_REPLAY_HEALTH,'utf8'));
+    app.read('state.health = realHealth; renderModel()');
+    assert.ok(app.elements.get('model').children.some(child => child.children.some(item => item.textContent === 'Behavioral detection · advisory only')));
+  }
 });

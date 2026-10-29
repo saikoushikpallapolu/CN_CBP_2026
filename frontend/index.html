@@ -118,6 +118,8 @@
               </aside>
             </div>
             <div class="stream-controls">
+              <select id="response-mode" aria-label="Response mode"><option value="simulate" selected>Simulated blocking</option><option value="rate_limit">Simulated rate limit · 5/s</option><option value="monitor">Monitor only</option></select>
+              <label class="stream-loop"><input id="pause-threat" type="checkbox" /> Pause on threat</label>
               <button id="stream-play" class="stream-control" disabled>▶ Play</button>
               <button id="stream-restart" class="stream-icon" aria-label="Restart replay" disabled>↺</button>
               <span id="stream-position">0.0 / 30 s</span>
@@ -125,13 +127,14 @@
               <select id="stream-speed" aria-label="Replay speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
               <label class="stream-loop"><input id="stream-loop" type="checkbox" /> Loop</label>
             </div>
+            <div class="response-summary" role="status"><strong id="response-state">Simulation only · no firewall changes</strong><span id="response-counts">0 would drop · 0 observed</span></div>
             <p id="stream-note" class="stream-note">Recorded samples. Dots group dense packet intervals; ring markers are actual model verdicts.</p>
           </section>
           <section class="panel event-log-panel" aria-label="Packet and threat event log">
             <div class="panel-heading log-heading">
               <div><h2>Packet & threat log</h2><small id="log-summary">Connect a sensor or upload a capture</small></div>
               <div class="log-actions">
-                <select id="log-filter" aria-label="Log event type"><option value="all">All events</option><option value="packet">Packets</option><option value="threat">Threats</option><option value="review">Review</option></select>
+                <select id="log-filter" aria-label="Log event type"><option value="all">All events</option><option value="packet">Packets</option><option value="threat">Threat predictions</option><option value="review">Uncertain / review</option><option value="action">Response actions</option></select>
                 <button id="log-export" class="button secondary" disabled>↓ Export log</button>
               </div>
             </div>
@@ -150,9 +153,9 @@
               ><small>Bidirectional · up to 16 packets</small>
             </article>
             <article class="metric">
-              <span>Threat detections <b class="red">◈</b></span
+              <span>Attack predictions <b class="red">◈</b></span
               ><strong id="metric-threats">—</strong
-              ><small id="metric-unknown">Unknown traffic is escalated</small>
+              ><small id="metric-unknown">Uncertain predictions need review</small>
             </article>
             <article class="metric">
               <span>Capture elapsed <b>◷</b></span
@@ -226,7 +229,7 @@
                 <option>benign</option>
                 <option>botnet</option>
                 <option>ddos</option>
-                <option>unknown</option></select
+                <option value="unknown">Uncertain / review</option></select
               ><select id="protocol" aria-label="Filter protocol">
                 <option value="">All protocols</option>
                 <option>TCP</option>

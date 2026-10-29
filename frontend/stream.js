@@ -13,6 +13,7 @@ class TrafficStream {
     document.getElementById("stream-restart").addEventListener("click", () => this.seek(0, true));
     document.getElementById("stream-speed").addEventListener("change", e => { this.speed = Number(e.target.value); });
     document.getElementById("stream-seek").addEventListener("input", e => this.seek(Number(e.target.value) / 1000));
+    document.getElementById("response-mode").addEventListener("change", () => { this.publish(); this.draw(performance.now()); });
     this.canvas.addEventListener("click", e => {
       const box = this.canvas.getBoundingClientRect();
       const x = e.clientX - box.left, y = e.clientY - box.top;
@@ -31,8 +32,8 @@ class TrafficStream {
     document.getElementById("stream-source").textContent = focus ? `${focus} · ${result.filename}` : result.filename;
     document.getElementById("stream-mode").textContent = result.simulation ? "VIRTUAL SENSOR" : "CAPTURE REPLAY";
     document.getElementById("stream-empty").hidden = true;
-    const references = result.simulation?.phases?.map(p => `${p.reference.replace("demo-", "")} (${p.packet_count ?? "?"} packets)`).join(" → ") || "Reference sequence";
-    document.getElementById("stream-note").textContent = `${next.scope}. ${result.simulation ? `${references}. Content ${result.simulation.content_sha256?.slice(0, 12) || "legacy"}. Retimed public samples; no network traffic sent.` : result.timeline ? "Original capture timing fitted to 30 seconds." : "Legacy flow-context replay; full packet timing unavailable."} Verdicts are computed before playback. Loop repeats the same samples.`;
+    const references = result.simulation?.phases?.map(p => `${p.reference.replace("demo-", "")} (${p.packet_count ?? "?"} packets${p.synthetic_continuation_packets ? `; ${p.synthetic_continuation_packets} repeated continuation` : ""})`).join(" → ") || "Reference sequence";
+    document.getElementById("stream-note").textContent = `${next.scope}. ${result.simulation ? `${references}. Content ${result.simulation.content_sha256?.slice(0, 12) || "legacy"}. Retimed public samples; no network traffic sent.` : result.timeline ? "Original capture timing fitted to 30 seconds." : "Legacy flow-context replay; full packet timing unavailable."} Counterfactual replay: original verdicts are retained; simulated drops do not rerun inference. Loop repeats the same samples.`;
     document.getElementById("stream-play").disabled = false;
     document.getElementById("stream-restart").disabled = false;
     document.getElementById("stream-seek").disabled = false;
@@ -75,7 +76,16 @@ class TrafficStream {
   }
   tick(time) {
     if (!this.playing) return;
-    if (this.lastFrame) this.position = Math.min(1, this.position + Math.min(.1, (time - this.lastFrame) / 1000) * this.speed / this.duration);
+    let next = this.position;
+    if (this.lastFrame) next = Math.min(1, this.position + Math.min(.1, (time - this.lastFrame) / 1000) * this.speed / this.duration);
+    const threat = document.getElementById("pause-threat").checked && this.model.events.find(e =>
+      ["botnet", "ddos"].includes(e.flow.prediction) && e.progress > this.position && e.progress <= next);
+    if (threat) {
+      this.position = threat.progress; this.stop(); this.publish(); this.draw(time);
+      document.getElementById("stream-state").textContent = "Paused on threat";
+      return;
+    }
+    this.position = next;
     this.lastFrame = time;
     if (time - this.lastUpdate >= 120 || this.position >= 1) { this.publish(); this.lastUpdate = time; }
     this.draw(time);
@@ -88,7 +98,7 @@ class TrafficStream {
   }
   publish() {
     if (!this.model) return;
-    const frame = TrafficReplay.snapshot(this.model, this.position);
+    const frame = TrafficReplay.snapshot(this.model, this.position, document.getElementById("response-mode").value || "monitor");
     document.getElementById("stream-seek").value = Math.round(this.position * 1000);
     document.getElementById("stream-position").textContent = `${(this.position * this.duration).toFixed(1)} / 30 s`;
     const date = new Date(frame.captureTimestamp * 1000);
@@ -137,6 +147,15 @@ class TrafficStream {
       ctx.beginPath(); ctx.arc(x, y, 2 + Math.min(5, Math.log2(bin.count + 1)), 0, Math.PI * 2); ctx.fill();
     }
     ctx.globalAlpha = 1; this.hitTargets = [];
+    const responseMode = document.getElementById("response-mode").value;
+    if (responseMode === "simulate" || responseMode === "rate_limit") {
+      const dropped = this.model?.packetEvents.filter(p => (responseMode === "simulate" ? p.wouldDrop : p.wouldRateDrop) && p.progress <= this.position && toX(p.progress) > -20) || [];
+      ctx.strokeStyle = "#ff697b"; ctx.lineWidth = 2;
+      for (const packet of dropped.slice(-90)) {
+        const x = toX(packet.progress), y = waveY(x);
+        ctx.beginPath(); ctx.moveTo(x - 4,y - 4); ctx.lineTo(x + 4,y + 4); ctx.moveTo(x - 4,y + 4); ctx.lineTo(x + 4,y - 4); ctx.stroke();
+      }
+    }
     const events = this.model?.events.filter(e => e.progress <= this.position && e.flow.prediction !== "benign" && toX(e.progress) > -25) || [];
     for (const event of events.slice(-90)) {
       const x = toX(event.progress), y = waveY(x), color = palette[event.flow.prediction];
