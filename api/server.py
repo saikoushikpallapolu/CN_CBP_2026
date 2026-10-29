@@ -26,6 +26,10 @@ SAMPLES = {
     "friday": ("Friday · attack window", "data/production/samples/friday.pcap"),
     "cse": ("CSE 2018 · LOIC attack window", "data/production/samples/cse.pcap"),
     "mawi": ("MAWI · unlabeled backbone", "data/production/samples/mawi.pcap"),
+    "demo-normal": ("Demo · labeled normal traffic", "data/production/samples/demo-normal.pcap"),
+    "demo-botnet": ("Demo · labeled botnet", "data/production/samples/demo-botnet.pcap"),
+    "demo-ddos": ("Demo · labeled DDoS", "data/production/samples/demo-ddos.pcap"),
+    "demo-unseen": ("Demo · unseen HOIC / review", "data/production/samples/demo-unseen.pcap"),
 }
 
 def authorize(x_api_key: str | None = Header(default=None)):
@@ -111,6 +115,27 @@ def samples():
 
 class SampleRequest(BaseModel):
     sample_id: str
+
+
+@app.post("/api/demo", dependencies=[Depends(authorize)])
+def demonstration():
+    from classification.demo import load_cases, compare_case
+    if not ANALYSIS_SLOT.acquire(blocking=False):
+        raise HTTPException(429, "Analysis in progress. Retry shortly.")
+    try:
+        manifest = load_cases(ROOT)
+        engine = get_flow_classifier()
+        results = []
+        for case in manifest["cases"]:
+            path = ROOT / "data/production/samples" / (case["id"] + ".pcap")
+            # Ground truth never enters the classifier or changes its verdict.
+            results.append(compare_case(case, engine.analyze(path, path.name)))
+        return dict(scope="Small public recorded-capture demo; not a full accuracy benchmark or live traffic test",
+                    model=engine.health(), selection=manifest["selection"], cases=results)
+    except (ValueError, OSError) as error:
+        raise HTTPException(422, str(error)) from error
+    finally:
+        ANALYSIS_SLOT.release()
 
 @app.post("/api/analyze/sample", dependencies=[Depends(authorize)])
 def sample(request: SampleRequest):

@@ -264,3 +264,38 @@ def test_engine_metadata_preserves_training_report(tmp_path):
     engine_metadata_path(engine).write_text('{"engine_sha256": "example"}')
     assert training_report.read_text() == '{"accuracy": 0.98}'
     assert engine_metadata_path(engine).name == "model.engine.json"
+
+
+def test_demo_does_not_count_unknown_as_correct_attack_type():
+    from classification.demo import compare_case
+    case = dict(id="demo-unseen", title="Unknown attack", expected_class="ddos", source_group="holdout",
+                label_basis="Independent label", sha256="verified")
+    result = dict(flows=[dict(prediction="unknown"), dict(prediction="benign"), dict(prediction="ddos")],
+                  counts=dict(unknown=1, benign=1, ddos=1, botnet=0), telemetry=dict(analysis_ms=1))
+    report = compare_case(case, result)
+    assert report["class_match_rate"] == pytest.approx(1/3)
+    assert report["attack_escalation_rate"] == pytest.approx(2/3)
+    case["expected_class"] = "benign"
+    report = compare_case(case, result)
+    assert report["benign_attack_alert_rate"] == pytest.approx(1/3)
+    assert report["benign_review_rate"] == pytest.approx(2/3)
+
+
+def test_demo_auth_and_backpressure(client, monkeypatch):
+    import api.server as server
+    monkeypatch.setenv("TRAFFICSCAN_API_KEY", "demo-secret")
+    assert client.post("/api/demo").status_code == 401
+    server.ANALYSIS_SLOT.acquire()
+    try:
+        assert client.post("/api/demo", headers={"X-API-Key": "demo-secret"}).status_code == 429
+    finally:
+        server.ANALYSIS_SLOT.release()
+
+
+def test_class_specific_policy_uses_predicted_class():
+    logits = torch.tensor([[2., 1., 0.], [1., 2., 0.]])
+    baseline = probabilities(logits)[2]
+    selected = probabilities(logits, confidence_threshold=[.5, .9, .9], entropy_threshold=[.95, .8, .8])[2]
+    assert baseline.tolist() == [True, True]
+    assert selected.tolist() == [False, True]
+    assert torch.equal(baseline, probabilities(logits, confidence_threshold=[.75]*3, entropy_threshold=[.8]*3)[2])

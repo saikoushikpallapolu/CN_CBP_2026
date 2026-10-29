@@ -57,6 +57,12 @@ def main():
         checks["sample_analysis"] = response.status_code == 200
         checks["failed_gates_force_unknown"] = bool(payload.get("flows")) and all(flow["prediction"] == "unknown" for flow in payload["flows"])
         checks["history_saved"] = requests.get(base + "/api/investigations", headers=headers, timeout=10).status_code == 200
+        demo = requests.post(base + "/api/demo", headers=headers, timeout=60)
+        if demo.status_code == 200:
+            cases = demo.json().get("cases", [])
+            checks["demo_preserves_release_gates"] = len(cases) == 4 and all(case["unknown_rate"] == 1 for case in cases)
+        elif args.gpu:
+            checks["demo_preserves_release_gates"] = False
         page = requests.get(base, timeout=10)
         checks["frontend_and_security_headers"] = page.status_code == 200 and "Content-Security-Policy" in page.headers
         destination = root / ("artifacts/deployment-smoke-gpu.json" if args.gpu else "artifacts/deployment-smoke.json")

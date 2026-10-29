@@ -30,6 +30,8 @@
           <span>▤</span>Data sources</button
         ><button class="nav" data-view="model">
           <span>◇</span>Model & validation
+        </button><button class="nav" data-view="demo">
+          <span>▷</span>Test & demo
         </button>
       </nav>
       <div class="sidebar-bottom">
@@ -276,6 +278,20 @@
             </div>
           </div>
           <div id="model" class="history-grid"></div>
+        </section>
+        <section id="view-demo" class="view" hidden>
+          <div class="page-heading">
+            <div><div class="eyebrow">VERIFY THE MODEL</div><h1>Test & demo</h1>
+              <p>Four labeled public captures. Real inference, compared with recorded truth.</p></div>
+            <button id="run-demo" class="button primary">▷ Run demo suite</button>
+          </div>
+          <div class="notice">Offline samples, not live traffic. UNKNOWN means review; it is not a correct attack-type prediction.</div>
+          <div id="demo-results" class="history-grid">
+            <article class="info-card"><h2>1 · Normal</h2><p>Check benign acceptance and false alerts.</p></article>
+            <article class="info-card"><h2>2 · Botnet</h2><p>Check attack recognition and missed traffic.</p></article>
+            <article class="info-card"><h2>3 · DDoS</h2><p>Inspect a known attack fingerprint.</p></article>
+            <article class="info-card"><h2>4 · Unseen HOIC</h2><p>Check uncertainty and escalation.</p></article>
+          </div>
         </section>
       </main>
     </div>

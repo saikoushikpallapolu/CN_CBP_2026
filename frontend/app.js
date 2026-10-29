@@ -7,6 +7,7 @@ const state = {
   page: 0,
   busy: false,
   key: sessionStorage.getItem("traffic-key") || "",
+  demo: null,
 };
 const colors = {
   benign: "#0a957a",
@@ -516,6 +517,7 @@ function switchView(name) {
     history: "Capture history",
     corpus: "Data sources",
     model: "Model & validation",
+    demo: "Test & demo",
   }[name];
   if (name === "history") history();
   if (name === "corpus") corpus();
@@ -523,6 +525,49 @@ function switchView(name) {
 }
 for (const nav of document.querySelectorAll(".nav"))
   nav.addEventListener("click", () => switchView(nav.dataset.view));
+$("run-demo").addEventListener("click", async () => {
+  const button = $("run-demo");
+  button.disabled = true;
+  button.textContent = "Running real inference…";
+  try {
+    const report = await api("/api/demo", { method: "POST" });
+    state.demo = report;
+    $("demo-results").replaceChildren();
+    for (const item of report.cases) {
+      const card = node("article", undefined, "info-card");
+      const pct = (value) => `${(value * 100).toFixed(1)}%`;
+      card.append(node("h2", item.title), kv("Recorded truth", labels[item.expected_class]),
+        kv("Capture group", item.source_group),
+        kv("Flows", item.flow_count), kv("Correct class", pct(item.class_match_rate)),
+        kv("Unknown / review", pct(item.unknown_rate)));
+      if (item.expected_class === "benign") {
+        card.append(kv("False attack alerts", pct(item.benign_attack_alert_rate)),
+          kv("Total review rate", pct(item.benign_review_rate)));
+      } else card.append(kv("Attack escalation", pct(item.attack_escalation_rate)));
+      card.append(kv("Analysis time", `${item.analysis_ms} ms`));
+      if (item.id === "demo-ddos") card.append(node("p", "Training-source reference; not an independent accuracy test."));
+      const inspect = node("button", "Inspect capture ↗", "button secondary");
+      inspect.addEventListener("click", async () => {
+        if (state.busy) return;
+        setBusy(true);
+        try {
+          showResult(await api("/api/analyze/sample", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sample_id: item.id }) }));
+          switchView("investigate");
+        } catch (error) { notice(error.message, true); }
+        finally { setBusy(false); }
+      });
+      card.append(inspect);
+      $("demo-results").append(card);
+    }
+    const exportCard = node("article", undefined, "info-card");
+    exportCard.append(node("h2", "Evidence"), node("p", report.scope));
+    const exportButton = node("button", "↓ Export demo report", "button secondary");
+    exportButton.addEventListener("click", () => download(report, "trafficscan-demo.json"));
+    exportCard.append(exportButton);
+    $("demo-results").append(exportCard);
+  } catch (error) { notice(error.message, true); }
+  finally { button.disabled = false; button.textContent = "▷ Run demo suite"; }
+});
 $("file").addEventListener("change", (event) =>
   uploadFiles(event.target.files),
 );

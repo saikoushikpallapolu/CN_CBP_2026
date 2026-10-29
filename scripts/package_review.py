@@ -29,9 +29,10 @@ def main():
             if not path.is_file():
                 raise ValueError("Missing reviewed model artifact: " + name)
             selected[name] = path
-    for name in ("monday", "ctu1", "friday", "cse", "mawi"):
+    for name in ("monday", "ctu1", "friday", "cse", "mawi", "demo-normal", "demo-botnet", "demo-ddos", "demo-unseen"):
         relative = "data/production/samples/" + name + ".pcap"
         selected[relative] = root / relative
+    selected["data/production/samples/demo-manifest.json"] = root / "data/production/samples/demo-manifest.json"
     for name in ("dataset.npz", "dataset.json"):
         relative = "data/production/" + name
         selected[relative] = root / relative
