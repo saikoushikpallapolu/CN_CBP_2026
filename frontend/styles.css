@@ -9,6 +9,65 @@
   --amber: #bc8427;
   --green: #0a957a;
 }
+.stream-panel { background: #101f2f; color: #dce8f1; border: 1px solid #223749; border-radius: 14px; overflow: hidden; margin-bottom: 22px; box-shadow: 0 14px 36px #10253815; }
+.stream-top { display: flex; gap: 18px; align-items: center; padding: 19px 22px; border-bottom: 1px solid #294052; font-size: 11px; }
+.stream-ident { display: flex; align-items: center; gap: 9px; color: #64d9c2; letter-spacing: 1.3px; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.stream-indicator { width: 6px; height: 6px; border-radius: 50%; background: #5bdbbf; box-shadow: 0 0 12px #5bdbbf66; }
+#stream-source { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #a8bbcd; }
+#stream-clock { color: #9cb0c2; font-family: Consolas, monospace; font-size: 10px; white-space: nowrap; }
+.sensor-bar { display: flex; gap: 9px; align-items: center; padding: 14px 22px; background: #142638; }
+.sensor-bar label { font-size: 10px; color: #a5bacd; margin-right: 3px; white-space: nowrap; }
+.sensor-bar input, .sensor-bar select, .stream-controls select { background: #102132; border: 1px solid #365064; color: #e2eef7; border-radius: 6px; height: 35px; padding: 0 10px; min-width: 0; }
+.sensor-bar input { flex: 1; font-family: Consolas, monospace; max-width: 300px; width: 100px; }
+.sensor-bar select { font-size: 11px; }
+.sensor-bar .sensor-connect { color: #071d25; background: #69e2c9; border: 0; height: 35px; padding: 0 15px; font-size: 11px; white-space: nowrap; }
+.sensor-bar .sensor-connect:hover { background: #9cefdc; }
+.stream-visual { display: grid; grid-template-columns: minmax(0, 1fr) 245px; }
+.wave-wrap { position: relative; min-width: 0; background: radial-gradient(ellipse at 48% 64%, #173442 0, #101f2f 68%); }
+#traffic-wave { width: 100%; height: 276px; display: block; cursor: crosshair; }
+.stream-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 9px; text-align: center; padding: 20px; pointer-events: none; background: #101f2fa8; }
+.stream-empty strong { font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
+.stream-empty > span:not(.signal-symbol) { font-size: 11px; color: #a8bed0; line-height: 1.6; }
+.stream-empty small { color: #6f8b9f; font-size: 10px; max-width: 350px; line-height: 1.6; }
+.signal-symbol { color: #6ce1c9; font-size: 36px; line-height: 1; }
+.wave-key { display: flex; gap: 18px; align-items: center; justify-content: center; padding: 6px 10px 17px; font-size: 9px; color: #a7bbcb; }
+.wave-key span { display: flex; align-items: center; gap: 6px; }
+.wave-key i { width: 5px; height: 5px; border-radius: 50%; }
+.key-normal { background: #4ddbc0; }.key-botnet { background: #f7bc57; }.key-ddos { background: #ff697b; }.key-unknown { background: #9cacc3; }
+.detection-feed { min-width: 0; border-left: 1px solid #294052; padding: 17px 14px; background: #0e1c2bb3; }
+.feed-heading { display: flex; gap: 6px; justify-content: space-between; margin-bottom: 14px; color: #a7bdd0; font-size: 8px; letter-spacing: 1px; }
+#stream-state { color: #60d4bc; letter-spacing: 0; white-space: nowrap; }
+#stream-events { height: 236px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #355469 transparent; }
+.feed-empty { font-size: 11px; color: #7390a6; line-height: 1.8; margin: 36px 10px; }
+.feed-event { border: 1px solid #294255; border-left: 2px solid #a0b4c9; border-radius: 6px; background: #192b3c; color: #d0dfeb; width: 100%; text-align: left; padding: 9px; margin-bottom: 7px; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; font-size: 10px; }
+.feed-event:hover { background: #203b4d; }
+.feed-event.ddos { border-left-color: #ff697b; }.feed-event.botnet { border-left-color: #f7bc57; }
+.feed-event small { display: block; flex-basis: 100%; font-family: Consolas, monospace; color: #8fa8bb; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.feed-event .badge { font-size: 8px; padding: 3px 5px; }
+.stream-controls { display: flex; align-items: center; gap: 12px; border-top: 1px solid #294052; padding: 13px 20px; }
+.stream-control, .stream-icon { background: #20384a; border: 1px solid #365366; border-radius: 6px; color: #d8eaf5; height: 32px; padding: 0 12px; font-size: 11px; white-space: nowrap; }
+.stream-icon { padding: 0 10px; }
+.stream-control:hover, .stream-icon:hover { background: #2d4b60; }
+#stream-position { font-family: Consolas, monospace; font-size: 10px; color: #9bb4c7; width: 80px; flex-shrink: 0; }
+#stream-seek { flex: 1; min-width: 50px; accent-color: #61d9c2; height: 4px; cursor: pointer; }
+.stream-controls select { height: 30px; font-size: 10px; }
+.stream-loop { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #9bb4c7; white-space: nowrap; cursor: pointer; }.stream-loop input { accent-color: #61d9c2; }
+.stream-note { margin: 0; background: #0c1a28; padding: 10px 20px; color: #839eb2; font-size: 10px; line-height: 1.6; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 1100px) {
+  .sensor-bar { flex-wrap: wrap; }.sensor-bar label { flex-basis: 100%; }
+  .stream-visual { grid-template-columns: minmax(0, 1fr) 210px; }
+}
+@media (max-width: 760px) {
+  .stream-top { padding: 14px; flex-wrap: wrap; gap: 9px; }#stream-source { flex-basis: 55%; }#stream-clock { display: none; }
+  .sensor-bar { padding: 12px; gap: 7px; }.sensor-bar input { flex-basis: 55%; max-width: none; }.sensor-bar select { flex: 1; width: 90px; }
+  .stream-visual { grid-template-columns: 1fr; }#traffic-wave { height: 220px; }
+  .detection-feed { border-left: 0; border-top: 1px solid #294052; padding: 12px; }
+  #stream-events { height: 110px; display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden; }.feed-event { min-width: 190px; max-width: 220px; align-content: flex-start; }
+  .feed-empty { margin: 10px; }.stream-controls { gap: 8px; flex-wrap: wrap; padding: 12px; }#stream-position { width: auto; }
+  #stream-seek { order: 5; flex-basis: 100%; margin: 8px 0; }.stream-controls select { margin-left: auto; }
+  .wave-key { gap: 12px; }.stream-note { padding: 10px 12px; }
+}
 * {
   box-sizing: border-box;
 }

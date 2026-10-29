@@ -8,6 +8,7 @@ const state = {
   busy: false,
   key: sessionStorage.getItem("traffic-key") || "",
   demo: null,
+  visible: null,
 };
 const colors = {
   benign: "#0a957a",
@@ -24,6 +25,37 @@ const labels = {
 const number = (value) => new Intl.NumberFormat().format(value);
 const endpointText = (address, port) =>
   `${address.includes(":") ? `[${address}]` : address}:${port}`;
+let lastFeedKey = "";
+const streamPlayer = new TrafficStream(renderReplay, inspectFlow);
+
+function renderReplay(frame, replay, position) {
+  state.visible = frame;
+  $("metric-packets").textContent = number(frame.packets);
+  $("metric-flows").textContent = number(frame.flows.length);
+  $("metric-threats").textContent = number(frame.counts.botnet + frame.counts.ddos);
+  const seconds = Math.max(0, frame.captureTimestamp - replay.start);
+  $("metric-time").textContent = seconds < 60 ? `${seconds.toFixed(1)} s` : `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
+  $("metric-coverage").textContent = `${number(frame.represented)} packets fingerprinted`;
+  $("metric-unknown").textContent = `${number(frame.counts.unknown)} unknown · review required`;
+  $("metric-speed").textContent = `Analysis: ${state.result.telemetry.analysis_ms} ms · precomputed`;
+  renderDistribution(); renderFlows();
+  const detections = frame.flows.filter(f => f.prediction !== "benign").slice(-5).reverse();
+  const key = detections.map(f => f.id).join(",");
+  if (key !== lastFeedKey) {
+    lastFeedKey = key;
+    $("stream-events").replaceChildren();
+    if (!detections.length) $("stream-events").append(node("p", "No attack or review verdicts at this point.", "feed-empty"));
+    for (const flow of detections) {
+      const button = node("button", undefined, `feed-event ${flow.prediction}`);
+      button.append(badge(flow.prediction), node("span", `Flow ${String(flow.id).padStart(4, "0")} · ${flow.protocol}`),
+        node("small", `${endpointText(flow.source, flow.sport)} → ${endpointText(flow.destination, flow.dport)}`));
+      button.addEventListener("click", () => inspectFlow(flow));
+      $("stream-events").append(button);
+    }
+    $("stream-announcement").textContent = `${frame.counts.botnet + frame.counts.ddos} attack predictions and ${frame.counts.unknown} review verdicts revealed.`;
+  }
+  $("traffic-wave").setAttribute("aria-label", `Replay: ${frame.packets} packets, ${frame.flows.length} flows, ${frame.counts.botnet + frame.counts.ddos} attack predictions, ${frame.counts.unknown} review verdicts.`);
+}
 function node(tag, text, className) {
   const n = document.createElement(tag);
   if (text !== undefined) n.textContent = text;
@@ -76,11 +108,13 @@ function download(value, name, type = "application/json") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function setBusy(busy) {
+  if (busy && streamPlayer.playing) { streamPlayer.stop(); streamPlayer.publish(); }
   state.busy = busy;
   $("dropzone").classList.toggle("loading", busy);
   $("samples").disabled = busy;
   $("file").disabled = busy;
   $("new").disabled = busy;
+  $("sensor-connect").disabled = busy;
   $("queue").hidden = !busy;
 }
 async function refresh() {
@@ -122,6 +156,8 @@ async function refresh() {
   }
 }
 function reset() {
+  streamPlayer.clear(); state.visible = null; lastFeedKey = "";
+  $("stream-events").replaceChildren(node("p", "Verdicts appear as each flow's packet context arrives.", "feed-empty"));
   state.result = null;
   state.page = 0;
   state.selected = null;
@@ -134,7 +170,7 @@ function reset() {
     $(id).textContent = "—";
   $("capture-name").textContent = "No capture selected";
   $("metric-coverage").textContent = "Awaiting capture";
-  $("metric-speed").textContent = "End-to-end processing";
+  $("metric-speed").textContent = "Waiting for replay";
   $("metric-unknown").textContent = "Unknown traffic is escalated";
   $("export").disabled = true;
   $("csv").disabled = true;
@@ -145,6 +181,7 @@ function reset() {
   renderFlows();
 }
 function showResult(result) {
+  streamPlayer.stop(); state.visible = null; lastFeedKey = "unset";
   $("score-heading").textContent = result.model?.production_ready
     ? "CONFIDENCE"
     : "MODEL SCORE";
@@ -190,9 +227,11 @@ function showResult(result) {
   $("protocol").value = "";
   renderDistribution();
   renderFlows();
+  $("export").title = "Export the full analyzed capture, including flow results not yet revealed in playback";
+  streamPlayer.load(result);
 }
 function renderDistribution() {
-  const counts = state.result?.counts || {
+  const counts = state.visible?.counts || state.result?.counts || {
     benign: 0,
     botnet: 0,
     ddos: 0,
@@ -224,7 +263,7 @@ function filteredFlows() {
   const verdict = $("verdict").value;
   const protocol = $("protocol").value;
   const sort = $("sort").value;
-  return [...(state.result?.flows || [])]
+  return [...(state.visible?.flows || state.result?.flows || [])]
     .filter(
       (flow) =>
         (!verdict || flow.prediction === verdict) &&
@@ -252,11 +291,12 @@ function renderFlows() {
   $("flows").replaceChildren();
   $("empty").hidden = flows.length > 0;
   if (!flows.length) {
+    const waiting = state.visible && !state.visible.flows.length && streamPlayer.position < 1;
     $("empty").querySelector("h3").textContent = state.result
-      ? "No flows match your filters"
+      ? waiting ? "Waiting for flow context" : "No flows match your filters"
       : "Your next investigation starts here";
     $("empty").querySelector("p").textContent = state.result
-      ? "Adjust the verdict, protocol or search query."
+      ? waiting ? "Packets arrive first. Verdicts appear when each flow burst is ready." : "Adjust the verdict, protocol or search query."
       : "Upload a capture to explore flows, verdicts and byte fingerprints.";
   }
   for (const flow of flows.slice(state.page * 25, state.page * 25 + 25)) {
@@ -297,6 +337,7 @@ function renderFlows() {
   $("next").disabled = state.page + 1 >= pages;
 }
 function inspectFlow(flow) {
+  if (streamPlayer.playing) { streamPlayer.stop(); streamPlayer.publish(); }
   state.selected = flow;
   $("detail-title").textContent = `Flow ${String(flow.id).padStart(4, "0")}`;
   $("detail-summary").replaceChildren(badge(flow.prediction));
@@ -513,7 +554,7 @@ function switchView(name) {
   for (const nav of document.querySelectorAll(".nav"))
     nav.classList.toggle("active", nav.dataset.view === name);
   $("crumb").textContent = {
-    investigate: "Investigations",
+    investigate: "Traffic stream",
     history: "Capture history",
     corpus: "Data sources",
     model: "Model & validation",
@@ -522,7 +563,33 @@ function switchView(name) {
   if (name === "history") history();
   if (name === "corpus") corpus();
   if (name === "model") renderModel();
+  if (name !== "investigate" && streamPlayer.playing) { streamPlayer.stop(); streamPlayer.publish(); }
 }
+$("sensor-connect").addEventListener("click", async () => {
+  if (state.busy) return;
+  try {
+    const address = TrafficReplay.normalizeIP($("sensor-address").value);
+    if (address === "192.0.2.10") {
+      setBusy(true); $("queue").textContent = "Preparing virtual sensor · real model inference…";
+      showResult(await api("/api/simulate", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, scenario: $("sensor-scenario").value }) }));
+      switchView("investigate");
+    } else {
+      if (!state.result) throw new Error("Upload a capture first, then focus an IP from that capture. Use 192.0.2.10 for the virtual sensor.");
+      lastFeedKey = "unset"; streamPlayer.load(state.result, address);
+    }
+  } catch (error) { notice(error.message, true); }
+  finally { setBusy(false); }
+});
+$("sensor-address").addEventListener("keydown", event => { if (event.key === "Enter") $("sensor-connect").click(); });
+$("sensor-address").addEventListener("input", () => {
+  $("sensor-connect").textContent = $("sensor-address").value.trim() === "192.0.2.10" ? "↗ Connect sensor" : "⌕ Focus host";
+});
+$("sensor-clear").addEventListener("click", () => {
+  $("sensor-address").value = "192.0.2.10";
+  $("sensor-connect").textContent = "↗ Connect sensor";
+  if (state.result) { lastFeedKey = "unset"; streamPlayer.load(state.result); }
+});
 for (const nav of document.querySelectorAll(".nav"))
   nav.addEventListener("click", () => switchView(nav.dataset.view));
 $("run-demo").addEventListener("click", async () => {

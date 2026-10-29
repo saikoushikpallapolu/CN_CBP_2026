@@ -7,6 +7,8 @@
     <title>TrafficScan | Network investigations</title>
     <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/stream-core.js" defer></script>
+    <script src="/static/stream.js" defer></script>
     <script src="/static/app.js" defer></script>
   </head>
   <body>
@@ -23,7 +25,7 @@
       <div class="nav-label">WORKSPACE</div>
       <nav aria-label="Main navigation">
         <button class="nav active" data-view="investigate">
-          <span>▦</span>Investigations</button
+          <span>∿</span>Traffic stream</button
         ><button class="nav" data-view="history">
           <span>◷</span>Capture history</button
         ><button class="nav" data-view="corpus">
@@ -49,7 +51,7 @@
     <div class="shell">
       <header class="topbar">
         <div class="breadcrumb">
-          Workspace <span>/</span> <strong id="crumb">Investigations</strong>
+          Workspace <span>/</span> <strong id="crumb">Traffic stream</strong>
         </div>
         <div class="top-actions">
           <span class="local-badge">● Local analysis</span
@@ -74,9 +76,9 @@
         <section id="view-investigate" class="view">
           <div class="page-heading">
             <div>
-              <div class="eyebrow">NETWORK INTELLIGENCE</div>
-              <h1>Investigations</h1>
-              <p>From packet capture to actionable evidence.</p>
+              <div class="eyebrow">NETWORK OBSERVATORY</div>
+              <h1>Traffic stream</h1>
+              <p>Follow the packets. Inspect the signal.</p>
             </div>
             <div class="heading-actions">
               <button id="export" class="button secondary" disabled>
@@ -86,9 +88,49 @@
               </button>
             </div>
           </div>
+          <section class="stream-panel" aria-label="Traffic replay workspace">
+            <div class="stream-top">
+              <div class="stream-ident"><span class="stream-indicator"></span><span id="stream-mode">READY TO REPLAY</span></div>
+              <span id="stream-source">Connect the virtual sensor or open a capture</span>
+              <span id="stream-clock">— UTC</span>
+            </div>
+            <div class="sensor-bar">
+              <label for="sensor-address">Sensor / IP focus</label>
+              <input id="sensor-address" value="192.0.2.10" placeholder="Virtual sensor or captured host IP" aria-label="Virtual sensor or captured host IP" autocomplete="off" />
+              <select id="sensor-scenario" aria-label="Virtual sensor scenario">
+                <option value="mixed">Mixed traffic</option><option value="ddos">DDoS sequence</option>
+                <option value="botnet">Botnet sequence</option><option value="unknown">Unseen attack</option>
+              </select>
+              <button id="sensor-connect" class="button sensor-connect">↗ Connect sensor</button>
+              <button id="sensor-clear" class="stream-icon" title="Clear host focus" aria-label="Clear host focus">×</button>
+            </div>
+            <div class="stream-visual">
+              <div class="wave-wrap">
+                <canvas id="traffic-wave" role="img" aria-label="Packet activity wave. Use the detection feed to inspect classified events."></canvas>
+                <div id="stream-empty" class="stream-empty"><span class="signal-symbol">∿</span><strong>A network in motion.</strong>
+                  <span>Connect the virtual sensor above, or upload a capture below.</span>
+                  <small>192.0.2.10 is a virtual replay address. No attack packets are transmitted.</small></div>
+                <div class="wave-key"><span><i class="key-normal"></i>Packets</span><span><i class="key-botnet"></i>Botnet</span><span><i class="key-ddos"></i>DDoS</span><span><i class="key-unknown"></i>Review</span></div>
+              </div>
+              <aside class="detection-feed" aria-label="Replay detection feed">
+                <div class="feed-heading"><span>DETECTION FEED</span><span id="stream-state">Waiting</span></div>
+                <div id="stream-events"><p class="feed-empty">Verdicts appear as each flow's packet context arrives.</p></div>
+                <div id="stream-announcement" class="sr-only" role="status" aria-live="polite"></div>
+              </aside>
+            </div>
+            <div class="stream-controls">
+              <button id="stream-play" class="stream-control" disabled>▶ Play</button>
+              <button id="stream-restart" class="stream-icon" aria-label="Restart replay" disabled>↺</button>
+              <span id="stream-position">0.0 / 30 s</span>
+              <input id="stream-seek" type="range" min="0" max="1000" step="1" value="0" aria-label="Replay position" disabled />
+              <select id="stream-speed" aria-label="Replay speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+              <label class="stream-loop"><input id="stream-loop" type="checkbox" /> Loop</label>
+            </div>
+            <p id="stream-note" class="stream-note">Recorded samples. Dots group dense packet intervals; ring markers are actual model verdicts.</p>
+          </section>
           <div class="metrics">
             <article class="metric">
-              <span>Packets analyzed <b>↗</b></span
+              <span>Packets observed <b>↗</b></span
               ><strong id="metric-packets">—</strong
               ><small id="metric-coverage">Awaiting capture</small>
             </article>
@@ -103,7 +145,7 @@
               ><small id="metric-unknown">Unknown traffic is escalated</small>
             </article>
             <article class="metric">
-              <span>Analysis time <b>◷</b></span
+              <span>Capture elapsed <b>◷</b></span
               ><strong id="metric-time">—</strong
               ><small id="metric-speed">End-to-end processing</small>
             </article>
@@ -137,7 +179,7 @@
             <section class="panel distribution-panel">
               <div class="panel-heading">
                 <h2>Verdict distribution</h2>
-                <span class="muted">LIVE RESULTS</span>
+                <span class="muted">REPLAY RESULTS</span>
               </div>
               <div class="distribution">
                 <div class="donut" id="donut">
