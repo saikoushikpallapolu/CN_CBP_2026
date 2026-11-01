@@ -11,6 +11,8 @@ const state = {
   logPage: 0,
   logKey: "",
   logModel: null,
+  research: null,
+  researchLoading: false,
 };
 const colors = {
   benign: "#0a957a",
@@ -524,7 +526,7 @@ async function corpus() {
           "Label source",
           source.labels
             ? "Flow intervals"
-            : source.status?.startsWith("verified_normal") || ["controlled_normal_enrichment", "behavior_controlled_normal"].includes(source.status)
+            : source.status?.startsWith("verified_normal") || ["controlled_normal_enrichment", "behavior_controlled_normal", "research_reserved_normal"].includes(source.status)
               ? `Publisher-designated normal · ${source.split || "recorded"}`
               : source.status === "schedule_labeled_subset"
                 ? "Schedule + endpoints"
@@ -686,11 +688,68 @@ function switchView(name) {
     history: "Capture history",
     corpus: "Data sources",
     model: "Model & validation",
+    research: "Research lab",
   }[name];
   if (name === "history") history();
   if (name === "corpus") corpus();
   if (name === "model") renderModel();
+  if (name === "research") researchLab();
   if (name !== "investigate" && streamPlayer.playing) { streamPlayer.stop(); streamPlayer.publish(); }
+}
+async function researchLab() {
+  if (state.researchLoading) return;
+  state.researchLoading = true;
+  try {
+    const list = await api("/api/research/runs");
+    const select = $("research-run"), selected = select.value;
+    select.replaceChildren();
+    if (!list.runs.length) {
+      const option = node("option", "No experiments recorded"); option.value = ""; select.append(option);
+      $("research-status").textContent = "No completed or running experiment is available yet.";return;
+    }
+    for (const run of list.runs) {const option=node("option",`${run.id} · ${run.status}`);option.value=run.id;select.append(option);}
+    select.value = list.runs.some(run=>run.id===selected) ? selected : list.runs[0].id;
+    state.research = await api(`/api/research/runs/${encodeURIComponent(select.value)}`);
+    renderResearch();
+  } catch(error) { $("research-status").textContent=error.message; }
+  finally {state.researchLoading=false;}
+}
+function renderResearch() {
+  const report=state.research;if(!report)return;
+  const summary=report.summary||{}, frozen=report.frozen||{}, data=frozen.dataset||{};
+  $("research-status").textContent = `${summary.status || "Initializing"}${summary.current ? ` · ${summary.current} · seed ${summary.seed}${summary.epoch ? ` · epoch ${summary.epoch}` : ""}` : ""} · ${summary.results?.length || 0} model runs · independent reproduction pending`;
+  $("research-provenance").replaceChildren(kv("Dataset / SHA-256",`${number(data.n || 0)} sessions · ${data.dataset_sha256?.slice(0,16) || "pending"}`),
+    kv("Frozen protocol",frozen.protocol_sha256?.slice(0,16)),kv("Partitions",Object.entries(data.counts||{}).map(([name,count])=>`${name}: ${number(count)}`).join(" · ")));
+  $("research-exports").replaceChildren();
+  for(const file of report.exports||[]) {
+    const button=node("button",`↓ ${file}`,"button secondary");
+    button.addEventListener("click",async()=>{
+      try {
+        const response=await fetch(`/api/research/runs/${encodeURIComponent(report.id)}/files/${encodeURIComponent(file)}`,{headers:state.key?{"X-API-Key":state.key}:{}});
+        if(!response.ok)throw new Error(`Export failed (${response.status})`);
+        const url=URL.createObjectURL(await response.blob()),a=node("a");a.href=url;a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      } catch(error){notice(error.message,true);}
+    });$("research-exports").append(button);
+  }
+  const split=$("research-split").value||"development", policy=$("research-policy").value||"adaptive", seed=$("research-seed").value;
+  const results=split==="final" ? report.final?.results||[] : [...(summary.results||[]), ...(report.precision?.results||[])];
+  const host=$("research-results");host.replaceChildren();const pct=value=>value==null?"—":`${(value*100).toFixed(2)}%`;
+  for(const result of results) {
+    if(seed && String(result.seed)!==seed)continue;
+    const m=result.metrics?.[policy];if(!m)continue;
+    const row=node("tr");const name=node("td");name.append(node("span",result.model),node("small",result.model_sha256?.slice(0,10),"research-version"));row.append(name);
+    for(const value of [result.seed,policy,pct(m.correct_accepted_fraction),pct(m.coverage),pct(m.benign_false_alert_rate),pct(m.benign_review_rate),pct(m.attack_accepted_benign_rate),m.mean_packets?.toFixed(2),`${m.context_wait_ms_p95?.toFixed(2)} ms`])row.append(node("td",String(value??"—")));
+    host.append(row);
+  }
+  if(!host.children.length) {const row=node("tr"),cell=node("td",split==="final" && !report.final ? "Final evaluation has not run for this experiment. Prior source exposure must be checked before a blind-test claim." : "No matching results yet.");cell.colSpan=10;row.append(cell);host.append(row);}
+  const evidence=$("research-evidence");evidence.replaceChildren();
+  const novel=results.filter(r=>r.novelty && (!seed || String(r.seed)===seed));
+  if(novel.length) {const card=node("article",undefined,"info-card");card.append(node("h2","KitNET · separate binary novelty task"));for(const item of novel)card.append(kv(`Seed ${item.seed} · false alerts / attack detection`,`${pct(item.novelty.benign_false_alert_rate)} / ${pct(item.novelty.attack_detection_rate)}`));card.append(node("p","Author algorithm on 18 shared behavioral features. This is not a reproduction of the original Kitsune feature extractor."));evidence.append(card);}
+  if(report.streaming) {const card=node("article",undefined,"info-card model-wide");card.append(node("h2","Measured incremental stream · original packet timing"));
+    for(const row of report.streaming.reports||[])card.append(kv(`${row.source.split("/").slice(-2,-1)[0]} · ${row.fixed ? "fixed16" : "adaptive"} · ${row.speed}×`,`${row.decisions} decisions · p95 ${row.latency_ms[95]?.toFixed(2)??"—"} ms · queue drops ${row.queue_drops}/${row.offered} · censored ${row.censored_sessions}`));
+    card.append(node("p","At 1×, arrival-to-decision latency includes context waiting and queue processing. Accelerated runs are overload tests. Censored sessions are excluded from latency percentiles."));evidence.append(card);}
+  if(report.precision) {const card=node("article",undefined,"info-card");card.append(node("h2","Precision ablation · same CPU runtime"));for(const row of report.precision.results||[])card.append(kv(`${row.model} · seed ${row.seed}`,`Batch 64 / 16 packets · median ${row.timings?.batch64_context16_cpu_ms_p50?.toFixed(2) ?? "—"} ms · p95 ${row.timings?.batch64_context16_cpu_ms_p95?.toFixed(2) ?? "—"} ms`));card.append(node("p","Model timing only, two CPU threads. Includes neither packet waiting nor the complete application pipeline."));evidence.append(card);}
+  if(report.scorecard) {const card=node("article",undefined,"info-card model-wide");card.append(node("h2","Evidence-based research readiness"));for(const row of report.scorecard.categories||[])card.append(kv(`${row.category} · ${row.score}/10`,row.reason));evidence.append(card);}
 }
 $("sensor-connect").addEventListener("click", async () => {
   if (state.busy) return;
@@ -739,6 +798,10 @@ $("log-export").addEventListener("click", () => {
     response_mode: state.visible?.response.mode,
     filter, events: events.map(({progress, ...event}) => event)}, "trafficscan-event-log.json");
 });
+$("research-refresh").addEventListener("click",researchLab);
+$("research-run").addEventListener("change",researchLab);
+for(const id of ["research-split","research-policy","research-seed"])$(id).addEventListener("change",renderResearch);
+setInterval(()=>{if(!$("view-research").hidden)researchLab();},5000);
 $("file").addEventListener("change", (event) =>
   uploadFiles(event.target.files),
 );

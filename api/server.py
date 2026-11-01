@@ -206,6 +206,9 @@ def investigation(identifier: str):
     return json.loads(row[0])
 
 app.mount("/static", StaticFiles(directory=ROOT / "frontend"), name="static")
+
+from api.research import install_research_routes
+install_research_routes(app,authorize)
 @app.get("/")
 def index():
     return FileResponse(ROOT / "frontend/index.html")

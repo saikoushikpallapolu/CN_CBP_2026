@@ -32,6 +32,8 @@
           <span>▤</span>Data sources</button
         ><button class="nav" data-view="model">
           <span>◇</span>Model & validation
+        </button><button class="nav" data-view="research">
+          <span>⌬</span>Research lab
         </button>
       </nav>
       <div class="sidebar-bottom">
@@ -333,6 +335,21 @@
             </div>
           </div>
           <div id="model" class="model-grid"></div>
+        </section>
+        <section id="view-research" class="view" hidden>
+          <div class="page-heading"><div><div class="eyebrow">EXPERIMENT WORKBENCH</div><h1>Research lab</h1><p>Frozen experiments, matched comparisons and measured limits.</p></div><button id="research-refresh" class="button secondary">↻ Refresh</button></div>
+          <div class="panel research-toolbar">
+            <label>Experiment <select id="research-run" aria-label="Experiment"><option value="">Loading experiments…</option></select></label>
+            <label>Split <select id="research-split"><option value="development">Development</option><option value="final">Final holdout</option></select></label>
+            <label>Policy <select id="research-policy"><option value="adaptive">Adaptive</option><option value="fixed16">Fixed 16</option><option value="fixed4">Fixed 4</option><option value="fixed8">Fixed 8</option><option value="fixed32">Fixed 32</option><option value="no_rejection_fixed16">No rejection · fixed 16</option></select></label>
+            <label>Seed <select id="research-seed"><option value="">All seeds</option><option>17</option><option>42</option><option>73</option></select></label>
+          </div>
+          <div id="research-status" class="notice" role="status">Reading research registry…</div>
+          <div id="research-provenance" class="research-provenance"></div>
+          <div id="research-exports" class="research-exports"></div>
+          <section class="panel research-table-wrap"><table class="timing-table"><thead><tr><th>Model / version</th><th>Seed</th><th>Policy</th><th>Correct accepted</th><th>Coverage</th><th>Benign false alerts</th><th>Benign review</th><th>Attack → benign</th><th>Packets</th><th>Context wait p95</th></tr></thead><tbody id="research-results"></tbody></table></section>
+          <div id="research-evidence" class="model-grid"></div>
+          <p class="muted">Research models are isolated from the serving classifier. Final results are not used for tuning. A file-integrity check is not independent scientific reproduction.</p>
         </section>
       </main>
     </div>

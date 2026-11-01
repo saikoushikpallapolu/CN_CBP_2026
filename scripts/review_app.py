@@ -61,6 +61,10 @@ def main():
                                          ("artifacts/review", "/app/review", False)):
             command.extend(["--mount", f"type=bind,source={root / source},target={target}" + (",readonly" if readonly else "")])
         command.append("trafficscan:gpu")
+        research=root / "artifacts/research"
+        if research.is_dir():
+            command[-1:-1]=["--mount",f"type=bind,source={research},target=/app/research_artifacts,readonly",
+                           "-e","TRAFFICSCAN_RESEARCH_ROOT=/app/research_artifacts"]
         subprocess.run(command, check=True, capture_output=True, text=True)
     url = f"http://127.0.0.1:{args.port}"
     for attempt in range(45):

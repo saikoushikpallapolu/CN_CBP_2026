@@ -37,6 +37,7 @@ function workspace(result, {reduced = false, failure} = {}) {
     sessionStorage: {getItem() {return '';}, setItem() {}},
     matchMedia: () => ({matches: reduced}), ResizeObserver: class {observe() {}},
     devicePixelRatio: 1, performance: {now: () => 1},
+    setInterval: () => 1,
     requestAnimationFrame: fn => { pending.set(++frameID, fn); return frameID; },
     cancelAnimationFrame: id => pending.delete(id),
     fetch: async (url, options) => {
@@ -162,6 +163,20 @@ test('model screen foregrounds paired measurements without claiming universal su
   app.context.health.runtime_report = null;
   app.read('renderModel()');
   assert.equal(app.elements.get('model').children[0].children[0].children[1].textContent, 'Not measured');
+});
+
+test('research workbench labels model versions, split, coverage and review separately', () => {
+  const app=workspace(result);
+  app.elements.get('research-split').value='development';app.elements.get('research-policy').value='adaptive';
+  app.context.experiment={id:'unit-run',frozen:{dataset:{n:10,dataset_sha256:'1234567890abcdef',counts:{train:6,development:4}},protocol_sha256:'hash'},
+    summary:{status:'running',results:[{model:'unit-model',seed:42,model_sha256:'abcdef123456',metrics:{adaptive:{correct_accepted_fraction:.5,coverage:.75,benign_false_alert_rate:.1,benign_review_rate:.2,attack_accepted_benign_rate:.3,mean_packets:8,context_wait_ms_p95:12}}}]},exports:[]};
+  app.read('state.research=experiment;renderResearch()');
+  const row=app.elements.get('research-results').children[0];
+  assert.equal(row.children[0].children[1].textContent,'abcdef1234');
+  assert.equal(row.children[3].textContent,'50.00%');
+  assert.equal(row.children[4].textContent,'75.00%');
+  app.elements.get('research-split').value='final';app.read('renderResearch()');
+  assert.match(app.elements.get('research-results').children[0].children[0].textContent,/Prior source exposure/);
 });
 
 test('log pagination retains every event and dropdown requests its selected sequence', async () => {

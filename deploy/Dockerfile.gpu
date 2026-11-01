@@ -8,6 +8,7 @@ COPY classification classification
 COPY data_processing data_processing
 COPY api api
 COPY frontend frontend
+COPY research research
 COPY ml/build_tensorrt.py ml/build_tensorrt.py
 COPY ml/evaluate_tensorrt.py ml/evaluate_tensorrt.py
 COPY ml/evaluate_additional_attack.py ml/evaluate_additional_attack.py

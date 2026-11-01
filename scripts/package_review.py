@@ -14,7 +14,7 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     names = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=root, text=True).splitlines()
-    folders = {"api", "classification", "data_processing", "deploy", "docs", "frontend", "ml", "native", "scripts", "tests"}
+    folders = {"api", "classification", "data_processing", "deploy", "docs", "frontend", "ml", "native", "scripts", "tests", "research"}
     root_files = {"README.md", "pytest.ini", ".dockerignore", ".gitignore", "download_tuesday.py"}
     selected = {}
     for name in names:
