@@ -1,0 +1,21 @@
+{
+  "version": "adaptive-flow-research-v1",
+  "question": "Does uncertainty-driven additional packet context improve the accuracy-delay-cost tradeoff over fixed 16-packet decisions under source shift?",
+  "stages": [4,8,16,32],
+  "bytes_per_packet": 32,
+  "seeds": [17,42,73],
+  "epochs": 6,
+  "batch_size": 128,
+  "max_per_source": 1500,
+  "max_packets_per_source": 300000,
+  "thresholds": [0.8,0.9,0.95,0.99],
+  "entropy_limit": 0.8,
+  "selection_benign_false_alert_budget": 0.01,
+  "selection_benign_review_budget": 0.2,
+  "aspirational_false_alert_budget": 0.001,
+  "aspirational_benign_review_budget": 0.05,
+  "final_holdout_sources": ["research-ctu12","research-ctu13","research-normal13","research-normal14","research-normal18"],
+  "known_exposed_sources": ["ctu10","friday","cse21-hoic","normal9-behavior"],
+  "unknown_family_policy": "NSIS.ay reserved from fitting, calibration, and policy selection; development HOIC is already inspected",
+  "promotion": "Research only. No replacement of the serving classifier or claims of novelty/independent reproduction."
+}

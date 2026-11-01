@@ -147,13 +147,13 @@ def sanitize(packet: Packet) -> bytes:
     return bytes(data)
 
 
-def packet_features(packet: Packet) -> bytes:
+def packet_features(packet: Packet, mask=True) -> bytes:
     """32 invariant bytes: network framing, transport flags/window and payload.
 
     Taking only the first 32 Ethernet bytes would mostly preserve masked zeros
     and never reach TCP flags. This protocol-aware layout avoids that defect.
     """
-    data = sanitize(packet)
+    data = sanitize(packet) if mask else packet.raw
     n, t = packet.network_offset, packet.transport_offset
     network = data[n:n + 12] if packet.version == 4 else data[n:n + 8].ljust(12, b"\0")
     if packet.protocol == 6:

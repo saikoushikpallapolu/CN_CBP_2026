@@ -1,0 +1,32 @@
+{
+  "repository": "https://github.com/ymirsky/KitNET-py",
+  "commit": "02eb5e804568ee9f3968d4fc5bdfd37a9c0bc190",
+  "patches": "Relative imports and NumPy2 Inf to inf compatibility only; feature adapter separate, not original Kitsune extractor",
+  "files": {
+    "KitNET.py": {
+      "url": "https://raw.githubusercontent.com/ymirsky/KitNET-py/02eb5e804568ee9f3968d4fc5bdfd37a9c0bc190/KitNET.py",
+      "original_sha256": "09f8544c62c3d7a7954c29f632a114bfc92d233b9aac3635f5551d0ed9aa43e3",
+      "local_sha256": "655793813f2c1bf2bbb6b357b82c6e735edcb19920bc4511622d9b6595895e7e"
+    },
+    "dA.py": {
+      "url": "https://raw.githubusercontent.com/ymirsky/KitNET-py/02eb5e804568ee9f3968d4fc5bdfd37a9c0bc190/dA.py",
+      "original_sha256": "1117682e8370bd7fdefdee3bd05ccc68f9e405768818a39b6c5c52ee501cbc47",
+      "local_sha256": "40da7e367efc66c503949477aefb7f6176f2a2cd5e2c94bc8253c2b75c03c709"
+    },
+    "corClust.py": {
+      "url": "https://raw.githubusercontent.com/ymirsky/KitNET-py/02eb5e804568ee9f3968d4fc5bdfd37a9c0bc190/corClust.py",
+      "original_sha256": "622406f98df3f547e20b739baeb68a71dd6abcdadd0a9c1f8a0526c98bc93853",
+      "local_sha256": "bbf46343def6d86b1088fceeb6de8c56a6d37b3b937f4e4ec4cf08982c30df27"
+    },
+    "utils.py": {
+      "url": "https://raw.githubusercontent.com/ymirsky/KitNET-py/02eb5e804568ee9f3968d4fc5bdfd37a9c0bc190/utils.py",
+      "original_sha256": "a12d53638ed1eae451647c6d587870b20bb36b23459f63cea9c94268400fef18",
+      "local_sha256": "f11dd38fcbaff878bebc6e9abd676f17a1c0e41cbc1de57ecec27e7aeb468b72"
+    },
+    "LICENSE.txt": {
+      "url": "https://raw.githubusercontent.com/ymirsky/KitNET-py/02eb5e804568ee9f3968d4fc5bdfd37a9c0bc190/LICENSE.txt",
+      "original_sha256": "aacae60addeeb4a72247fb145b97de32044e11b1e429d8042552cc97f43bb230",
+      "local_sha256": "a266b78d48259fa82726b95384788bd7213f9bac92238d1ae0e49d0358b61dd2"
+    }
+  }
+}
