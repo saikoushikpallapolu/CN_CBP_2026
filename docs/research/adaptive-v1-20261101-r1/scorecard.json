@@ -1,0 +1,49 @@
+{
+  "categories": [
+    {
+      "category": "Focused adaptive method",
+      "score": 7,
+      "reason": "Causal 4\u21928\u219216\u219232 implemented and compared; novelty review and robust Pareto gains still need independent confirmation"
+    },
+    {
+      "category": "Frozen dataset strength",
+      "score": 6,
+      "reason": "Source/session audits and reserved novel families; limited independent capture clusters, small family counts and historical/public labels"
+    },
+    {
+      "category": "Fair baselines",
+      "score": 8,
+      "reason": "Three-seed matched-context 1D/2D, fixed16, statistical/RF and author KitNET18; original full Kitsune feature pipeline is not reproduced"
+    },
+    {
+      "category": "Ablations",
+      "score": 8,
+      "reason": "Masking, modalities, stopping, rejection and same-CPU FP32/INT8 measured; budgets are a bounded pilot, not exhaustive tuning"
+    },
+    {
+      "category": "False alerts and uncertainty",
+      "score": 8,
+      "reason": "Review-aware metrics, per-family results, risk\u2013coverage, calibration and cluster intervals; low false-alert claims need stronger cohorts"
+    },
+    {
+      "category": "Incremental systems evidence",
+      "score": 7,
+      "reason": "Original-pacing isolated queue measurements and overload test; no real NIC/prevention or full production workload evidence"
+    },
+    {
+      "category": "Statistical and independent verification",
+      "score": 6,
+      "reason": "Three seeds and capture-cluster bootstrap; independent human reproduction is pending and capture clusters remain few"
+    },
+    {
+      "category": "Experiment workbench",
+      "score": 9,
+      "reason": "Versioned runs, hashes, split/seed/policy comparison, downloadable tables and vector figures; browser visual review remains pending"
+    }
+  ],
+  "mean_score": 7.375,
+  "assessment": "Evidence-based, not guaranteed publication readiness. Scores are reviewer judgment, not model accuracy or a venue decision.",
+  "independent_reproduction": "pending_external_person",
+  "final_evaluated": true,
+  "measured_shared_threshold_pareto_example": true
+}

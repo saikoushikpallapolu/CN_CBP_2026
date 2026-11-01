@@ -1,5 +1,7 @@
 # TrafficScan
 
+**Research update:** open **Research lab** for the frozen adaptive-context study, three-seed baselines, ablations, uncertainty metrics and downloadable figures. [Research method, measured findings and limitations](docs/RESEARCH_IMPLEMENTATION.md). Research models remain experimental; the serving classifier is unchanged.
+
 > Response update: Traffic stream now supports monitor-only, simulated blocking/rate-limiting, and pause-on-threat. UNKNOWN is labeled Uncertain / review. Behavioral models were trained and evaluated but remain advisory because promotion checks failed. Known virtual scenarios include explicitly labeled repeated reference continuation. See [response and behavioral evaluation](docs/RESPONSE_AND_BEHAVIOR.md).
 
 

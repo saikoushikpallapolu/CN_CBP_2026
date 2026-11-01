@@ -1,0 +1,238 @@
+{
+  "status": "measured",
+  "reports": [
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\normal7-behavior\\capture.pcap",
+      "source_sha256": "012f5bc1d8232c7b0890d1c7d9c1b4baeeefa6b82c1ff4e18368748d4f0ba3b8",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": null,
+      "speed": 1.0,
+      "clip_seconds": 5.0,
+      "offered": 2333,
+      "processed": 2333,
+      "queue_drops": 0,
+      "queue_capacity": 256,
+      "queue_peak": 67,
+      "elapsed_seconds": 4.998797699998249,
+      "processed_packets_per_second": 466.71222562193645,
+      "decisions": 17,
+      "censored_sessions": 7,
+      "latency_ms": {
+        "50": 2898.1146000005538,
+        "95": 3017.173079989152,
+        "99": 3050.4286959965248
+      },
+      "inference_ms": {
+        "50": 9.946499994839542,
+        "95": 21.173070000076983,
+        "99": 71.76869399641875
+      },
+      "mean_packets_to_decision": 4.705882352941177,
+      "inference_calls": 19,
+      "rss_peak_bytes": 1090486272,
+      "gpu_peak_bytes": 34848256,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    },
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\normal7-behavior\\capture.pcap",
+      "source_sha256": "012f5bc1d8232c7b0890d1c7d9c1b4baeeefa6b82c1ff4e18368748d4f0ba3b8",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": 16,
+      "speed": 1.0,
+      "clip_seconds": 5.0,
+      "offered": 2333,
+      "processed": 2333,
+      "queue_drops": 0,
+      "queue_capacity": 256,
+      "queue_peak": 67,
+      "elapsed_seconds": 4.99953239999013,
+      "processed_packets_per_second": 466.64364051418204,
+      "decisions": 6,
+      "censored_sessions": 18,
+      "latency_ms": {
+        "50": 301.48325000482146,
+        "95": 1484.4733250101854,
+        "99": 1628.916185009439
+      },
+      "inference_ms": {
+        "50": 9.591150002961513,
+        "95": 11.479425003926735,
+        "99": 11.74628500448307
+      },
+      "mean_packets_to_decision": 16.0,
+      "inference_calls": 6,
+      "rss_peak_bytes": 1090850816,
+      "gpu_peak_bytes": 34848256,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    },
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\ctu10\\capture.pcap",
+      "source_sha256": "44bb65a53d5b838d45cf3b26b804c7099096c632306acda0e6a6a4406f16d219",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": null,
+      "speed": 1.0,
+      "clip_seconds": 5.0,
+      "offered": 34,
+      "processed": 34,
+      "queue_drops": 0,
+      "queue_capacity": 256,
+      "queue_peak": 30,
+      "elapsed_seconds": 4.681909599996288,
+      "processed_packets_per_second": 7.261994123087502,
+      "decisions": 0,
+      "censored_sessions": 1,
+      "latency_ms": {
+        "50": null,
+        "95": null,
+        "99": null
+      },
+      "inference_ms": {
+        "50": 9.741700006998144,
+        "95": 9.741700006998144,
+        "99": 9.741700006998144
+      },
+      "mean_packets_to_decision": null,
+      "inference_calls": 1,
+      "rss_peak_bytes": 1090850816,
+      "gpu_peak_bytes": 34785280,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    },
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\ctu10\\capture.pcap",
+      "source_sha256": "44bb65a53d5b838d45cf3b26b804c7099096c632306acda0e6a6a4406f16d219",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": 16,
+      "speed": 1.0,
+      "clip_seconds": 5.0,
+      "offered": 34,
+      "processed": 34,
+      "queue_drops": 0,
+      "queue_capacity": 256,
+      "queue_peak": 30,
+      "elapsed_seconds": 4.6814029999950435,
+      "processed_packets_per_second": 7.262779982846168,
+      "decisions": 0,
+      "censored_sessions": 1,
+      "latency_ms": {
+        "50": null,
+        "95": null,
+        "99": null
+      },
+      "inference_ms": {
+        "50": null,
+        "95": null,
+        "99": null
+      },
+      "mean_packets_to_decision": null,
+      "inference_calls": 0,
+      "rss_peak_bytes": 1090879488,
+      "gpu_peak_bytes": 34566656,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    },
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\cse\\capture.pcap",
+      "source_sha256": "129e85a4cb0f3202165eed09f0fab04afac9f97624fa7ac3f676b1837d5b815d",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": null,
+      "speed": 1.0,
+      "clip_seconds": 5.0,
+      "offered": 520,
+      "processed": 520,
+      "queue_drops": 0,
+      "queue_capacity": 256,
+      "queue_peak": 161,
+      "elapsed_seconds": 4.993596999993315,
+      "processed_packets_per_second": 104.13335317221156,
+      "decisions": 68,
+      "censored_sessions": 0,
+      "latency_ms": {
+        "50": 99.56979999697069,
+        "95": 333.3006900007603,
+        "99": 388.8595629952033
+      },
+      "inference_ms": {
+        "50": 19.100400000752416,
+        "95": 22.200945004442474,
+        "99": 24.66362600403954
+      },
+      "mean_packets_to_decision": 4.0,
+      "inference_calls": 68,
+      "rss_peak_bytes": 1091293184,
+      "gpu_peak_bytes": 34785280,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    },
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\cse\\capture.pcap",
+      "source_sha256": "129e85a4cb0f3202165eed09f0fab04afac9f97624fa7ac3f676b1837d5b815d",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": 16,
+      "speed": 1.0,
+      "clip_seconds": 5.0,
+      "offered": 520,
+      "processed": 520,
+      "queue_drops": 0,
+      "queue_capacity": 256,
+      "queue_peak": 47,
+      "elapsed_seconds": 4.97673819999909,
+      "processed_packets_per_second": 104.4861069847104,
+      "decisions": 0,
+      "censored_sessions": 68,
+      "latency_ms": {
+        "50": null,
+        "95": null,
+        "99": null
+      },
+      "inference_ms": {
+        "50": null,
+        "95": null,
+        "99": null
+      },
+      "mean_packets_to_decision": null,
+      "inference_calls": 0,
+      "rss_peak_bytes": 1091411968,
+      "gpu_peak_bytes": 34566656,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    },
+    {
+      "scope": "Original capture pacing at speed=1; arrival queue, parsing, causal features and incremental inference; no NIC or HTTP",
+      "source": "data\\external\\cse\\capture.pcap",
+      "source_sha256": "129e85a4cb0f3202165eed09f0fab04afac9f97624fa7ac3f676b1837d5b815d",
+      "checkpoint_sha256": "d0820f74329f8963cd87da53af3f1821e7cd614e824b775a255eaea7ed491f75",
+      "fixed": null,
+      "speed": 100.0,
+      "clip_seconds": 5.0,
+      "offered": 520,
+      "processed": 24,
+      "queue_drops": 496,
+      "queue_capacity": 8,
+      "queue_peak": 8,
+      "elapsed_seconds": 0.10239450000517536,
+      "processed_packets_per_second": 234.38758916530634,
+      "decisions": 4,
+      "censored_sessions": 1,
+      "latency_ms": {
+        "50": 45.99975000019185,
+        "95": 49.10157999547664,
+        "99": 49.13455599511508
+      },
+      "inference_ms": {
+        "50": 21.48450000095181,
+        "95": 24.935034996451577,
+        "99": 25.37100699657458
+      },
+      "mean_packets_to_decision": 4.0,
+      "inference_calls": 4,
+      "rss_peak_bytes": 1091411968,
+      "gpu_peak_bytes": 34785280,
+      "warning": "Latency is conditional on completed decisions; short censored clips do not establish full-capture performance"
+    }
+  ],
+  "real_prevention": false,
+  "synthetic_demo_packets": false
+}

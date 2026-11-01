@@ -1,0 +1,171 @@
+{
+  "verified_at": "2026-11-01T16:59:46.827915+00:00",
+  "artifact_checks": {
+    "research\\run.py": true,
+    "research\\models.py": true,
+    "research\\adaptive.py": true,
+    "research\\metrics.py": true,
+    "research\\dataset.py": true,
+    "data_processing\\production.py": true,
+    "classification\\behavior.py": true,
+    "ml\\production_model.py": true,
+    "research\\vendor\\kitnet\\corClust.py": true,
+    "research\\vendor\\kitnet\\dA.py": true,
+    "research\\vendor\\kitnet\\KitNET.py": true,
+    "research\\vendor\\kitnet\\utils.py": true,
+    "research\\vendor\\kitnet\\__init__.py": true,
+    "research\\vendor\\kitnet\\UPSTREAM.json": true,
+    "models\\resnet1d_prefix-17.pth": true,
+    "models\\resnet1d_fixed16-17.pth": true,
+    "models\\resnet2d_prefix-17.pth": true,
+    "models\\resnet1d_unmasked-17.pth": true,
+    "models\\hybrid_prefix-17.pth": true,
+    "models\\logistic_behavior-17.joblib": true,
+    "models\\forest_behavior-17.joblib": true,
+    "models\\kitnet18-17.joblib": true,
+    "models\\resnet1d_prefix-42.pth": true,
+    "models\\resnet1d_fixed16-42.pth": true,
+    "models\\resnet2d_prefix-42.pth": true,
+    "models\\resnet1d_unmasked-42.pth": true,
+    "models\\hybrid_prefix-42.pth": true,
+    "models\\logistic_behavior-42.joblib": true,
+    "models\\forest_behavior-42.joblib": true,
+    "models\\kitnet18-42.joblib": true,
+    "models\\resnet1d_prefix-73.pth": true,
+    "models\\resnet1d_fixed16-73.pth": true,
+    "models\\resnet2d_prefix-73.pth": true,
+    "models\\resnet1d_unmasked-73.pth": true,
+    "models\\hybrid_prefix-73.pth": true,
+    "models\\logistic_behavior-73.joblib": true,
+    "models\\forest_behavior-73.joblib": true,
+    "models\\kitnet18-73.joblib": true,
+    "dataset": true
+  },
+  "capture_group_and_session_disjoint": true,
+  "replay_checks": [
+    {
+      "model": "resnet1d_prefix",
+      "seed": 17,
+      "samples": 128,
+      "max_probability_error": 0.0002517251212895699,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 17,
+      "samples": 128,
+      "max_probability_error": 0.00019264354755321733,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 17,
+      "samples": 128,
+      "max_probability_error": 0.0009869140035781987,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 17,
+      "samples": 128,
+      "max_probability_error": 0.00012720643448138613,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 17,
+      "samples": 128,
+      "max_probability_error": 0.00010637329125551265,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 42,
+      "samples": 128,
+      "max_probability_error": 0.00010747189562387849,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 42,
+      "samples": 128,
+      "max_probability_error": 0.000144974237529516,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 42,
+      "samples": 128,
+      "max_probability_error": 0.0006477774332546149,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 42,
+      "samples": 128,
+      "max_probability_error": 0.00010914235738745948,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 42,
+      "samples": 128,
+      "max_probability_error": 0.00011711806833281102,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 73,
+      "samples": 128,
+      "max_probability_error": 0.00015033021155380633,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 73,
+      "samples": 128,
+      "max_probability_error": 0.00035107381844712293,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 73,
+      "samples": 128,
+      "max_probability_error": 0.0013136163650526722,
+      "tolerance": 0.0001,
+      "passed": false
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 73,
+      "samples": 128,
+      "max_probability_error": 8.932026785571368e-05,
+      "tolerance": 0.0001,
+      "passed": true
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 73,
+      "samples": 128,
+      "max_probability_error": 0.00022777023468079083,
+      "tolerance": 0.0001,
+      "passed": false
+    }
+  ],
+  "status": "numeric_mismatch",
+  "scope": "Same machine, first128 development sessions per neural model",
+  "independent_human_reproduction": false,
+  "warning": "This is an integrity/replay check, not a new scientific replication"
+}

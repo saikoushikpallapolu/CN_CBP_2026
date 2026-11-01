@@ -1,0 +1,617 @@
+{
+  "kernel_scope": "Same PyTorch FP32 backend/device, matched prefix bytes, batch64, includes host/device copies; excludes parsing, context waiting and feature extraction",
+  "results": [
+    {
+      "model": "resnet1d_prefix",
+      "seed": 17,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.048449995636474,
+      "p95_ms": 8.874229997309158,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 17,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 8.0605499970261,
+      "p95_ms": 10.153130004619015,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 17,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.18504999531433,
+      "p95_ms": 8.982694996666394,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 17,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.453500002156943,
+      "p95_ms": 9.763790002034511,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 17,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.147749995056074,
+      "p95_ms": 8.695870004885364,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 17,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 6.988650005951058,
+      "p95_ms": 7.67670500135864,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 17,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.2864499961724505,
+      "p95_ms": 8.885755004303064,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 17,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.840600002964493,
+      "p95_ms": 10.053125004196772,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 17,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.557949997135438,
+      "p95_ms": 9.620705004635964,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 17,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.005550003668759,
+      "p95_ms": 8.262870001635747,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 17,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.377549998636823,
+      "p95_ms": 8.881199997267686,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 17,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.4610000010579824,
+      "p95_ms": 8.924400002433686,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 17,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.215249999717344,
+      "p95_ms": 8.146364997082856,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 17,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.036350005364511,
+      "p95_ms": 8.407090004038764,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 17,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.387549994746223,
+      "p95_ms": 9.09387000283459,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 17,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.589099994220305,
+      "p95_ms": 9.44615500047803,
+      "parameters": 242515
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 17,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 8.00609999714652,
+      "p95_ms": 10.302894999767886,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 17,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.255699994857423,
+      "p95_ms": 9.473689999867927,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 17,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 8.225849996961188,
+      "p95_ms": 10.492604999308242,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 17,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.470650001778267,
+      "p95_ms": 9.682720007549504,
+      "parameters": 242569
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 42,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.2032000025501475,
+      "p95_ms": 9.391055003652582,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 42,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.130899997719098,
+      "p95_ms": 9.787154997320611,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 42,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.606799998029601,
+      "p95_ms": 10.8658750061295,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 42,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.711499994911719,
+      "p95_ms": 9.676794996630633,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 42,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.146349998947699,
+      "p95_ms": 9.92315999828861,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 42,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.4064000000362284,
+      "p95_ms": 10.61524500255473,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 42,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.193799996457528,
+      "p95_ms": 9.409299998515053,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 42,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 8.09204999677604,
+      "p95_ms": 12.03489499603165,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 42,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.603949998156168,
+      "p95_ms": 10.808095009997485,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 42,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.4765500030480325,
+      "p95_ms": 9.187169993674614,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 42,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.708749995799735,
+      "p95_ms": 9.960834999947108,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 42,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.641100004548207,
+      "p95_ms": 10.890505007409956,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 42,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.2422999946866184,
+      "p95_ms": 9.617184990202073,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 42,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 6.806149998737965,
+      "p95_ms": 8.151559998805167,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 42,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.6029999981983565,
+      "p95_ms": 9.55044500005897,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 42,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 8.176850002200808,
+      "p95_ms": 10.741969991795486,
+      "parameters": 242515
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 42,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 6.9518999953288585,
+      "p95_ms": 8.480399995460173,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 42,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.287000000360422,
+      "p95_ms": 10.377775000961263,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 42,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.656149995455053,
+      "p95_ms": 10.50924000737723,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 42,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.639250005013309,
+      "p95_ms": 9.426060003170276,
+      "parameters": 242569
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 73,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 6.835900006990414,
+      "p95_ms": 8.666335001180414,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 73,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.381449999229517,
+      "p95_ms": 9.722604996204609,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 73,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.52985000872286,
+      "p95_ms": 15.404740004305493,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_prefix",
+      "seed": 73,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.460900007572491,
+      "p95_ms": 9.47340999409789,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 73,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.435699997586198,
+      "p95_ms": 9.305639996455284,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 73,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.742850000795443,
+      "p95_ms": 13.263414998800725,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 73,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 8.058999999775551,
+      "p95_ms": 11.056845005077776,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_fixed16",
+      "seed": 73,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.313100002647843,
+      "p95_ms": 8.495140000013635,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 73,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.399299996905029,
+      "p95_ms": 9.34688500710763,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 73,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.394899999781046,
+      "p95_ms": 10.530535004363628,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 73,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.381999996141531,
+      "p95_ms": 9.284384999045868,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet2d_prefix",
+      "seed": 73,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.607899999129586,
+      "p95_ms": 8.93731999603915,
+      "parameters": 175803
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 73,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.301949997781776,
+      "p95_ms": 12.637600008747537,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 73,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.063249999191612,
+      "p95_ms": 8.005300002696458,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 73,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.574449991807342,
+      "p95_ms": 9.258715003670657,
+      "parameters": 242515
+    },
+    {
+      "model": "resnet1d_unmasked",
+      "seed": 73,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.541200007835869,
+      "p95_ms": 9.424829996714832,
+      "parameters": 242515
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 73,
+      "packets": 4,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.605400001921225,
+      "p95_ms": 11.857030011015011,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 73,
+      "packets": 8,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.360399999015499,
+      "p95_ms": 9.57407500100089,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 73,
+      "packets": 16,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.607550003740471,
+      "p95_ms": 8.828569995966973,
+      "parameters": 242569
+    },
+    {
+      "model": "hybrid_prefix",
+      "seed": 73,
+      "packets": 32,
+      "batch": 64,
+      "device": "cuda",
+      "p50_ms": 7.571449990791734,
+      "p95_ms": 16.14068000635598,
+      "parameters": 242569
+    }
+  ],
+  "png_scope": "Same CPU, 64 identical 16x32 byte arrays; in-memory codec round trip only, not end-to-end speedup. The 2D model consumes tensors directly and is not forced through PNG.",
+  "png": {
+    "direct_tensor_array": {
+      "p50_ms": 0.09315000352216884,
+      "p95_ms": 0.1457650068914517
+    },
+    "png_round_trip": {
+      "p50_ms": 16.019850001612213,
+      "p95_ms": 18.109935000393303
+    }
+  },
+  "png_bit_exact": true
+}

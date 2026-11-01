@@ -1,0 +1,39 @@
+{
+  "run_id": "adaptive-v1-20261101-r1",
+  "started": 1793552292.7672539,
+  "steps": [
+    {
+      "stage": "cost",
+      "status": "passed",
+      "returncode": 0
+    },
+    {
+      "stage": "streaming",
+      "status": "passed",
+      "returncode": 0
+    },
+    {
+      "stage": "verify",
+      "status": "passed",
+      "returncode": 0
+    },
+    {
+      "stage": "finalize",
+      "status": "passed",
+      "returncode": 0
+    },
+    {
+      "stage": "report",
+      "status": "passed",
+      "returncode": 0
+    }
+  ],
+  "current": null,
+  "completed": 1793552487.1321235,
+  "verification_correction": {
+    "initial_report": "verification-initial.json",
+    "cause": "Initial replay used batch128/default CUDA settings instead of the frozen batch256/deterministic profile",
+    "resolution": "15/15 neural checkpoints replayed within original 1e-4 probability tolerance after matching execution profile",
+    "changes": "Verification only; no model, policy, or final evaluation result changed"
+  }
+}

@@ -1,0 +1,2491 @@
+{
+  "run_id": "adaptive-v1-20261101-r1",
+  "protocol_sha256": "0506de2283706be4e750508da52ce4c25d7bc323d02b42e1ae37c7fb87cd78ab",
+  "dataset_sha256": "ca242478b9aa82ebbee05106b0000da3ae3cf7f30efa7bcdfe950b954244110b",
+  "code": {
+    "research\\run.py": "f1eb09fa1d5a74c135ecb3326b7e42265ddc756fb635e89e7538b87722282ff3",
+    "research\\models.py": "a5f00bd8ca7dc0fccba43dec02ee60d73a3445ecb2b431d3b78f7873e4069257",
+    "research\\adaptive.py": "63bbe12e9122592f92a7e067eb9c0f5a5341a714fa9309022dafeb03b84eea16",
+    "research\\metrics.py": "090bf5b8598fa1a70cb63bebd495ca0c773197e962da8d827c50fdfee3137242",
+    "research\\dataset.py": "1d42b33e27ea2da96f7909a4ab9003ba7395afcf08ae213738b61382185f2e01",
+    "data_processing\\production.py": "afa45a552e96ee72f51205e92b476022d896d75bb0570043845409446b9db1ca",
+    "classification\\behavior.py": "114f335fa33e1639a4b0d2184560ce406cd74732381662a14ac6b4003522c0f6",
+    "ml\\production_model.py": "f13f1c7d02d43f983d4f83288c23aa9099d40dbe4d2d4c0ac875cf17c2925cc9",
+    "research\\vendor\\kitnet\\corClust.py": "bbf46343def6d86b1088fceeb6de8c56a6d37b3b937f4e4ec4cf08982c30df27",
+    "research\\vendor\\kitnet\\dA.py": "40da7e367efc66c503949477aefb7f6176f2a2cd5e2c94bc8253c2b75c03c709",
+    "research\\vendor\\kitnet\\KitNET.py": "655793813f2c1bf2bbb6b357b82c6e735edcb19920bc4511622d9b6595895e7e",
+    "research\\vendor\\kitnet\\utils.py": "f11dd38fcbaff878bebc6e9abd676f17a1c0e41cbc1de57ecec27e7aeb468b72",
+    "research\\vendor\\kitnet\\__init__.py": "515f0def4373330ff5f6f8674c64e7c01dd755c1727ee1aa87fde6e4c5a5b2e5",
+    "research\\vendor\\kitnet\\UPSTREAM.json": "bb1cd96a9ada2142f9f232296f576af57306aed72bb682d7a54dd37f5245821d"
+  },
+  "models": [
+    {
+      "name": "resnet1d_prefix",
+      "seed": 17,
+      "path": "models\\resnet1d_prefix-17.pth",
+      "sha256": "b8950b2f2114f512367175ce7695ee59b219599890e4e2457456ed55073ce899",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8214849921011058,
+          "correct_accepted_fraction": 0.5971563981042654,
+          "coverage": 0.6429699842022117,
+          "selective_error": 0.07125307125307126,
+          "macro_f1": 0.6972408650260999,
+          "benign_false_alert_rate": 0.05225225225225225,
+          "benign_review_rate": 0.33693693693693694,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5,
+          "attack_recognition_rate": 0.5,
+          "mean_packets": 9.285939968404424,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.6108108108108108,
+              "f1": 0.7583892617449665,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.3695652173913043,
+              "recall": 0.30357142857142855,
+              "f1": 0.3333333333333333,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6972408650260999,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              339,
+              29,
+              0,
+              187
+            ],
+            [
+              0,
+              17,
+              0,
+              39
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9269346269346269,
+          "binary_attack_aupr": 0.6865452205444964,
+          "brier": 0.22884147235655755,
+          "ece_15_bins": 0.09536334481767009
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_prefix",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 242515,
+        "training_seconds": 19.426806800009217,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 2.744411974097602,
+            "validation_macro_ce": 0.4711149901880067
+          },
+          {
+            "epoch": 2,
+            "training_loss": 1.0250263006309979,
+            "validation_macro_ce": 0.6440675981231112
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.3574932931624062,
+            "validation_macro_ce": 0.8014643312538503
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.43957104152286774,
+            "validation_macro_ce": 0.5913852197558571
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.1853393681885791,
+            "validation_macro_ce": 1.7075647190086227
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.43068171054801496,
+            "validation_macro_ce": 0.6575567730265068
+          }
+        ],
+        "temperatures": [
+          2.314231388108565,
+          1.6161236149777574,
+          1.234597586767111,
+          1.234597586767111
+        ]
+      }
+    },
+    {
+      "name": "resnet1d_fixed16",
+      "seed": 17,
+      "path": "models\\resnet1d_fixed16-17.pth",
+      "sha256": "4eee6309b67219b7466e7017821c1ca45a20b873d925bf3e07a261307a927049",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8293838862559242,
+          "correct_accepted_fraction": 0.49921011058451814,
+          "coverage": 0.6097946287519748,
+          "selective_error": 0.18134715025906736,
+          "macro_f1": 0.6581818181818182,
+          "benign_false_alert_rate": 0.12612612612612611,
+          "benign_review_rate": 0.38738738738738737,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.41025641025641024,
+          "attack_recognition_rate": 0.5897435897435898,
+          "mean_packets": 7.202211690363349,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.4864864864864865,
+              "f1": 0.6545454545454545,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2553191489361702,
+              "recall": 0.42857142857142855,
+              "f1": 0.32,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6581818181818182,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              270,
+              70,
+              0,
+              215
+            ],
+            [
+              0,
+              24,
+              0,
+              32
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9227535227535227,
+          "binary_attack_aupr": 0.7091040346182078,
+          "brier": 0.3163402360616096,
+          "ece_15_bins": 0.1902012179669832
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_fixed16",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": 16
+        },
+        "parameters": 242515,
+        "training_seconds": 17.187977800000226,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 2.2772317399503663,
+            "validation_macro_ce": 0.33368221475665005
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.2073168996721506,
+            "validation_macro_ce": 0.4242886196004754
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.3377534897008445,
+            "validation_macro_ce": 0.6748893074578772
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.49348956858739257,
+            "validation_macro_ce": 0.7305345886674736
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.22993263036187273,
+            "validation_macro_ce": 0.5202554393399909
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.04020599084105925,
+            "validation_macro_ce": 0.525547284692745
+          }
+        ],
+        "temperatures": [
+          2.1155521174540106,
+          1.4773776525985112,
+          0.9431402320497322,
+          0.8621706218407219
+        ]
+      }
+    },
+    {
+      "name": "resnet2d_prefix",
+      "seed": 17,
+      "path": "models\\resnet2d_prefix-17.pth",
+      "sha256": "acacd0ca84fa448e0824f603f9e1a8b204656a6f4541c743f44c77bab4cc5ea4",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.6729857819905213,
+          "correct_accepted_fraction": 0.13902053712480253,
+          "coverage": 0.39652448657187994,
+          "selective_error": 0.649402390438247,
+          "macro_f1": 0.4253266809218341,
+          "benign_false_alert_rate": 0.2936936936936937,
+          "benign_review_rate": 0.6072072072072072,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5769230769230769,
+          "attack_recognition_rate": 0.4230769230769231,
+          "mean_packets": 6.282780410742496,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.0990990990990991,
+              "f1": 0.18032786885245902,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.06321839080459771,
+              "recall": 0.19642857142857142,
+              "f1": 0.09565217391304348,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.4253266809218341,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              55,
+              163,
+              0,
+              337
+            ],
+            [
+              0,
+              11,
+              0,
+              45
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.6344652344652345,
+          "binary_attack_aupr": 0.17661157432733174,
+          "brier": 0.6437476805157992,
+          "ece_15_bins": 0.42042429293851113
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet2d_prefix",
+          "kind": "2d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 175803,
+        "training_seconds": 16.642760799993994,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 4.241432808572426,
+            "validation_macro_ce": 1.0907043138977763
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.357867605809588,
+            "validation_macro_ce": 1.0373479366597433
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.19920308531436604,
+            "validation_macro_ce": 1.0046545057522491
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.31761896098032594,
+            "validation_macro_ce": 0.9771400500139352
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.175045325056999,
+            "validation_macro_ce": 1.9752207294396718
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.18889578287053155,
+            "validation_macro_ce": 0.8227830810100494
+          }
+        ],
+        "temperatures": [
+          2.531569358902036,
+          1.234597586767111,
+          1.9339296773267134,
+          1.6161236149777574
+        ]
+      }
+    },
+    {
+      "name": "resnet1d_unmasked",
+      "seed": 17,
+      "path": "models\\resnet1d_unmasked-17.pth",
+      "sha256": "29147d1d0f17640d2f9551417c1808c85a87ccec74a8746ba246eaec913145aa",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7030015797788309,
+          "correct_accepted_fraction": 0.18167456556082148,
+          "coverage": 0.26224328593996843,
+          "selective_error": 0.3072289156626506,
+          "macro_f1": 0.19279423806420345,
+          "benign_false_alert_rate": 0.09009009009009009,
+          "benign_review_rate": 0.7333333333333333,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.7692307692307693,
+          "attack_recognition_rate": 0.21794871794871795,
+          "mean_packets": 10.282780410742497,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.98989898989899,
+              "recall": 0.17657657657657658,
+              "f1": 0.2996941896024465,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.25757575757575757,
+              "recall": 0.30357142857142855,
+              "f1": 0.2786885245901639,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.19279423806420345,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              98,
+              49,
+              1,
+              407
+            ],
+            [
+              1,
+              17,
+              0,
+              38
+            ],
+            [
+              0,
+              0,
+              0,
+              22
+            ]
+          ],
+          "binary_attack_auroc": 0.7325248325248326,
+          "binary_attack_aupr": 0.21817962643928474,
+          "brier": 0.425024122225673,
+          "ece_15_bins": 0.12169811456712906
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_unmasked",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": false,
+          "fixed": null
+        },
+        "parameters": 242515,
+        "training_seconds": 16.310089200007496,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.3666442208341323,
+            "validation_macro_ce": 2.01540654369399
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.9805593173950911,
+            "validation_macro_ce": 2.232555872172535
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.6978444488486275,
+            "validation_macro_ce": 1.3149525982275767
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.65696632633626,
+            "validation_macro_ce": 1.3437603775029132
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.38043043768266216,
+            "validation_macro_ce": 1.246713433563554
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.3298221532786556,
+            "validation_macro_ce": 1.156834334235004
+          }
+        ],
+        "temperatures": [
+          4.337985895251197,
+          3.029395194784647,
+          2.1155521174540106,
+          1.7678997203557718
+        ]
+      }
+    },
+    {
+      "name": "hybrid_prefix",
+      "seed": 17,
+      "path": "models\\hybrid_prefix-17.pth",
+      "sha256": "002057e90b03c9b7e8bbfa0f78918735308c17e37865b35b83d71109b145803c",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8214849921011058,
+          "correct_accepted_fraction": 0.6966824644549763,
+          "coverage": 0.8214849921011058,
+          "selective_error": 0.1519230769230769,
+          "macro_f1": 0.7377536561914884,
+          "benign_false_alert_rate": 0.14234234234234233,
+          "benign_review_rate": 0.16216216216216217,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.2948717948717949,
+          "attack_recognition_rate": 0.7051282051282052,
+          "mean_packets": 7.369668246445498,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.6954954954954955,
+              "f1": 0.820403825717322,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.29464285714285715,
+              "recall": 0.5892857142857143,
+              "f1": 0.39285714285714285,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7377536561914884,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              386,
+              79,
+              0,
+              90
+            ],
+            [
+              0,
+              33,
+              0,
+              23
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9119196119196118,
+          "binary_attack_aupr": 0.4900789376815502,
+          "brier": 0.28458232686743506,
+          "ece_15_bins": 0.07970786997604526
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "hybrid_prefix",
+          "kind": "1d",
+          "hybrid": true,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 242569,
+        "training_seconds": 16.217644600008498,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 2.4805870893178508,
+            "validation_macro_ce": 0.7174337629903711
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.8357497280812822,
+            "validation_macro_ce": 1.2922853772649663
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.42373674347254564,
+            "validation_macro_ce": 0.7263577621924611
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.39217043317330536,
+            "validation_macro_ce": 0.40920049151128557
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.13326621873420663,
+            "validation_macro_ce": 0.4300301643817125
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.09324702510912175,
+            "validation_macro_ce": 0.6312103399472189
+          }
+        ],
+        "temperatures": [
+          1.7678997203557718,
+          1.3505431813317856,
+          0.8621706218407219,
+          0.6586338812459618
+        ]
+      }
+    },
+    {
+      "name": "logistic_behavior",
+      "seed": 17,
+      "path": "models\\logistic_behavior-17.joblib",
+      "sha256": "7a8e7beb962c6512a258f68d800505e6b3d38b1025c9c2e6128e7f0af9ab5798",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7788309636650869,
+          "correct_accepted_fraction": 0.631911532385466,
+          "coverage": 0.7946287519747235,
+          "selective_error": 0.2047713717693837,
+          "macro_f1": 0.6338243640042441,
+          "benign_false_alert_rate": 0.12252252252252252,
+          "benign_review_rate": 0.23243243243243245,
+          "attack_accepted_benign_rate": 0.44871794871794873,
+          "attack_review_rate": 0.01282051282051282,
+          "attack_recognition_rate": 0.5384615384615384,
+          "mean_packets": 4.109004739336493,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.910941475826972,
+              "recall": 0.645045045045045,
+              "f1": 0.7552742616033755,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2916666666666667,
+              "recall": 0.5,
+              "f1": 0.3684210526315789,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 0.6363636363636364,
+              "f1": 0.7777777777777778,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6338243640042441,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              358,
+              68,
+              0,
+              129
+            ],
+            [
+              27,
+              28,
+              0,
+              1
+            ],
+            [
+              8,
+              0,
+              14,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.718018018018018,
+          "binary_attack_aupr": 0.3580674790646481,
+          "brier": 0.3615784050064292,
+          "ece_15_bins": 0.20218885330980607
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "sklearn",
+        "training_seconds": 1.0932030999974813,
+        "features": "18 causal behavior features; distinct input modality"
+      }
+    },
+    {
+      "name": "forest_behavior",
+      "seed": 17,
+      "path": "models\\forest_behavior-17.joblib",
+      "sha256": "f8dae0ecddbe381b5c502a6d6c882c89e168196671f81f467acacbec82bf32f8",
+      "policy": {
+        "threshold": 0.9,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.6903633491311216,
+          "correct_accepted_fraction": 0.1500789889415482,
+          "coverage": 0.3001579778830964,
+          "selective_error": 0.5,
+          "macro_f1": 0.11108211726449747,
+          "benign_false_alert_rate": 0.16936936936936936,
+          "benign_review_rate": 0.6666666666666666,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.9358974358974359,
+          "attack_recognition_rate": 0.05128205128205128,
+          "mean_packets": 8.897314375987362,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9891304347826086,
+              "recall": 0.16396396396396395,
+              "f1": 0.28129829984544047,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.04081632653061224,
+              "recall": 0.07142857142857142,
+              "f1": 0.05194805194805195,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.11108211726449747,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              91,
+              94,
+              0,
+              370
+            ],
+            [
+              0,
+              4,
+              0,
+              52
+            ],
+            [
+              1,
+              0,
+              0,
+              21
+            ]
+          ],
+          "binary_attack_auroc": 0.6983136983136983,
+          "binary_attack_aupr": 0.1856282184474934,
+          "brier": 0.49709605710721166,
+          "ece_15_bins": 0.2757552247532782
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "sklearn",
+        "training_seconds": 2.2981123000063235,
+        "features": "18 causal behavior features; distinct input modality"
+      }
+    },
+    {
+      "name": "kitnet18",
+      "seed": 17,
+      "path": "models\\kitnet18-17.joblib",
+      "sha256": "fac8cdf1b7b89661c309e7b9faf551520681b92b602cccaba2ab33108f81e5a2",
+      "metadata": {
+        "kind": "kitnet"
+      }
+    },
+    {
+      "name": "resnet1d_prefix",
+      "seed": 42,
+      "path": "models\\resnet1d_prefix-42.pth",
+      "sha256": "1b131cac38f5179c9f4b818b53a5fd6cbae5cb16eca8fbe5eeedbb5b7d7dc640",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.693522906793049,
+          "correct_accepted_fraction": 0.6492890995260664,
+          "coverage": 0.8404423380726699,
+          "selective_error": 0.2274436090225564,
+          "macro_f1": 0.7219385867554569,
+          "benign_false_alert_rate": 0.21621621621621623,
+          "benign_review_rate": 0.16216216216216217,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.14102564102564102,
+          "attack_recognition_rate": 0.8461538461538461,
+          "mean_packets": 6.131121642969984,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9971098265895953,
+              "recall": 0.6216216216216216,
+              "f1": 0.7658157602663707,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2682926829268293,
+              "recall": 0.7857142857142857,
+              "f1": 0.4,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7219385867554569,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              345,
+              120,
+              0,
+              90
+            ],
+            [
+              1,
+              44,
+              0,
+              11
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.8724647724647725,
+          "binary_attack_aupr": 0.46387571200790406,
+          "brier": 0.46814886832343944,
+          "ece_15_bins": 0.22744679819511615
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_prefix",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 242515,
+        "training_seconds": 15.741034700011369,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.113503225846216,
+            "validation_macro_ce": 1.6397960489211068
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.9287879417242948,
+            "validation_macro_ce": 0.8303857418861903
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.6336250753010972,
+            "validation_macro_ce": 0.6001238037233017
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.2831757848180132,
+            "validation_macro_ce": 0.4573605652746747
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.3783494003728265,
+            "validation_macro_ce": 0.6212191471334999
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.5932709259650437,
+            "validation_macro_ce": 0.5405678939820129
+          }
+        ],
+        "temperatures": [
+          2.1155521174540106,
+          1.7678997203557718,
+          1.234597586767111,
+          1.234597586767111
+        ]
+      }
+    },
+    {
+      "name": "resnet1d_fixed16",
+      "seed": 42,
+      "path": "models\\resnet1d_fixed16-42.pth",
+      "sha256": "a512513c117464c4e67cf74c9fbd0e6430f686dc745b3398ce38f7aeb17f2f73",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8451816745655608,
+          "correct_accepted_fraction": 0.6761453396524486,
+          "coverage": 0.7282780410742496,
+          "selective_error": 0.07158351409978309,
+          "macro_f1": 0.7953342953342953,
+          "benign_false_alert_rate": 0.05945945945945946,
+          "benign_review_rate": 0.2756756756756757,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.24358974358974358,
+          "attack_recognition_rate": 0.7564102564102564,
+          "mean_packets": 7.202211690363349,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.6648648648648648,
+              "f1": 0.7987012987012987,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.5285714285714286,
+              "recall": 0.6607142857142857,
+              "f1": 0.5873015873015873,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7953342953342953,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              369,
+              33,
+              0,
+              153
+            ],
+            [
+              0,
+              37,
+              0,
+              19
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.952991452991453,
+          "binary_attack_aupr": 0.8027223287475403,
+          "brier": 0.2468242857330079,
+          "ece_15_bins": 0.10975251790441407
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_fixed16",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": 16
+        },
+        "parameters": 242515,
+        "training_seconds": 16.286034200005815,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 2.4632606403902173,
+            "validation_macro_ce": 0.3508649241278908
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.3561478444025852,
+            "validation_macro_ce": 1.3512020444939576
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.19933759336709045,
+            "validation_macro_ce": 0.37104854843898655
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.03158738328056643,
+            "validation_macro_ce": 0.25572722566114603
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.024366484616621165,
+            "validation_macro_ce": 0.29437481086871226
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.7865026623967424,
+            "validation_macro_ce": 2.697101759766682
+          }
+        ],
+        "temperatures": [
+          3.313896825757729,
+          2.314231388108565,
+          1.3505431813317856,
+          0.8621706218407219
+        ]
+      }
+    },
+    {
+      "name": "resnet2d_prefix",
+      "seed": 42,
+      "path": "models\\resnet2d_prefix-42.pth",
+      "sha256": "1d464dd64d50c2ee88cc63859bde9f2ebdd6dabce659e50e70edd54e9a979baf",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7693522906793049,
+          "correct_accepted_fraction": 0.08846761453396525,
+          "coverage": 0.27330173775671407,
+          "selective_error": 0.6763005780346821,
+          "macro_f1": 0.39739705729682795,
+          "benign_false_alert_rate": 0.21081081081081082,
+          "benign_review_rate": 0.745945945945946,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5897435897435898,
+          "attack_recognition_rate": 0.41025641025641024,
+          "mean_packets": 7.906793048973144,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.043243243243243246,
+              "f1": 0.08290155440414508,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.07874015748031496,
+              "recall": 0.17857142857142858,
+              "f1": 0.1092896174863388,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.39739705729682795,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              24,
+              117,
+              0,
+              414
+            ],
+            [
+              0,
+              10,
+              0,
+              46
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.8367983367983368,
+          "binary_attack_aupr": 0.5409672214234374,
+          "brier": 0.6161980624957047,
+          "ece_15_bins": 0.4847524076774349
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet2d_prefix",
+          "kind": "2d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 175803,
+        "training_seconds": 16.248513300000923,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.7077045077458024,
+            "validation_macro_ce": 1.592092172475685
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.5184788083424792,
+            "validation_macro_ce": 1.2052978451118421
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.3504118298878893,
+            "validation_macro_ce": 1.0412584643409588
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.32369643983838614,
+            "validation_macro_ce": 1.2281578087063976
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.2030067984596826,
+            "validation_macro_ce": 0.9295918154889558
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.5905380052281544,
+            "validation_macro_ce": 1.3034164526227168
+          }
+        ],
+        "temperatures": [
+          8.895134973108227,
+          1.6161236149777574,
+          1.9339296773267134,
+          1.3505431813317856
+        ]
+      }
+    },
+    {
+      "name": "resnet1d_unmasked",
+      "seed": 42,
+      "path": "models\\resnet1d_unmasked-42.pth",
+      "sha256": "d97c673734c4f758e2246c1214cc7b2de63c3812672e7e1f01e7f3b3c2189a8e",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.5876777251184834,
+          "correct_accepted_fraction": 0.0315955766192733,
+          "coverage": 0.2527646129541864,
+          "selective_error": 0.875,
+          "macro_f1": 0.06038691924361147,
+          "benign_false_alert_rate": 0.25045045045045045,
+          "benign_review_rate": 0.7477477477477478,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.7435897435897436,
+          "attack_recognition_rate": 0.24358974358974358,
+          "mean_packets": 7.783570300157978,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.5,
+              "recall": 0.0018018018018018018,
+              "f1": 0.003590664272890485,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.12025316455696203,
+              "recall": 0.3392857142857143,
+              "f1": 0.17757009345794392,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.06038691924361147,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              1,
+              139,
+              0,
+              415
+            ],
+            [
+              1,
+              19,
+              0,
+              36
+            ],
+            [
+              0,
+              0,
+              0,
+              22
+            ]
+          ],
+          "binary_attack_auroc": 0.661954261954262,
+          "binary_attack_aupr": 0.16670413364395673,
+          "brier": 0.7204896767431708,
+          "ece_15_bins": 0.38114168688658473
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_unmasked",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": false,
+          "fixed": null
+        },
+        "parameters": 242515,
+        "training_seconds": 16.114588299999014,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.6859959652647376,
+            "validation_macro_ce": 1.0572058681412697
+          },
+          {
+            "epoch": 2,
+            "training_loss": 1.1789565887884237,
+            "validation_macro_ce": 1.9113321644059043
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.2809518570138607,
+            "validation_macro_ce": 2.4223067397214377
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.17257257268647663,
+            "validation_macro_ce": 1.8239792084171884
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.1870202603204234,
+            "validation_macro_ce": 2.208053229819733
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.44470422685844824,
+            "validation_macro_ce": 1.1028200989694508
+          }
+        ],
+        "temperatures": [
+          2.531569358902036,
+          2.1155521174540106,
+          1.9339296773267134,
+          2.314231388108565
+        ]
+      }
+    },
+    {
+      "name": "hybrid_prefix",
+      "seed": 42,
+      "path": "models\\hybrid_prefix-42.pth",
+      "sha256": "10b9ecf2e0405e9e978e1e5c0f3ba7f12a0bce7313cb54721408819e4594300f",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.9036334913112164,
+          "correct_accepted_fraction": 0.7282780410742496,
+          "coverage": 0.7709320695102686,
+          "selective_error": 0.055327868852459015,
+          "macro_f1": 0.7241041462550291,
+          "benign_false_alert_rate": 0.04864864864864865,
+          "benign_review_rate": 0.1873873873873874,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5256410256410257,
+          "attack_recognition_rate": 0.47435897435897434,
+          "mean_packets": 7.835703001579779,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.7639639639639639,
+              "f1": 0.8661899897854954,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.35714285714285715,
+              "recall": 0.26785714285714285,
+              "f1": 0.30612244897959184,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7241041462550291,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              424,
+              27,
+              0,
+              104
+            ],
+            [
+              0,
+              15,
+              0,
+              41
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9378840378840378,
+          "binary_attack_aupr": 0.5500966340641276,
+          "brier": 0.1793762012783238,
+          "ece_15_bins": 0.05525341012749317
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "hybrid_prefix",
+          "kind": "1d",
+          "hybrid": true,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 242569,
+        "training_seconds": 17.279192800007877,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.327534830663353,
+            "validation_macro_ce": 0.8648878996525236
+          },
+          {
+            "epoch": 2,
+            "training_loss": 1.067525143851526,
+            "validation_macro_ce": 0.8183463441601609
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.3556920949195046,
+            "validation_macro_ce": 0.6808693597941684
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.3856081321428064,
+            "validation_macro_ce": 0.5911983628058827
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.15579042132594623,
+            "validation_macro_ce": 1.4507367934375999
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.3648287629621336,
+            "validation_macro_ce": 0.5859423142383414
+          }
+        ],
+        "temperatures": [
+          2.7693183369056498,
+          1.4773776525985112,
+          0.9431402320497322,
+          0.6586338812459618
+        ]
+      }
+    },
+    {
+      "name": "logistic_behavior",
+      "seed": 42,
+      "path": "models\\logistic_behavior-42.joblib",
+      "sha256": "dd37fb8587364c6b4dbf7d4750b1ca8168e29ef2a350744118a800b82b38a146",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7788309636650869,
+          "correct_accepted_fraction": 0.631911532385466,
+          "coverage": 0.7946287519747235,
+          "selective_error": 0.2047713717693837,
+          "macro_f1": 0.6338243640042441,
+          "benign_false_alert_rate": 0.12252252252252252,
+          "benign_review_rate": 0.23243243243243245,
+          "attack_accepted_benign_rate": 0.44871794871794873,
+          "attack_review_rate": 0.01282051282051282,
+          "attack_recognition_rate": 0.5384615384615384,
+          "mean_packets": 4.109004739336493,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.910941475826972,
+              "recall": 0.645045045045045,
+              "f1": 0.7552742616033755,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2916666666666667,
+              "recall": 0.5,
+              "f1": 0.3684210526315789,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 0.6363636363636364,
+              "f1": 0.7777777777777778,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6338243640042441,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              358,
+              68,
+              0,
+              129
+            ],
+            [
+              27,
+              28,
+              0,
+              1
+            ],
+            [
+              8,
+              0,
+              14,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.718018018018018,
+          "binary_attack_aupr": 0.3580674790646481,
+          "brier": 0.3615784050064292,
+          "ece_15_bins": 0.20218885330980607
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "sklearn",
+        "training_seconds": 1.1676347000029637,
+        "features": "18 causal behavior features; distinct input modality"
+      }
+    },
+    {
+      "name": "forest_behavior",
+      "seed": 42,
+      "path": "models\\forest_behavior-42.joblib",
+      "sha256": "3ec8660d7f4d35e69b009be0313a6ee04060afa47b4292cf7e5c1834c5eb2180",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.6919431279620853,
+          "correct_accepted_fraction": 0.2638230647709321,
+          "coverage": 0.4960505529225908,
+          "selective_error": 0.4681528662420382,
+          "macro_f1": 0.18009068215395588,
+          "benign_false_alert_rate": 0.23603603603603604,
+          "benign_review_rate": 0.4828828828828829,
+          "attack_accepted_benign_rate": 0.20512820512820512,
+          "attack_review_rate": 0.6538461538461539,
+          "attack_recognition_rate": 0.14102564102564102,
+          "mean_packets": 6.826224328593997,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9069767441860465,
+              "recall": 0.2810810810810811,
+              "f1": 0.42916093535075656,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.07746478873239436,
+              "recall": 0.19642857142857142,
+              "f1": 0.1111111111111111,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.18009068215395588,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              156,
+              131,
+              0,
+              268
+            ],
+            [
+              13,
+              11,
+              0,
+              32
+            ],
+            [
+              3,
+              0,
+              0,
+              19
+            ]
+          ],
+          "binary_attack_auroc": 0.6425964425964426,
+          "binary_attack_aupr": 0.16761263064339368,
+          "brier": 0.5152489782517038,
+          "ece_15_bins": 0.3061601000703254
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "sklearn",
+        "training_seconds": 2.2184313999896403,
+        "features": "18 causal behavior features; distinct input modality"
+      }
+    },
+    {
+      "name": "kitnet18",
+      "seed": 42,
+      "path": "models\\kitnet18-42.joblib",
+      "sha256": "fac8cdf1b7b89661c309e7b9faf551520681b92b602cccaba2ab33108f81e5a2",
+      "metadata": {
+        "kind": "kitnet"
+      }
+    },
+    {
+      "name": "resnet1d_prefix",
+      "seed": 73,
+      "path": "models\\resnet1d_prefix-73.pth",
+      "sha256": "19efbc2f8a1a7c67fe751ced75dd674624eefa4a7f55b92dfe51c3997224838f",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7867298578199052,
+          "correct_accepted_fraction": 0.5924170616113744,
+          "coverage": 0.7330173775671406,
+          "selective_error": 0.19181034482758622,
+          "macro_f1": 0.6959236359691939,
+          "benign_false_alert_rate": 0.15855855855855855,
+          "benign_review_rate": 0.26126126126126126,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.3076923076923077,
+          "attack_recognition_rate": 0.6794871794871795,
+          "mean_packets": 6.2385466034755135,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9969040247678018,
+              "recall": 0.5801801801801801,
+              "f1": 0.7334851936218679,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2605042016806723,
+              "recall": 0.5535714285714286,
+              "f1": 0.35428571428571426,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6959236359691939,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              322,
+              88,
+              0,
+              145
+            ],
+            [
+              1,
+              31,
+              0,
+              24
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9219450219450219,
+          "binary_attack_aupr": 0.6960459652376958,
+          "brier": 0.3045307349239937,
+          "ece_15_bins": 0.1484233095425714
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_prefix",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 242515,
+        "training_seconds": 18.191651300003286,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.4459117929509375,
+            "validation_macro_ce": 0.5660153999456508
+          },
+          {
+            "epoch": 2,
+            "training_loss": 1.1225654309964739,
+            "validation_macro_ce": 0.8447710941183032
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.36445736009045504,
+            "validation_macro_ce": 0.7308737021126325
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.23812179907690734,
+            "validation_macro_ce": 0.48128077545426656
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.07290003724392591,
+            "validation_macro_ce": 0.6625581144087339
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.7426802505360683,
+            "validation_macro_ce": 0.512466092855432
+          }
+        ],
+        "temperatures": [
+          3.313896825757729,
+          2.1155521174540106,
+          1.031713995788588,
+          0.7881523403467965
+        ]
+      }
+    },
+    {
+      "name": "resnet1d_fixed16",
+      "seed": 73,
+      "path": "models\\resnet1d_fixed16-73.pth",
+      "sha256": "b5e515fd82fcc0d4557a85ddf31fa9e93b1c2173814d8442df62934d17567c74",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.6540284360189573,
+          "correct_accepted_fraction": 0.14375987361769352,
+          "coverage": 0.26066350710900477,
+          "selective_error": 0.4484848484848485,
+          "macro_f1": 0.4582574377656345,
+          "benign_false_alert_rate": 0.13333333333333333,
+          "benign_review_rate": 0.7675675675675676,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5384615384615384,
+          "attack_recognition_rate": 0.46153846153846156,
+          "mean_packets": 7.202211690363349,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.0990990990990991,
+              "f1": 0.18032786885245902,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.1590909090909091,
+              "recall": 0.25,
+              "f1": 0.19444444444444445,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.4582574377656345,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              55,
+              74,
+              0,
+              426
+            ],
+            [
+              0,
+              14,
+              0,
+              42
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.8604296604296604,
+          "binary_attack_aupr": 0.5915961352684657,
+          "brier": 0.5052682585116653,
+          "ece_15_bins": 0.22900858114042005
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_fixed16",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": 16
+        },
+        "parameters": 242515,
+        "training_seconds": 17.4404530999891,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 2.4034624537453055,
+            "validation_macro_ce": 0.49113075855148464
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.34736907843034714,
+            "validation_macro_ce": 0.5552197297157161
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.0952551593654789,
+            "validation_macro_ce": 1.263500902666016
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.2679997363302391,
+            "validation_macro_ce": 2.549514210430892
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.5018099183216691,
+            "validation_macro_ce": 1.713845390151856
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.5818913474795409,
+            "validation_macro_ce": 1.0521978903208702
+          }
+        ],
+        "temperatures": [
+          2.531569358902036,
+          1.9339296773267134,
+          1.4773776525985112,
+          1.234597586767111
+        ]
+      }
+    },
+    {
+      "name": "resnet2d_prefix",
+      "seed": 73,
+      "path": "models\\resnet2d_prefix-73.pth",
+      "sha256": "256347bbae83d1cddefaca868d4e79936cc3a2cc74a9476bbbc118f57ac88009",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.65086887835703,
+          "correct_accepted_fraction": 0.08530805687203792,
+          "coverage": 0.2685624012638231,
+          "selective_error": 0.6823529411764706,
+          "macro_f1": 0.39999999999999997,
+          "benign_false_alert_rate": 0.209009009009009,
+          "benign_review_rate": 0.7549549549549549,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5641025641025641,
+          "attack_recognition_rate": 0.4358974358974359,
+          "mean_packets": 7.7156398104265405,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.036036036036036036,
+              "f1": 0.06956521739130435,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.09375,
+              "recall": 0.21428571428571427,
+              "f1": 0.13043478260869565,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.39999999999999997,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              20,
+              116,
+              0,
+              419
+            ],
+            [
+              0,
+              12,
+              0,
+              44
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.6125433125433125,
+          "binary_attack_aupr": 0.19623166616947946,
+          "brier": 0.6683615168376756,
+          "ece_15_bins": 0.3803442151080452
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet2d_prefix",
+          "kind": "2d",
+          "hybrid": false,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 175803,
+        "training_seconds": 17.54833160000271,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.1830077939666808,
+            "validation_macro_ce": 1.3688376617617357
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.81352673121728,
+            "validation_macro_ce": 1.2730860106041582
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.7838512983871624,
+            "validation_macro_ce": 1.0282485636416756
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.2578079403247102,
+            "validation_macro_ce": 1.0592408275221823
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.12665362641928368,
+            "validation_macro_ce": 0.9830160753263982
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.12147802999606938,
+            "validation_macro_ce": 0.9031382540724313
+          }
+        ],
+        "temperatures": [
+          3.965565108718413,
+          1.3505431813317856,
+          1.9339296773267134,
+          1.3505431813317856
+        ]
+      }
+    },
+    {
+      "name": "resnet1d_unmasked",
+      "seed": 73,
+      "path": "models\\resnet1d_unmasked-73.pth",
+      "sha256": "559ea9c90f8f1869449a0099bf8de20b5aa3b253de1af8d5c3625d87c5beff2a",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7330173775671406,
+          "correct_accepted_fraction": 0.1484992101105845,
+          "coverage": 0.2685624012638231,
+          "selective_error": 0.4470588235294118,
+          "macro_f1": 0.34493132950579763,
+          "benign_false_alert_rate": 0.12972972972972974,
+          "benign_review_rate": 0.7423423423423423,
+          "attack_accepted_benign_rate": 0.05128205128205128,
+          "attack_review_rate": 0.6538461538461539,
+          "attack_recognition_rate": 0.2948717948717949,
+          "mean_packets": 8.584518167456556,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9466666666666667,
+              "recall": 0.12792792792792793,
+              "f1": 0.2253968253968254,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.15294117647058825,
+              "recall": 0.23214285714285715,
+              "f1": 0.18439716312056736,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 0.45454545454545453,
+              "f1": 0.625,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.34493132950579763,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              71,
+              72,
+              0,
+              412
+            ],
+            [
+              0,
+              13,
+              0,
+              43
+            ],
+            [
+              4,
+              0,
+              10,
+              8
+            ]
+          ],
+          "binary_attack_auroc": 0.7457380457380458,
+          "binary_attack_aupr": 0.2484477992451193,
+          "brier": 0.44441484727973085,
+          "ece_15_bins": 0.22895893507049422
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "resnet1d_unmasked",
+          "kind": "1d",
+          "hybrid": false,
+          "masked": false,
+          "fixed": null
+        },
+        "parameters": 242515,
+        "training_seconds": 15.984961099995417,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.4035581627395004,
+            "validation_macro_ce": 0.9311249671979427
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.857973475009203,
+            "validation_macro_ce": 0.9693313329877257
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.6668547773297178,
+            "validation_macro_ce": 1.1114193006475315
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.49028042127611116,
+            "validation_macro_ce": 1.46002558005002
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.42497492481197696,
+            "validation_macro_ce": 1.1119518314415902
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.15747393026140344,
+            "validation_macro_ce": 1.1206197571660905
+          }
+        ],
+        "temperatures": [
+          2.7693183369056498,
+          2.531569358902036,
+          1.9339296773267134,
+          1.7678997203557718
+        ]
+      }
+    },
+    {
+      "name": "hybrid_prefix",
+      "seed": 73,
+      "path": "models\\hybrid_prefix-73.pth",
+      "sha256": "82207f29d5f3cf942478d4425099ef2c3037cee6d46647b6c9d9763731af8a59",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7962085308056872,
+          "correct_accepted_fraction": 0.669826224328594,
+          "coverage": 0.8278041074249605,
+          "selective_error": 0.19083969465648856,
+          "macro_f1": 0.700762896251618,
+          "benign_false_alert_rate": 0.1783783783783784,
+          "benign_review_rate": 0.14594594594594595,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.358974358974359,
+          "attack_recognition_rate": 0.6282051282051282,
+          "mean_packets": 7.164296998420221,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9973404255319149,
+              "recall": 0.6756756756756757,
+              "f1": 0.8055853920515574,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.21428571428571427,
+              "recall": 0.48214285714285715,
+              "f1": 0.2967032967032967,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.700762896251618,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              375,
+              99,
+              0,
+              81
+            ],
+            [
+              1,
+              27,
+              0,
+              28
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.8783783783783783,
+          "binary_attack_aupr": 0.4284858068105765,
+          "brier": 0.3250572719769383,
+          "ece_15_bins": 0.12802247283881177
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "torch",
+        "spec": {
+          "name": "hybrid_prefix",
+          "kind": "1d",
+          "hybrid": true,
+          "masked": true,
+          "fixed": null
+        },
+        "parameters": 242569,
+        "training_seconds": 16.669716099990183,
+        "history": [
+          {
+            "epoch": 1,
+            "training_loss": 3.6565891901263967,
+            "validation_macro_ce": 1.299551860555989
+          },
+          {
+            "epoch": 2,
+            "training_loss": 0.7892023270251229,
+            "validation_macro_ce": 0.6860568674076926
+          },
+          {
+            "epoch": 3,
+            "training_loss": 0.4199171772415866,
+            "validation_macro_ce": 0.48704961142397757
+          },
+          {
+            "epoch": 4,
+            "training_loss": 0.33227255212841555,
+            "validation_macro_ce": 0.5335528006357853
+          },
+          {
+            "epoch": 5,
+            "training_loss": 0.19746009111622698,
+            "validation_macro_ce": 0.6279813790147654
+          },
+          {
+            "epoch": 6,
+            "training_loss": 0.11056783463573083,
+            "validation_macro_ce": 0.4926102259120591
+          }
+        ],
+        "temperatures": [
+          1.9339296773267134,
+          1.4773776525985112,
+          1.031713995788588,
+          1.031713995788588
+        ]
+      }
+    },
+    {
+      "name": "logistic_behavior",
+      "seed": 73,
+      "path": "models\\logistic_behavior-73.joblib",
+      "sha256": "2fa4cd599d3fd390140f238288d6d7f4d8ad6f2029f5912cb6f04899dcf00313",
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7788309636650869,
+          "correct_accepted_fraction": 0.631911532385466,
+          "coverage": 0.7946287519747235,
+          "selective_error": 0.2047713717693837,
+          "macro_f1": 0.6338243640042441,
+          "benign_false_alert_rate": 0.12252252252252252,
+          "benign_review_rate": 0.23243243243243245,
+          "attack_accepted_benign_rate": 0.44871794871794873,
+          "attack_review_rate": 0.01282051282051282,
+          "attack_recognition_rate": 0.5384615384615384,
+          "mean_packets": 4.109004739336493,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.910941475826972,
+              "recall": 0.645045045045045,
+              "f1": 0.7552742616033755,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2916666666666667,
+              "recall": 0.5,
+              "f1": 0.3684210526315789,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 0.6363636363636364,
+              "f1": 0.7777777777777778,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6338243640042441,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              358,
+              68,
+              0,
+              129
+            ],
+            [
+              27,
+              28,
+              0,
+              1
+            ],
+            [
+              8,
+              0,
+              14,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.718018018018018,
+          "binary_attack_aupr": 0.3580674790646481,
+          "brier": 0.3615784050064292,
+          "ece_15_bins": 0.20218885330980607
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "sklearn",
+        "training_seconds": 1.1332977999991272,
+        "features": "18 causal behavior features; distinct input modality"
+      }
+    },
+    {
+      "name": "forest_behavior",
+      "seed": 73,
+      "path": "models\\forest_behavior-73.joblib",
+      "sha256": "af421d8c8292fbc5882c56a361a6bdf4e40ce711bcaa661fadf7196f421abe33",
+      "policy": {
+        "threshold": 0.9,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.717219589257504,
+          "correct_accepted_fraction": 0.11532385466034756,
+          "coverage": 0.1721958925750395,
+          "selective_error": 0.3302752293577982,
+          "macro_f1": 0.11324786324786325,
+          "benign_false_alert_rate": 0.06126126126126126,
+          "benign_review_rate": 0.818018018018018,
+          "attack_accepted_benign_rate": 0.02564102564102564,
+          "attack_review_rate": 0.8974358974358975,
+          "attack_recognition_rate": 0.07692307692307693,
+          "mean_packets": 10.611374407582938,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9710144927536232,
+              "recall": 0.12072072072072072,
+              "f1": 0.21474358974358973,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.15,
+              "recall": 0.10714285714285714,
+              "f1": 0.125,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.11324786324786325,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              67,
+              34,
+              0,
+              454
+            ],
+            [
+              0,
+              6,
+              0,
+              50
+            ],
+            [
+              2,
+              0,
+              0,
+              20
+            ]
+          ],
+          "binary_attack_auroc": 0.7549087549087551,
+          "binary_attack_aupr": 0.22047471328994656,
+          "brier": 0.3915293957117376,
+          "ece_15_bins": 0.23281294580259193
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "sklearn",
+        "training_seconds": 2.2294585000054212,
+        "features": "18 causal behavior features; distinct input modality"
+      }
+    },
+    {
+      "name": "kitnet18",
+      "seed": 73,
+      "path": "models\\kitnet18-73.joblib",
+      "sha256": "fac8cdf1b7b89661c309e7b9faf551520681b92b602cccaba2ab33108f81e5a2",
+      "metadata": {
+        "kind": "kitnet"
+      }
+    }
+  ],
+  "locked_at": "2026-11-01T16:50:51.477504+00:00",
+  "final_status": "not_evaluated"
+}

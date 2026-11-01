@@ -1,0 +1,436 @@
+{
+  "run_id": "adaptive-v1-20261101-r1",
+  "created_at": "2026-11-01T16:45:12.877355+00:00",
+  "protocol": {
+    "version": "adaptive-flow-research-v1",
+    "question": "Does uncertainty-driven additional packet context improve the accuracy-delay-cost tradeoff over fixed 16-packet decisions under source shift?",
+    "stages": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "bytes_per_packet": 32,
+    "seeds": [
+      17,
+      42,
+      73
+    ],
+    "epochs": 6,
+    "batch_size": 128,
+    "max_per_source": 1500,
+    "max_packets_per_source": 300000,
+    "thresholds": [
+      0.8,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "entropy_limit": 0.8,
+    "selection_benign_false_alert_budget": 0.01,
+    "selection_benign_review_budget": 0.2,
+    "aspirational_false_alert_budget": 0.001,
+    "aspirational_benign_review_budget": 0.05,
+    "final_holdout_sources": [
+      "research-ctu12",
+      "research-ctu13",
+      "research-normal13",
+      "research-normal14",
+      "research-normal18"
+    ],
+    "known_exposed_sources": [
+      "ctu10",
+      "friday",
+      "cse21-hoic",
+      "normal9-behavior"
+    ],
+    "unknown_family_policy": "NSIS.ay reserved from fitting, calibration, and policy selection; development HOIC is already inspected",
+    "promotion": "Research only. No replacement of the serving classifier or claims of novelty/independent reproduction."
+  },
+  "protocol_sha256": "0506de2283706be4e750508da52ce4c25d7bc323d02b42e1ae37c7fb87cd78ab",
+  "dataset": {
+    "version": "research-prefix-v1",
+    "sources": [
+      {
+        "source": "monday",
+        "group": "monday",
+        "split": "train",
+        "accepted": 1500,
+        "excluded": 0,
+        "sha256": "f1e3059cbfc1fafea425ccb4202ce1cbfe09d17c0fce98195638e52d880ecb46",
+        "classes": {
+          "('benign', 'benign')": 1500
+        }
+      },
+      {
+        "source": "normal7-behavior",
+        "group": "normal7-behavior",
+        "split": "train",
+        "accepted": 223,
+        "excluded": 0,
+        "sha256": "012f5bc1d8232c7b0890d1c7d9c1b4baeeefa6b82c1ff4e18368748d4f0ba3b8",
+        "classes": {
+          "('benign', 'benign')": 223
+        }
+      },
+      {
+        "source": "normal-dns",
+        "group": "normal-dns",
+        "split": "train",
+        "accepted": 1500,
+        "excluded": 0,
+        "sha256": "7fbefbe1a18867bc683f59890cbc0124e5f6166e5aa13035fcf1ccf2f06f7ae4",
+        "classes": {
+          "('benign', 'benign')": 1500
+        }
+      },
+      {
+        "source": "ctu1",
+        "group": "ctu1",
+        "split": "train",
+        "accepted": 745,
+        "excluded": 10664,
+        "sha256": "afd4b1c87ceb23c34cd0233ad1d7f508750aa2be7abb9bb924134a7461d3cdd2",
+        "classes": {
+          "('botnet', 'Neris')": 745
+        },
+        "label_sha256": "7c4073f6c8c6a4ed626acc39eb016f3df36a7032c7c557acf68d84130c160566",
+        "clock_alignment": {
+          "method": "median matched SYN start delta",
+          "matched_events": 510,
+          "offset_seconds": 0.4772799015045166,
+          "median_absolute_residual_seconds": 0.012186408042907715,
+          "join_tolerance_seconds": 0.037475221157073975,
+          "limitation": "independent flow-label audit remains required"
+        }
+      },
+      {
+        "source": "ctu2",
+        "group": "ctu2",
+        "split": "train",
+        "accepted": 1500,
+        "excluded": 2516,
+        "sha256": "ef28a016fbfa3d59896d6f82a717eb07091b2e14fc24a929c0b1f1c7a7601eb8",
+        "classes": {
+          "('botnet', 'Neris')": 1500
+        },
+        "label_sha256": "1eab7059e7a80a804843b4add994b05e824d64a109713fdb83a0db226fd23491",
+        "clock_alignment": {
+          "method": "median matched SYN start delta",
+          "matched_events": 2641,
+          "offset_seconds": 1.0150399208068848,
+          "median_absolute_residual_seconds": 0.00021195411682128906,
+          "join_tolerance_seconds": 0.07573426246643067,
+          "limitation": "independent flow-label audit remains required"
+        }
+      },
+      {
+        "source": "wednesday",
+        "group": "wednesday",
+        "split": "train",
+        "accepted": 1500,
+        "excluded": 327,
+        "sha256": "b174c6a9c790e41fa124e8c57ec634bd91a4a0b31dab4e4775e7954988aea8df",
+        "classes": {
+          "('ddos', 'wednesday')": 1500
+        }
+      },
+      {
+        "source": "cse",
+        "group": "cse",
+        "split": "train",
+        "accepted": 753,
+        "excluded": 0,
+        "sha256": "129e85a4cb0f3202165eed09f0fab04afac9f97624fa7ac3f676b1837d5b815d",
+        "classes": {
+          "('ddos', 'LOIC-HTTP')": 750,
+          "('ddos', 'LOIC-UDP')": 3
+        }
+      },
+      {
+        "source": "ctu-normal",
+        "group": "ctu-normal",
+        "split": "validation",
+        "accepted": 555,
+        "excluded": 0,
+        "sha256": "476c2d768494b7cf73cd795a4e5fa99755fae61d38ea7ad2a7e884893167ee35",
+        "classes": {
+          "('benign', 'benign')": 555
+        }
+      },
+      {
+        "source": "ctu9",
+        "group": "ctu9",
+        "split": "validation",
+        "accepted": 56,
+        "excluded": 4206,
+        "sha256": "a27cf23379dde85126a8a38a824fdb7dbfe0d9f7746ac841c1702ac1d06b3d08",
+        "classes": {
+          "('botnet', 'Neris')": 56
+        },
+        "label_sha256": "f1b64923e10a0900b1ed8ea91dd873733a6349c51a2a6941e0603bd4d2862c35",
+        "clock_alignment": {
+          "method": "unadjusted"
+        }
+      },
+      {
+        "source": "cse21",
+        "group": "cse21",
+        "split": "validation",
+        "accepted": 22,
+        "excluded": 0,
+        "sha256": "784aa56f4f7994f2fdc3be47d7110d532bd6916814a1cdbe701a46727536e1be",
+        "classes": {
+          "('ddos', 'LOIC-UDP')": 22
+        }
+      },
+      {
+        "source": "normal9-behavior",
+        "group": "ctu-win16-20160913",
+        "split": "development",
+        "accepted": 86,
+        "excluded": 0,
+        "sha256": "39fae2c5c731abf860f41c157faeaddf69d88f97d379c03056c172b56c7055c9",
+        "classes": {
+          "('benign', 'benign')": 86
+        }
+      },
+      {
+        "source": "ctu10",
+        "group": "ctu10",
+        "split": "development",
+        "accepted": 31,
+        "excluded": 286,
+        "sha256": "44bb65a53d5b838d45cf3b26b804c7099096c632306acda0e6a6a4406f16d219",
+        "classes": {
+          "('botnet', 'Rbot')": 31
+        },
+        "label_sha256": "048f87b340aedc97c41ae334bb63222d745ab63a12d627682241029848187179",
+        "clock_alignment": {
+          "method": "unadjusted"
+        }
+      },
+      {
+        "source": "friday",
+        "group": "friday",
+        "split": "development",
+        "accepted": 1500,
+        "excluded": 897,
+        "sha256": "c40b8a5086518d0abc04a5b5f4c04cd7870007179be173c59872be2996507005",
+        "classes": {
+          "('ddos', 'friday')": 1500
+        }
+      },
+      {
+        "source": "cse21-hoic",
+        "group": "cse21-hoic",
+        "split": "development",
+        "accepted": 1500,
+        "excluded": 0,
+        "sha256": "6e106b98c2b5e9f57a4be95d33cb390a30f56f6ab09d6f3b8ce42e587d72080b",
+        "classes": {
+          "('ddos', 'HOIC')": 1500
+        }
+      },
+      {
+        "source": "research-normal8a",
+        "group": "ctu-win16-20160913",
+        "split": "development",
+        "accepted": 161,
+        "excluded": 0,
+        "sha256": "235fc82d1abf0464675130a39eee4c3b047ac752edac3930444c4fd14d0ab266",
+        "classes": {
+          "('benign', 'benign')": 161
+        }
+      },
+      {
+        "source": "research-normal8b",
+        "group": "ctu-win16-20160913",
+        "split": "development",
+        "accepted": 136,
+        "excluded": 0,
+        "sha256": "220bd8e2801a278b28d484229152bd68dbbdc724889e8e95ca58e6f635149cb8",
+        "classes": {
+          "('benign', 'benign')": 136
+        }
+      },
+      {
+        "source": "research-normal13",
+        "group": "research-normal13",
+        "split": "final",
+        "accepted": 72,
+        "excluded": 0,
+        "sha256": "ebd495484e66dea49a7ff95f9ae7415b6a51a963713014ac0e822d2828afb2c7",
+        "classes": {
+          "('benign', 'benign')": 72
+        }
+      },
+      {
+        "source": "research-normal14",
+        "group": "research-normal14",
+        "split": "final",
+        "accepted": 178,
+        "excluded": 0,
+        "sha256": "6d67a0fc6f78e54b314123b370a23473fb90d9943d3874edb6b5a40eff44f3bc",
+        "classes": {
+          "('benign', 'benign')": 178
+        }
+      },
+      {
+        "source": "research-normal18",
+        "group": "research-normal18",
+        "split": "final",
+        "accepted": 1500,
+        "excluded": 0,
+        "sha256": "e09df1ac62d9753ed2360373915427432292192dc06e20572e45716a2932c8ce",
+        "classes": {
+          "('benign', 'benign')": 1500
+        }
+      },
+      {
+        "source": "research-ctu12",
+        "group": "research-ctu12",
+        "split": "final",
+        "accepted": 27,
+        "excluded": 598,
+        "sha256": "e0964d32128982b45d2f67dc8c91b7076139db621e5876e8f1924a85927994fd",
+        "classes": {
+          "('botnet', 'NSIS.ay')": 27
+        },
+        "label_sha256": "25bf52d7672d75a96074079207e710012bbcf5030a1eefac64096fc4a0ed6674",
+        "clock_alignment": {
+          "method": "unadjusted"
+        }
+      },
+      {
+        "source": "research-ctu13",
+        "group": "research-ctu13",
+        "split": "final",
+        "accepted": 37,
+        "excluded": 8920,
+        "sha256": "de173663be30ccea84f91410ed7ea0816db2d7b859da25bad543b656841ed97a",
+        "classes": {
+          "('botnet', 'Virut')": 37
+        },
+        "label_sha256": "a2fc65af834c191bcd381bfdc9ac4d4d4c5aa98d4ff57cb24b816bf58ae964cf",
+        "clock_alignment": {
+          "method": "unadjusted"
+        }
+      }
+    ],
+    "n": 13582,
+    "dataset_sha256": "ca242478b9aa82ebbee05106b0000da3ae3cf7f30efa7bcdfe950b954244110b",
+    "protocol_sha256": "0506de2283706be4e750508da52ce4c25d7bc323d02b42e1ae37c7fb87cd78ab",
+    "stages": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "behavior_features": [
+      "log_packets",
+      "log_bytes",
+      "log_duration",
+      "log_length_mean",
+      "log_length_std",
+      "log_iat_mean",
+      "log_iat_std",
+      "forward_fraction",
+      "syn_fraction",
+      "ack_fraction",
+      "rst_fraction",
+      "log_destination_packets_1s",
+      "log_destination_bytes_1s",
+      "log_destination_flows_1s",
+      "log_destination_senders_1s",
+      "tcp",
+      "udp",
+      "other"
+    ],
+    "synthetic_packets": false,
+    "session_policy": "First32, 30s idle, SYN ISN boundary; max8192 active; exact raw-event cross-split audit",
+    "sampling_policy": "First confirmed sessions per bounded source/family; not a representative population sample",
+    "limitations": [
+      "Small public subsets; publisher/schedule labels still need independent audit",
+      "Previously inspected sources are development evidence",
+      "No per-application ground truth for mixed normal traces",
+      "Final normal and attack sources remain small"
+    ],
+    "counts": {
+      "development": 3414,
+      "final": 1814,
+      "train": 7721,
+      "validation": 633
+    }
+  },
+  "code": {
+    "research\\run.py": "f1eb09fa1d5a74c135ecb3326b7e42265ddc756fb635e89e7538b87722282ff3",
+    "research\\models.py": "a5f00bd8ca7dc0fccba43dec02ee60d73a3445ecb2b431d3b78f7873e4069257",
+    "research\\adaptive.py": "63bbe12e9122592f92a7e067eb9c0f5a5341a714fa9309022dafeb03b84eea16",
+    "research\\metrics.py": "090bf5b8598fa1a70cb63bebd495ca0c773197e962da8d827c50fdfee3137242",
+    "research\\dataset.py": "1d42b33e27ea2da96f7909a4ab9003ba7395afcf08ae213738b61382185f2e01",
+    "data_processing\\production.py": "afa45a552e96ee72f51205e92b476022d896d75bb0570043845409446b9db1ca",
+    "classification\\behavior.py": "114f335fa33e1639a4b0d2184560ce406cd74732381662a14ac6b4003522c0f6",
+    "ml\\production_model.py": "f13f1c7d02d43f983d4f83288c23aa9099d40dbe4d2d4c0ac875cf17c2925cc9",
+    "research\\vendor\\kitnet\\corClust.py": "bbf46343def6d86b1088fceeb6de8c56a6d37b3b937f4e4ec4cf08982c30df27",
+    "research\\vendor\\kitnet\\dA.py": "40da7e367efc66c503949477aefb7f6176f2a2cd5e2c94bc8253c2b75c03c709",
+    "research\\vendor\\kitnet\\KitNET.py": "655793813f2c1bf2bbb6b357b82c6e735edcb19920bc4511622d9b6595895e7e",
+    "research\\vendor\\kitnet\\utils.py": "f11dd38fcbaff878bebc6e9abd676f17a1c0e41cbc1de57ecec27e7aeb468b72",
+    "research\\vendor\\kitnet\\__init__.py": "515f0def4373330ff5f6f8674c64e7c01dd755c1727ee1aa87fde6e4c5a5b2e5",
+    "research\\vendor\\kitnet\\UPSTREAM.json": "bb1cd96a9ada2142f9f232296f576af57306aed72bb682d7a54dd37f5245821d"
+  },
+  "environment": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "versions": {
+      "torch": "2.14.1+cu130",
+      "numpy": "2.5.4",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "onnxruntime": "1.31.1",
+      "onnx": "1.23.2"
+    }
+  },
+  "dataset_file": "frozen-v3.npz",
+  "final_status": "sealed_not_evaluated",
+  "independent_reproduction": "pending_external_person",
+  "models": [
+    {
+      "name": "resnet1d_prefix",
+      "kind": "1d",
+      "hybrid": false,
+      "masked": true,
+      "fixed": null
+    },
+    {
+      "name": "resnet1d_fixed16",
+      "kind": "1d",
+      "hybrid": false,
+      "masked": true,
+      "fixed": 16
+    },
+    {
+      "name": "resnet2d_prefix",
+      "kind": "2d",
+      "hybrid": false,
+      "masked": true,
+      "fixed": null
+    },
+    {
+      "name": "resnet1d_unmasked",
+      "kind": "1d",
+      "hybrid": false,
+      "masked": false,
+      "fixed": null
+    },
+    {
+      "name": "hybrid_prefix",
+      "kind": "1d",
+      "hybrid": true,
+      "masked": true,
+      "fixed": null
+    }
+  ]
+}

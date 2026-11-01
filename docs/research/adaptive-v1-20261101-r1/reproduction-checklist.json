@@ -1,0 +1,12 @@
+{
+  "status": "pending_external_person",
+  "steps": [
+    "Use a separate machine and person; record OS, hardware and dependency versions",
+    "Verify frozen dataset, protocol, model and code hashes",
+    "Reproduce preprocessing and compare session IDs and partition membership",
+    "Re-run all seeds without test-based tuning",
+    "Check confidence intervals and latency measurement scope",
+    "Record differences and a signed/date-stamped independent assessment"
+  ],
+  "warning": "An automated replay on this same machine is not independent reproduction"
+}

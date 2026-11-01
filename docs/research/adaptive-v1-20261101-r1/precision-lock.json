@@ -1,0 +1,534 @@
+{
+  "parent_lock_sha256": "6f4a790178a1f2ef08b4064124bfc13101e78772b33d72942bd5edce1e7efdbb",
+  "models": [
+    {
+      "name": "resnet1d_prefix_ort_fp32",
+      "seed": 17,
+      "path": "models\\prefix-17-fp32.onnx",
+      "sha256": "36bd11390d4f085d8a419f8f9e238d62b3bff8dd255d240d8b20d321031272ff",
+      "temperatures": [
+        2.314231388108565,
+        1.6161236149777574,
+        1.234597586767111,
+        1.234597586767111
+      ],
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8214849921011058,
+          "correct_accepted_fraction": 0.5971563981042654,
+          "coverage": 0.6429699842022117,
+          "selective_error": 0.07125307125307126,
+          "macro_f1": 0.6972408650260999,
+          "benign_false_alert_rate": 0.05225225225225225,
+          "benign_review_rate": 0.33693693693693694,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.5,
+          "attack_recognition_rate": 0.5,
+          "mean_packets": 9.285939968404424,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.6108108108108108,
+              "f1": 0.7583892617449665,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.3695652173913043,
+              "recall": 0.30357142857142855,
+              "f1": 0.3333333333333333,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6972408650260999,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              339,
+              29,
+              0,
+              187
+            ],
+            [
+              0,
+              17,
+              0,
+              39
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9269346269346269,
+          "binary_attack_aupr": 0.6865452205444964,
+          "brier": 0.22882886232584124,
+          "ece_15_bins": 0.09535765673403468
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "onnx"
+      }
+    },
+    {
+      "name": "resnet1d_prefix_ort_int8",
+      "seed": 17,
+      "path": "models\\prefix-17-int8.onnx",
+      "sha256": "f5cf4cf2b919dc113acc7340bb00656ebbb7d6d65eec52858872bf8839da0bf3",
+      "temperatures": [
+        2.531569358902036,
+        1.6161236149777574,
+        0.8621706218407219,
+        0.7204886084704594
+      ],
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8357030015797788,
+          "correct_accepted_fraction": 0.5876777251184834,
+          "coverage": 0.6350710900473934,
+          "selective_error": 0.07462686567164178,
+          "macro_f1": 0.7122890852962321,
+          "benign_false_alert_rate": 0.05405405405405406,
+          "benign_review_rate": 0.35315315315315315,
+          "attack_accepted_benign_rate": 0.0,
+          "attack_review_rate": 0.44871794871794873,
+          "attack_recognition_rate": 0.5512820512820513,
+          "mean_packets": 7.921011058451817,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 1.0,
+              "recall": 0.5927927927927928,
+              "f1": 0.744343891402715,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.4117647058823529,
+              "recall": 0.375,
+              "f1": 0.3925233644859813,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7122890852962321,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              329,
+              30,
+              0,
+              196
+            ],
+            [
+              0,
+              21,
+              0,
+              35
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9219912219912221,
+          "binary_attack_aupr": 0.6782363469497018,
+          "brier": 0.24538505655703546,
+          "ece_15_bins": 0.07048256652778387
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "onnx"
+      }
+    },
+    {
+      "name": "resnet1d_prefix_ort_fp32",
+      "seed": 42,
+      "path": "models\\prefix-42-fp32.onnx",
+      "sha256": "0aa00501f059da141773e6af46fade44161cee4ea85b7200cc05d3432406c790",
+      "temperatures": [
+        2.1155521174540106,
+        1.7678997203557718,
+        1.234597586767111,
+        1.234597586767111
+      ],
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.693522906793049,
+          "correct_accepted_fraction": 0.6492890995260664,
+          "coverage": 0.8404423380726699,
+          "selective_error": 0.2274436090225564,
+          "macro_f1": 0.7219385867554569,
+          "benign_false_alert_rate": 0.21621621621621623,
+          "benign_review_rate": 0.16216216216216217,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.14102564102564102,
+          "attack_recognition_rate": 0.8461538461538461,
+          "mean_packets": 6.131121642969984,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9971098265895953,
+              "recall": 0.6216216216216216,
+              "f1": 0.7658157602663707,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2682926829268293,
+              "recall": 0.7857142857142857,
+              "f1": 0.4,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7219385867554569,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              345,
+              120,
+              0,
+              90
+            ],
+            [
+              1,
+              44,
+              0,
+              11
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.8724647724647725,
+          "binary_attack_aupr": 0.463875712007904,
+          "brier": 0.4681428125977759,
+          "ece_15_bins": 0.22745105557001405
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "onnx"
+      }
+    },
+    {
+      "name": "resnet1d_prefix_ort_int8",
+      "seed": 42,
+      "path": "models\\prefix-42-int8.onnx",
+      "sha256": "31187ed07718e338c9c0528e139020f07d2b10d86161e1061f66291807098287",
+      "temperatures": [
+        2.1155521174540106,
+        1.7678997203557718,
+        1.234597586767111,
+        1.1286060470485015
+      ],
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.69826224328594,
+          "correct_accepted_fraction": 0.6524486571879937,
+          "coverage": 0.8420221169036335,
+          "selective_error": 0.225140712945591,
+          "macro_f1": 0.7234585880651506,
+          "benign_false_alert_rate": 0.21441441441441442,
+          "benign_review_rate": 0.16036036036036036,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.14102564102564102,
+          "attack_recognition_rate": 0.8461538461538461,
+          "mean_packets": 6.1469194312796205,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9971264367816092,
+              "recall": 0.6252252252252253,
+              "f1": 0.7685492801771872,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.26993865030674846,
+              "recall": 0.7857142857142857,
+              "f1": 0.4018264840182648,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7234585880651506,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              347,
+              119,
+              0,
+              89
+            ],
+            [
+              1,
+              44,
+              0,
+              11
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.8778239778239779,
+          "binary_attack_aupr": 0.4692323599106902,
+          "brier": 0.4626102870370901,
+          "ece_15_bins": 0.20152731518855282
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "onnx"
+      }
+    },
+    {
+      "name": "resnet1d_prefix_ort_fp32",
+      "seed": 73,
+      "path": "models\\prefix-73-fp32.onnx",
+      "sha256": "8e74bfcf4685801bb707974609f5b87b5cbd85e4af297510b999fceeac4e5107",
+      "temperatures": [
+        3.313896825757729,
+        2.1155521174540106,
+        1.031713995788588,
+        0.7881523403467965
+      ],
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.7867298578199052,
+          "correct_accepted_fraction": 0.5924170616113744,
+          "coverage": 0.7330173775671406,
+          "selective_error": 0.19181034482758622,
+          "macro_f1": 0.6959236359691939,
+          "benign_false_alert_rate": 0.15855855855855855,
+          "benign_review_rate": 0.26126126126126126,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.3076923076923077,
+          "attack_recognition_rate": 0.6794871794871795,
+          "mean_packets": 6.2385466034755135,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9969040247678018,
+              "recall": 0.5801801801801801,
+              "f1": 0.7334851936218679,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.2605042016806723,
+              "recall": 0.5535714285714286,
+              "f1": 0.35428571428571426,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.6959236359691939,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              322,
+              88,
+              0,
+              145
+            ],
+            [
+              1,
+              31,
+              0,
+              24
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9219219219219218,
+          "binary_attack_aupr": 0.6959445371299385,
+          "brier": 0.3045229664166395,
+          "ece_15_bins": 0.14841794968268102
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "onnx"
+      }
+    },
+    {
+      "name": "resnet1d_prefix_ort_int8",
+      "seed": 73,
+      "path": "models\\prefix-73-int8.onnx",
+      "sha256": "343abf4454483ffa7f76d4ce7c2e70c9c8010c1a74cb06d4ac005e5a5c332469",
+      "temperatures": [
+        3.313896825757729,
+        2.1155521174540106,
+        1.1286060470485015,
+        0.7881523403467965
+      ],
+      "policy": {
+        "threshold": 0.8,
+        "feasible": false,
+        "validation_metrics": {
+          "n": 633,
+          "accuracy_before_rejection": 0.8025276461295419,
+          "correct_accepted_fraction": 0.641390205371248,
+          "coverage": 0.7693522906793049,
+          "selective_error": 0.16632443531827515,
+          "macro_f1": 0.7159783842655724,
+          "benign_false_alert_rate": 0.14414414414414414,
+          "benign_review_rate": 0.21981981981981982,
+          "attack_accepted_benign_rate": 0.01282051282051282,
+          "attack_review_rate": 0.3076923076923077,
+          "attack_recognition_rate": 0.6794871794871795,
+          "mean_packets": 7.499210110584518,
+          "per_class": [
+            {
+              "label": 0,
+              "precision": 0.9971751412429378,
+              "recall": 0.6360360360360361,
+              "f1": 0.7766776677667767,
+              "support": 555
+            },
+            {
+              "label": 1,
+              "precision": 0.27927927927927926,
+              "recall": 0.5535714285714286,
+              "f1": 0.3712574850299401,
+              "support": 56
+            },
+            {
+              "label": 2,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 22
+            }
+          ],
+          "evaluated_classes": [
+            0,
+            1,
+            2
+          ],
+          "macro_f1_present_classes": 0.7159783842655724,
+          "macro_f1_scope": "Fixed three-class macro includes absent classes with F1=0; present-class metric is separate",
+          "confusion_true_rows_prediction_columns_0_1_2_review": [
+            [
+              353,
+              80,
+              0,
+              122
+            ],
+            [
+              1,
+              31,
+              0,
+              24
+            ],
+            [
+              0,
+              0,
+              22,
+              0
+            ]
+          ],
+          "binary_attack_auroc": 0.9001155001155001,
+          "binary_attack_aupr": 0.5807107851887825,
+          "brier": 0.3151406460318404,
+          "ece_15_bins": 0.11550361974254075
+        },
+        "selection": "Validation only; minimize constraint violation then packets; infeasible is never a deployment pass"
+      },
+      "metadata": {
+        "kind": "onnx"
+      }
+    }
+  ],
+  "calibration_session_hash": "99791fb6335749d69cbee416c6e3167c2eba088e3a8dac768c3ce519f99fe8e2"
+}
